@@ -2,7 +2,7 @@ import 'package:formz/formz.dart';
 import 'package:flutter/material.dart';
 
 enum ConfirmedPasswordValidationError {
-  invalid,
+  empty,
   mismatch,
 }
 
@@ -18,15 +18,20 @@ class ConfirmPassword
   @override
   ConfirmedPasswordValidationError? validator(String value) {
     if (value.isEmpty) {
-      return ConfirmedPasswordValidationError.invalid;
+      return ConfirmedPasswordValidationError.empty;
     }
     return password == value ? null : ConfirmedPasswordValidationError.mismatch;
   }
+
+  //valid
 }
+
 
 extension Explanation on ConfirmedPasswordValidationError {
   String? get name {
     switch (this) {
+      case ConfirmedPasswordValidationError.empty:
+        return "Please fill the confirm password field";
       case ConfirmedPasswordValidationError.mismatch:
         return 'passwords must match';
       default:

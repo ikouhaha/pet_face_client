@@ -1,0 +1,366 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pet_saver_client/common/config.dart';
+import 'package:pet_saver_client/common/helper.dart';
+import 'package:pet_saver_client/common/http-common.dart';
+import 'package:pet_saver_client/common/image_field.dart';
+import 'package:pet_saver_client/common/validations.dart';
+import 'package:pet_saver_client/components/auth_dropdown_field.dart';
+import 'package:pet_saver_client/components/auth_text_field.dart';
+import 'package:pet_saver_client/components/pet_card.dart';
+import 'package:pet_saver_client/models/formController.dart';
+import 'package:pet_saver_client/models/options.dart';
+import 'package:pet_saver_client/models/pet.dart';
+import 'package:pet_saver_client/models/petDetect.dart';
+
+import 'package:pet_saver_client/providers/global_provider.dart';
+import 'package:pet_saver_client/router/route_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+Future<List<PetModel>> fetchPetProfile(
+    {required  ref}) async {
+  var token = ref.read(GlobalProvider).token;
+  var response =
+      await Http.get(url: "/pets/profile", authorization: token, ref: ref);
+  List<PetModel> pets = petModelFromJson(json.encode(response.data));
+  return pets;
+}
+
+final _getProfileProvider =
+    FutureProvider.autoDispose<List<PetModel>>((ref) async {
+  return fetchPetProfile(ref: ref);
+});
+
+final StateNotifierProvider<PetSettingPageState, int> SettingPageProvider =
+    StateNotifierProvider<PetSettingPageState, int>(
+        (_) => PetSettingPageState());
+
+class PetSettingPageState extends StateNotifier<int> {
+  PetSettingPageState() : super(0);
+
+  void setState(num) => {state = num};
+  final _editKeyForm = GlobalKey<FormState>();
+
+  @override
+  String toString() {
+    return 'state：$state';
+  }
+}
+
+class PetSettingPage extends ConsumerStatefulWidget {
+  const PetSettingPage({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  _SettingScreenState createState() => _SettingScreenState();
+}
+
+class _SettingScreenState extends ConsumerState {
+  //final _petname = FormController();
+  final _name = FormController();
+  final _editKeyForm = GlobalKey<FormState>();
+  final _createKeyForm = GlobalKey<FormState>();
+  bool load = false;
+  XFile? file;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _name.dispose();
+  }
+  @override
+  didChangeDependencies(){
+    super.didChangeDependencies();
+
+ 
+    
+  }
+  void loadPage() {
+    ref.refresh(_getProfileProvider);
+  }
+  Alert editAlert(PetModel pet) {
+    _name.ct.text = pet.name!;
+    List<PetDetectResponse> results = [];
+
+    return Alert(
+        context: context,
+        title: "Submit",
+        content: Form(
+            key: _editKeyForm,
+            child: Column(
+              children: <Widget>[
+                ImageField(
+                    image: null,
+                    callback: (file, setImg) async {
+                      try {
+                        EasyLoading.showProgress(0.3, status: 'detecting...');
+                        Response response = await Http.postImage(
+                            server: Config.pythonApiServer,
+                            url: "/detectBase64",
+                            imageFile: file);
+                        pet.imageBase64 = await Helper.imageToBase64(file);
+                        results = petDetectResponseFromJson(
+                            json.encode(response.data["result"]));
+                        print(results);
+                        //todo make it to multiple, currently just support a pet a image
+                        if (results.length > 0) {
+                          setState(() {
+                            Image img = Helper.getImageByBase64orHttp(
+                                results[0].labelImg!);
+                            setImg(img);
+                          });
+                        }
+                      } catch (e) {
+                        print(e);
+                      } finally {
+                        EasyLoading.dismiss();
+                      }
+
+                      //ref.read(RegisterProvider).setImage(value)
+                    }),
+                _NameField(),
+                _BreedsField(),
+              ],
+            )),
+        buttons: [
+          DialogButton(
+            width: 300,
+            onPressed: () async {
+              try {
+                if (_editKeyForm.currentState!.validate()) {
+                  EasyLoading.showProgress(0.3, status: 'updating...');
+                  pet.cropImgBase64 = results[0].cropImgs![0];
+                  pet.type = results[0].name;
+                  Response response = await Http.put(
+                      ref: ref, url: "/pets/${pet.id}", data: pet.toJson());
+
+                  EasyLoading.showSuccess("update success");
+                }
+
+                //todo make it to multiple, currently just support a pet a image
+
+              } catch (e) {
+                EasyLoading.showError(e.toString());
+              } finally {
+                EasyLoading.dismiss();
+              }
+            },
+            child: Text(
+              "Submit",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]);
+  }
+
+  Alert createAlert() {
+    PetModel pet = new PetModel();
+    //to do change it to form input
+
+    List<PetDetectResponse> results = [];
+
+    return Alert(
+        context: context,
+        title: "Submit",
+        content: Form(
+            key: _createKeyForm,
+            child: Column(
+              children: <Widget>[
+                ImageField(
+                    image: null,
+                    callback: (file, setImg) async {
+                      try {
+                        EasyLoading.showProgress(0.3, status: 'detecting...');
+                        Response response = await Http.postImage(
+                            server: Config.pythonApiServer,
+                            url: "/detectBase64",
+                            imageFile: file);
+                        pet.imageBase64 = await Helper.imageToBase64(file);
+                        results = petDetectResponseFromJson(
+                            json.encode(response.data["result"]));
+                        print(results);
+                        //todo make it to multiple, currently just support a pet a image
+                        if (results.length > 0) {
+                          setState(() {
+                            Image img = Helper.getImageByBase64orHttp(
+                                results[0].labelImg!);
+                            setImg(img);
+                          });
+                        }
+                        
+                      } catch (e) {
+                        print(e);
+                      } finally {
+                        EasyLoading.dismiss();
+                      }
+
+                      //ref.read(RegisterProvider).setImage(value)
+                    }),
+                _NameField(),
+                _BreedsField(),
+              ],
+            )),
+        buttons: [
+          DialogButton(
+            width: 300,
+            onPressed: () async {
+              try {
+                if (_createKeyForm.currentState!.validate()) {
+                  pet.name = _name.ct.text;
+                  pet.about = "about";
+                  pet.breedId = 1;
+                  EasyLoading.showProgress(0.3, status: 'creating...');
+                  pet.cropImgBase64 = results[0].cropImgs![0];
+                  pet.type = results[0].name;
+                  Response response = await Http.post(
+                      ref: ref, url: "/pets", data: pet.toJson());
+
+                 
+                  Navigator.of(context, rootNavigator: true).pop();
+                  await EasyLoading.showSuccess("create success");
+                  
+                  loadPage();
+                }
+
+                //todo make it to multiple, currently just support a pet a image
+
+              } catch (e) {
+                EasyLoading.showError(e.toString());
+              } finally {
+                EasyLoading.dismiss();
+              }
+            },
+            child: Text(
+              "Submit",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+          )
+        ]);
+  }
+
+  showConfirmDelete(PetModel pet) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Text('Delete'),
+              content: Text("Are you sure you want to delete this pet?"),
+              actions: [
+                TextButton(
+                    onPressed: () async {
+                      try {
+                         Navigator.of(ctx).pop(false);
+                        EasyLoading.showProgress(0.3, status: 'deleting...');
+                        Response response =
+                            await Http.delete(ref: ref, url: "/pets/${pet.id}");
+                        EasyLoading.showSuccess("delete success");
+                        loadPage();
+                       
+                      } catch (e) {
+                        EasyLoading.showError(e.toString());
+                      } finally {
+                        EasyLoading.dismiss();
+                      }
+                    },
+                    child: Text("Yes"))
+              ],
+            ));
+  }
+
+  RouteState get _routeState => RouteStateScope.of(context);
+
+  @override
+  Widget build(BuildContext context) {
+    var provider = ref.watch(_getProfileProvider);
+    var size = MediaQuery.of(context).size;
+    
+    /*24 is for notification bar on Android*/
+    final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
+    final double itemWidth = size.width / 2;
+    return provider.when(
+        loading: () => Center(
+              child: CircularProgressIndicator(),
+            ),
+        error: (err, stack) => Text('Error: $err'),
+        data: (profiles) {
+          print(profiles);
+          return Scaffold(
+            body: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisExtent: 320,
+                childAspectRatio: 1.0,
+              ),
+              itemCount: profiles.length,
+              itemBuilder: (context, index) {
+                return PetCard(
+                    profile: profiles[index],
+                    editCallback: (profile) {
+                      print(profile);
+                      editAlert(profile).show();
+                    },
+                    deleteCallback: (profile) {
+                      showConfirmDelete(profile);
+                    });
+              },
+            ),
+            floatingActionButton: _createButton(),
+          );
+        });
+  }
+
+  Widget _PetNameInputField() {
+    return AuthTextField(
+        controller: _name.ct,
+        icon: Icon(Icons.pets),
+        hint: 'Pet Name',
+        key: const Key('name'),
+        keyboardType: TextInputType.text);
+  }
+
+  Widget _NameField() {
+    return AuthTextField(
+        key: const Key('email'),
+        focusNode: _name.fn,
+        icon: Icon(Icons.pets),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        controller: _name.ct,
+        hint: 'Name',
+        keyboardType: TextInputType.text,
+        validator: (value) => Validations.validateName(value));
+  }
+
+  Widget _BreedsField() {
+    return AuthDropDownField(
+        key: const Key('breeds'),
+        icon: Icon(Icons.list),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'Breeds',
+        //validator: (value) => Validations.validateName(value),
+        options: [
+          Option(name: "cat", value: "cat"),
+          Option(name: "dog", value: "dog")
+        ]);
+  }
+
+  Widget _createButton() {
+    return FloatingActionButton(
+      onPressed: () => createAlert().show(),
+      child: const Icon(Icons.add),
+    );
+  }
+
+}

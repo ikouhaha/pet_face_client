@@ -4,7 +4,7 @@ enum EmailValidationError { empty,invalid }
 
 class Email extends FormzInput<String, EmailValidationError> {
   const Email.pure() : super.pure('');
-  const Email.dirty([String value = '']) : super.dirty(value);
+  const Email.dirty([String value = '' ]) : super.dirty(value);
 
   static final RegExp _emailRegExp = RegExp(
     r'^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$',
@@ -17,15 +17,13 @@ class Email extends FormzInput<String, EmailValidationError> {
     }   
     return _emailRegExp.hasMatch(value) ? null : EmailValidationError.invalid;
   }
-
-  
 }
-
-
 
 extension Explanation on EmailValidationError {
   String? get name {
     switch(this) {
+      case EmailValidationError.empty:
+        return "Please fill the email field";
       case EmailValidationError.invalid:
         return "This is not a valid email";
       default:

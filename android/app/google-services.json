@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "544220858909",
+    "project_id": "petsaver-81af2",
+    "storage_bucket": "petsaver-81af2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544220858909:android:cbe379b7a06eedacdd14f4",
+        "android_client_info": {
+          "package_name": "com.example.pet_saver_client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "544220858909-ltnnkg4brkulai9010uhmfavlic21tv5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pet_saver_client",
+            "certificate_hash": "ec328a89f15283ea59876b3631941fe5bab8cee7"
+          }
+        },
+        {
+          "client_id": "544220858909-veskdu6cic4thmb0kc8dabhb1tes7j9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1lt55n-Ey9ANv7iMylgb48z_otVhzDro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "544220858909-veskdu6cic4thmb0kc8dabhb1tes7j9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

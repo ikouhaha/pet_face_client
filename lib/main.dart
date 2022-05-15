@@ -1,51 +1,37 @@
-import 'package:bloc/bloc.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_navigator_v2/common/app_bloc_observer.dart';
-import 'package:flutter_navigator_v2/pages/home.dart';
-import 'package:flutter_navigator_v2/router/route_parser.dart';
-import 'package:flutter_navigator_v2/router/router_delegate.dart';
+import 'package:pet_saver_client/app.dart';
+import 'package:pet_saver_client/pages/home.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
 
-   BlocOverrides.runZoned(
-    () => runApp(const MyApp()),
-    blocObserver: AppBlocObserver(),
-  );
-
-  //runApp(const );
-
-  
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+class Logger extends ProviderObserver {
   @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final delegate = MyRouteDelegate(
-    onGenerateRoute: (RouteSettings settings) {
-      return MaterialPageRoute(
-        settings: settings,
-        builder: (BuildContext context) {
-          return const HomePage();
-        },
-      );
-    },
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      routeInformationParser: MyRouteParser(), // 路由信息解析
-      routerDelegate: delegate, // 路由代理
-    );
+  void didUpdateProvider(
+    ProviderBase provider,
+    Object? previousValue,
+    Object? newValue,
+    ProviderContainer container,
+  ) {
+    var value = newValue.toString();
+    print('''
+{
+  "provider": "${provider.name ?? provider.runtimeType}",
+  "newValue": "$value"
+}''');
   }
+}
+
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(
+     ProviderScope(observers: [Logger()], child:  App())
+  );
+  //runApp(const );
 }
