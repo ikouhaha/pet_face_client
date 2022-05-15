@@ -31,16 +31,11 @@ class _BookstoreState extends ConsumerState<App> {
         '/',
         '/signin',
         '/signup',
-        '/authors',
+        '/post',
         '/settings',
-        '/pets',
-        '/post/:id',
-        '/books/new',
-        '/books/all',
-        '/books/popular',
-        '/book/:bookId',
-      
-        '/author/:authorId',
+        '/mypost',
+        '/new/post',
+        '/post/:id'
       ],
       guard: _guard,
       

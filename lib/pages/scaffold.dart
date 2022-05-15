@@ -84,8 +84,8 @@ class MyScaffoldState extends ConsumerState {
               onDestinationSelected: (idx) {
                 print(idx);
                 if (idx == 0) routeState.go('/');
-                if (idx == 1) routeState.go('/authors');
-                if (idx == 2) routeState.go('/pets');
+                if (idx == 1) routeState.go('/new/post');
+                if (idx == 2) routeState.go('/mypost');
                 if (idx == 3) routeState.go('/settings');
               },
               destinations: const [
@@ -94,12 +94,12 @@ class MyScaffoldState extends ConsumerState {
                   icon: Icons.home,
                 ),
                 AdaptiveScaffoldDestination(
-                  title: 'Authors',
-                  icon: Icons.person,
+                  title: 'Post',
+                  icon: Icons.post_add,
                 ),
                 AdaptiveScaffoldDestination(
                   title: 'Pets',
-                  icon: Icons.pets,
+                  icon: Icons.location_history,
                 ),
                   AdaptiveScaffoldDestination(
                   title: 'Settings',
@@ -113,8 +113,8 @@ class MyScaffoldState extends ConsumerState {
 
   int _getSelectedIndex(String pathTemplate) {
     if (pathTemplate == '/') return 0;
-    if (pathTemplate == '/authors') return 1;
-    if (pathTemplate == '/pets') return 2;
+    if (pathTemplate == '/new/post') return 1;
+    if (pathTemplate == '/mypost') return 2;
     if (pathTemplate == '/settings') return 3;
     return 0;
   }

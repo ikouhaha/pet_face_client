@@ -15,6 +15,7 @@ class AuthTextField extends StatelessWidget {
   final TextEditingController? controller;  
   final Function? validator;
   final FocusNode? focusNode;
+  final int? maxLines;
   
 
   const AuthTextField({
@@ -32,6 +33,7 @@ class AuthTextField extends StatelessWidget {
     this.padding = const EdgeInsets.all(0),
     this.icon = null,
     this.initialValue = null,
+    this.maxLines = 1,
     
   }):super(key: key);
 
@@ -70,7 +72,7 @@ class AuthTextField extends StatelessWidget {
             autocorrect: false,
             textInputAction: TextInputAction.done,
             obscureText: isPasswordField,
-            maxLines: 1,
+            maxLines: maxLines,
             onChanged: onChanged,
             validator: (value){
               

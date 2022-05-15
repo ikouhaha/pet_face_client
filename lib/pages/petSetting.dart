@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/helper.dart';
@@ -39,24 +40,9 @@ final _getProfileProvider =
   return fetchPetProfile(ref: ref);
 });
 
-final StateNotifierProvider<PetSettingPageState, int> SettingPageProvider =
-    StateNotifierProvider<PetSettingPageState, int>(
-        (_) => PetSettingPageState());
 
-class PetSettingPageState extends StateNotifier<int> {
-  PetSettingPageState() : super(0);
-
-  void setState(num) => {state = num};
-  final _editKeyForm = GlobalKey<FormState>();
-
-  @override
-  String toString() {
-    return 'state：$state';
-  }
-}
-
-class PetSettingPage extends ConsumerStatefulWidget {
-  const PetSettingPage({
+class PostPage extends ConsumerStatefulWidget {
+  const PostPage({
     Key? key,
   }) : super(key: key);
 
@@ -298,15 +284,13 @@ class _SettingScreenState extends ConsumerState {
         data: (profiles) {
           print(profiles);
           return Scaffold(
-            body: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisExtent: 320,
-                childAspectRatio: 1.0,
-              ),
+            body: MasonryGridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
               itemCount: profiles.length,
               itemBuilder: (context, index) {
-                return PetCard(
+                 return PetCard(
                     profile: profiles[index],
                     editCallback: (profile) {
                       print(profile);

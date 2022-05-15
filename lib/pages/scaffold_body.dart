@@ -3,9 +3,11 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:pet_saver_client/pages/post.dart';
 import 'package:pet_saver_client/pages/home.dart';
 import 'package:pet_saver_client/pages/list.dart';
 import 'package:pet_saver_client/pages/petSetting.dart';
+import 'package:pet_saver_client/pages/postDetail.dart';
 import 'package:pet_saver_client/pages/setting.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 
@@ -41,15 +43,21 @@ class BookstoreScaffoldBody extends StatelessWidget {
             key: ValueKey('settings'),
             child: SettingPage(),
           )
-           else if (currentRoute.pathTemplate== '/pets')
+           else if (currentRoute.pathTemplate== '/mypost')
           const FadeTransitionPage<void>(
             key: ValueKey('pets'),
-            child: PetSettingPage(),
+            child: PostPage(),
           )
-        else if (currentRoute.pathTemplate == ('/authors'))
+          else if (currentRoute.pathTemplate == '/new/post')
           const FadeTransitionPage<void>(
-            key: ValueKey('list'),
-            child: ListPage(),
+            key: ValueKey('pets'),
+            child: CreatePostPage(),
+          )
+
+          else if (currentRoute.pathTemplate == '/post/:id')
+          const FadeTransitionPage<void>(
+            key: ValueKey('pets'),
+            child: PostDetailPage(),
           )
 
         // Avoid building a Navigator with an empty `pages` list when the

@@ -96,13 +96,21 @@ class _PetCardState extends ConsumerState<PetCard>
                  
                 ),
               ),              
-              ListTile(
+               ListTile(
+                minLeadingWidth: 2,
                 leading: Icon(Icons.pets),
-                title: Text("${_pet.name}"),
-                subtitle: Text(
-                  "${_pet.breed["bred_for"]}",
-                  style: TextStyle(color: Colors.black.withOpacity(0.6)),
-                ),
+                title: Text("${_pet.type}"),
+                
+              ),
+              ListTile(
+                minLeadingWidth: 2,
+                leading: Icon(Icons.lock_clock),
+                title: Text("a day ago"),
+              ),
+               ListTile(
+                minLeadingWidth: 2,
+                leading: Icon(Icons.location_on_rounded),
+                title: Text("Tuen Mun District"),
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),

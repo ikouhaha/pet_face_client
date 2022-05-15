@@ -19,7 +19,6 @@ import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/options.dart';
 import 'package:pet_saver_client/models/pet.dart';
 import 'package:pet_saver_client/models/petDetect.dart';
-import 'package:pet_saver_client/pages/petSetting.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -42,9 +41,6 @@ final _getProfileProvider =
   return fetchPetProfile(ref: ref);
 });
 
-final StateNotifierProvider<PetSettingPageState, int> SettingPageProvider =
-    StateNotifierProvider<PetSettingPageState, int>(
-        (_) => PetSettingPageState());
 
 class HomePage extends ConsumerStatefulWidget {
   @override
@@ -151,7 +147,18 @@ class _HomePageState extends ConsumerState {
               ],
             )),
         buttons: [
+        
           DialogButton(
+            color: Colors.transparent,
+            onPressed: ()  {
+             
+            },
+            child: Text(
+              "Reset",
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+            DialogButton(
             onPressed: () async {
               try {
                 if (_createKeyForm.currentState!.validate()) {
@@ -182,7 +189,9 @@ class _HomePageState extends ConsumerState {
               "Submit",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
-          )
+          ),
+        
+        
         ]);
   }
 

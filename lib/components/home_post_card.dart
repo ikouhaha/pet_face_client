@@ -2,6 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:pet_saver_client/router/route_state.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pet_saver_client/common/config.dart';
 
@@ -126,7 +127,7 @@ class _PostCardState extends ConsumerState<PostCard>
               
               CupertinoButton(
                 onPressed: (){
-                  print(_pet);
+                   RouteStateScope.of(context).go("/post/${_pet.id}");
                 },
                 child:Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -145,6 +146,7 @@ class _PostCardState extends ConsumerState<PostCard>
             ],
           )),
     );
+  
   }
 
   Widget _saveButtons() {
