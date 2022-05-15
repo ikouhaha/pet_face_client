@@ -2,6 +2,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:pet_saver_client/router/route_state.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pet_saver_client/common/config.dart';
 
@@ -15,6 +16,7 @@ class PetCard extends ConsumerStatefulWidget {
   final PetModel profile;
   final ValueChanged<PetModel>? editCallback;
   final ValueChanged<PetModel>? deleteCallback;
+  
   const PetCard({Key? key, required this.profile, this.editCallback,this.deleteCallback})
       : super(key: key);
 
@@ -143,6 +145,13 @@ class _PetCardState extends ConsumerState<PetCard>
           onPressed: () =>
               widget.deleteCallback == null ? null : widget.deleteCallback!(_pet),
           child: const Text('delete'),
+        ),
+        FlatButton(
+          textColor: const Color(0xFF6200EE),
+          onPressed: () { 
+            RouteStateScope.of(context).go("/post/${_pet.id}");
+          },
+          child: const Text('view'),
         )
       ],
     );

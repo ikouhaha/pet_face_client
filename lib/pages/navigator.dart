@@ -53,7 +53,8 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
             (route.settings as Page).key == _authorDetailsKey) {
           routeState.go('/authors');
         }
-
+        
+        
         return route.didPop(result);
       },
       pages: [

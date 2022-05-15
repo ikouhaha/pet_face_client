@@ -300,8 +300,7 @@ class _SettingScreenState extends ConsumerState {
                       showConfirmDelete(profile);
                     });
               },
-            ),
-            floatingActionButton: _createButton(),
+            )
           );
         });
   }
@@ -340,11 +339,6 @@ class _SettingScreenState extends ConsumerState {
         ]);
   }
 
-  Widget _createButton() {
-    return FloatingActionButton(
-      onPressed: () => createAlert().show(),
-      child: const Icon(Icons.add),
-    );
-  }
+ 
 
 }
