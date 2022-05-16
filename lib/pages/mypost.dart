@@ -24,9 +24,8 @@ import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-Future<List<PetModel>> fetchPetProfile() async {  
-  var response =
-      await Http.get(url: "/pets/profile" );
+Future<List<PetModel>> fetchPetProfile() async {
+  var response = await Http.get(url: "/pets/profile");
   List<PetModel> pets = petModelFromJson(json.encode(response.data));
   return pets;
 }
@@ -61,7 +60,6 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
     _keyForm.currentState?.dispose();
   }
 
-
   // void _handleBookTapped(Book book) {
   //   _routeState.go('/book/${book.id}');
   // }
@@ -71,63 +69,57 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
     var provider = ref.watch(_getProfileProvider);
     //return const Center(child: Text("asdsd"));
 
-
-    return provider.when(
-        loading: (){
-          EasyLoading.show(status: "Loading...",maskType: EasyLoadingMaskType.black);
-          return Center(child: CircularProgressIndicator());
-        },
-        error: (dynamic err, stack) {
+    return provider.when(loading: () {
+      return Center(child: CircularProgressIndicator());
+    },  error: (dynamic err, stack) {
           if (err.message == "Unauthorized") {
             ref.read(GlobalProvider).logout();
             RouteStateScope.of(context).go("/signin");
           }
 
           return Text("Error: ${err}");
-        },
+        }, 
         data: (profile) {
-          EasyLoading.dismiss();
-          print(profile);
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Create Post'),
-              foregroundColor: Color(Colors.black.value),
-              backgroundColor: Color(Colors.white.value),
-              leading: GestureDetector(
-                onTap: () {
-                  RouteStateScope.of(context).go("/");
-                },
-                child: const Icon(
-                  Icons.arrow_back, // add custom icons also
-                ),
-              ),
+      print(profile);
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Create Post'),
+          foregroundColor: Color(Colors.black.value),
+          backgroundColor: Color(Colors.white.value),
+          leading: GestureDetector(
+            onTap: () {
+              RouteStateScope.of(context).go("/");
+            },
+            child: const Icon(
+              Icons.arrow_back, // add custom icons also
             ),
-            body: Stack(children: [
-              Positioned.fill(
-                  child: Card(
-                      child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(1, 0, 1, 8.0),
-                          child: Container(
-                              margin: const EdgeInsets.symmetric(vertical: 30.0),
-                              child: Form(
-                                  key: _keyForm,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      _petTypeField(),
-                                      _postTypeField(),
-                                      _BreedsField(),
-                                      _imageField(),
-                                      _descriptionField(),
-                                      _submitButton(),
-                                      // const _SignUpButton(),
-                                    ],
-                                  ))))))
-            ]),
-          );
-        });
+          ),
+        ),
+        body: Stack(children: [
+          Positioned.fill(
+              child: Card(
+                  child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(1, 0, 1, 8.0),
+                      child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 30.0),
+                          child: Form(
+                              key: _keyForm,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  _petTypeField(),
+                                  _postTypeField(),
+                                  _BreedsField(),
+                                  _imageField(),
+                                  _descriptionField(),
+                                  _submitButton(),
+                                  // const _SignUpButton(),
+                                ],
+                              ))))))
+        ]),
+      );
+    });
   }
 
   Widget _imageField() {
@@ -190,7 +182,6 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
       onChanged: (value) {},
     );
   }
-
 
   Widget _BreedsField() {
     return AuthDropDownField(

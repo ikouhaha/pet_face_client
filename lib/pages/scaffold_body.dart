@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:pet_saver_client/pages/post.dart';
+import 'package:pet_saver_client/pages/mypost.dart';
 import 'package:pet_saver_client/pages/home.dart';
 import 'package:pet_saver_client/pages/list.dart';
 import 'package:pet_saver_client/pages/petSetting.dart';

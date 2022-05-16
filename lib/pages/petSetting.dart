@@ -36,7 +36,7 @@ Future<List<PetModel>> fetchPetProfile(
 }
 
 final _getProfileProvider =
-    FutureProvider<List<PetModel>>((ref) async {
+    FutureProvider.autoDispose<List<PetModel>>((ref) async {
   return fetchPetProfile(ref: ref);
 });
 

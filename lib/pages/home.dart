@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -202,7 +202,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final double itemWidth = size.width / 2;
     return provider.when(
         loading: () {
-          EasyLoading.show(status: "Loading...",maskType: EasyLoadingMaskType.black);
+          
           return Center(
               child: CircularProgressIndicator(),
             );
@@ -216,10 +216,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           return Text("Error: ${err}");
         },
         data: (profiles) {
-          EasyLoading.dismiss();
-          print(profiles);
           return Scaffold(
             body: MasonryGridView.count(
+              addAutomaticKeepAlives: true,
               crossAxisCount: 2,
               mainAxisSpacing: 2,
               crossAxisSpacing: 2,

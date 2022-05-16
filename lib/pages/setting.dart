@@ -1,15 +1,10 @@
-import 'package:dio/dio.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:adaptive_navigation/adaptive_navigation.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/components/change_pwd_card.dart';
 import 'package:pet_saver_client/components/profile_card.dart';
 import 'package:pet_saver_client/models/user.dart';
-import 'package:pet_saver_client/pages/list.dart';
-import 'package:pet_saver_client/pages/register.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,10 +16,6 @@ final _getProfileProvider = FutureProvider.autoDispose<UserModel>((ref) async {
     UserModel userModel = UserModel.fromJson(response.data);
     return userModel;
 });
-
-final StateNotifierProvider<SettingPageState, int>
-    SettingPageProvider =
-    StateNotifierProvider<SettingPageState, int>((_) => SettingPageState());
 
 class SettingPageState extends StateNotifier<int> {
   SettingPageState() : super(0);
