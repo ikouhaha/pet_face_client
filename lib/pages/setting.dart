@@ -15,7 +15,11 @@ import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final _getProfileProvider = FutureProvider.autoDispose<UserModel>((ref) async {
-  return ref.read(GlobalProvider).fetchProfile(ref: ref);
+     
+    var response = await Http.get(url: "/users/profile");
+   
+    UserModel userModel = UserModel.fromJson(response.data);
+    return userModel;
 });
 
 final StateNotifierProvider<SettingPageState, int>
@@ -72,7 +76,14 @@ class _SettingScreenState extends ConsumerState {
         loading: () => Center(
               child: CircularProgressIndicator(),
             ),
-        error: (err, stack) => Text('Error: $err'),
+        error: (dynamic err, stack) {
+          if (err.message == "Unauthorized") {
+            ref.read(GlobalProvider).logout();
+            RouteStateScope.of(context).go("/signin");
+          }
+
+          return Text("Error: ${err}");
+        },
         data: (profile) {
           print(profile.toJson());
 

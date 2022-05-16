@@ -1,13 +1,13 @@
+// ignore_for_file: unused_import, avoid_print, non_constant_identifier_names, unused_element
+
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:adaptive_navigation/adaptive_navigation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:pet_saver_client/app.dart';
+
 import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
@@ -16,32 +16,24 @@ import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_dropdown_field.dart';
 import 'package:pet_saver_client/components/auth_radio_field.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
-import 'package:pet_saver_client/components/change_pwd_card.dart';
-import 'package:pet_saver_client/components/profile_card.dart';
 import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/options.dart';
 import 'package:pet_saver_client/models/pet.dart';
 import 'package:pet_saver_client/models/petDetect.dart';
-import 'package:pet_saver_client/models/user.dart';
-import 'package:pet_saver_client/pages/list.dart';
-import 'package:pet_saver_client/pages/petSetting.dart';
-import 'package:pet_saver_client/pages/register.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:photo_view/photo_view.dart';
 
-Future<List<PetModel>> fetchPetProfile({required ref}) async {
-  var token = ref.read(GlobalProvider).token;
+Future<List<PetModel>> fetchPetProfile() async {  
   var response =
-      await Http.get(url: "/pets/profile", authorization: token, ref: ref);
+      await Http.get(url: "/pets/profile" );
   List<PetModel> pets = petModelFromJson(json.encode(response.data));
   return pets;
 }
 
 final _getProfileProvider =
     FutureProvider.autoDispose<List<PetModel>>((ref) async {
-  return fetchPetProfile(ref: ref);
+  return fetchPetProfile();
 });
 
 class CreatePostPage extends ConsumerStatefulWidget {
@@ -53,10 +45,9 @@ class CreatePostPage extends ConsumerStatefulWidget {
   _PostScreenState createState() => _PostScreenState();
 }
 
-class _PostScreenState extends ConsumerState {
-  PetModel pet = new PetModel();
+class _PostScreenState extends ConsumerState<CreatePostPage> {
+  PetModel pet = PetModel();
   final _keyForm = GlobalKey<FormState>();
-  final _name = FormController();
 
   List<PetDetectResponse> results = [];
   @override
@@ -67,9 +58,9 @@ class _PostScreenState extends ConsumerState {
   @override
   void dispose() {
     super.dispose();
+    _keyForm.currentState?.dispose();
   }
 
-  RouteState get _routeState => RouteStateScope.of(context);
 
   // void _handleBookTapped(Book book) {
   //   _routeState.go('/book/${book.id}');
@@ -78,23 +69,35 @@ class _PostScreenState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
     var provider = ref.watch(_getProfileProvider);
+    //return const Center(child: Text("asdsd"));
+
 
     return provider.when(
-        loading: () => Center(
-              child: CircularProgressIndicator(),
-            ),
-        error: (err, stack) => Text('Error: $err'),
+        loading: (){
+          EasyLoading.show(status: "Loading...",maskType: EasyLoadingMaskType.black);
+          return Center(child: CircularProgressIndicator());
+        },
+        error: (dynamic err, stack) {
+          if (err.message == "Unauthorized") {
+            ref.read(GlobalProvider).logout();
+            RouteStateScope.of(context).go("/signin");
+          }
+
+          return Text("Error: ${err}");
+        },
         data: (profile) {
+          EasyLoading.dismiss();
+          print(profile);
           return Scaffold(
             appBar: AppBar(
-              title: Text('Create Post'),
+              title: const Text('Create Post'),
               foregroundColor: Color(Colors.black.value),
               backgroundColor: Color(Colors.white.value),
               leading: GestureDetector(
                 onTap: () {
                   RouteStateScope.of(context).go("/");
                 },
-                child: Icon(
+                child: const Icon(
                   Icons.arrow_back, // add custom icons also
                 ),
               ),
@@ -105,7 +108,7 @@ class _PostScreenState extends ConsumerState {
                       child: SingleChildScrollView(
                           padding: const EdgeInsets.fromLTRB(1, 0, 1, 8.0),
                           child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 30.0),
+                              margin: const EdgeInsets.symmetric(vertical: 30.0),
                               child: Form(
                                   key: _keyForm,
                                   child: Column(
@@ -142,7 +145,7 @@ class _PostScreenState extends ConsumerState {
                 petDetectResponseFromJson(json.encode(response.data["result"]));
             print(results);
             //todo make it to multiple, currently just support a pet a image
-            if (results.length > 0) {
+            if (results.isNotEmpty) {
               setState(() {
                 Image img = Helper.getImageByBase64orHttp(results[0].labelImg!);
                 setImg(img);
@@ -161,7 +164,7 @@ class _PostScreenState extends ConsumerState {
   Widget _postTypeField() {
     return AuthDropDownField(
         key: const Key('post type'),
-        icon: Icon(Icons.list),
+        icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Post Type',
         //validator: (value) => Validations.validateName(value),
@@ -176,7 +179,7 @@ class _PostScreenState extends ConsumerState {
     return AuthRadioField(
       type: RadioWidget.row,
       key: const Key('pet type'),
-      icon: Icon(Icons.list),
+      icon: const Icon(Icons.list),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       hint: 'Post Type',
       //validator: (value) => Validations.validateName(value),
@@ -188,23 +191,11 @@ class _PostScreenState extends ConsumerState {
     );
   }
 
-  Widget _regionField() {
-    return AuthDropDownField(
-        key: const Key('region'),
-        icon: Icon(Icons.list),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        hint: 'Region',
-        //validator: (value) => Validations.validateName(value),
-        options: [
-          Option(name: "cat", value: "cat"),
-          Option(name: "dog", value: "dog")
-        ]);
-  }
 
   Widget _BreedsField() {
     return AuthDropDownField(
         key: const Key('breeds'),
-        icon: Icon(Icons.list),
+        icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Breeds',
         //validator: (value) => Validations.validateName(value),
@@ -218,7 +209,7 @@ class _PostScreenState extends ConsumerState {
     return AuthTextField(
         maxLines: 6,
         key: const Key('description'),
-        icon: Icon(Icons.comment),
+        icon: const Icon(Icons.comment),
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         hint: 'Description',
         keyboardType: TextInputType.multiline,
@@ -255,10 +246,10 @@ class _LogoutButton extends ConsumerWidget {
         // print(state.status.isValidated);
 
         return Padding(
-            padding: EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.only(top: 20),
             child: CupertinoButton(
                 padding: EdgeInsets.zero,
-                child: Text('Logout'),
+                child: const Text('Logout'),
                 disabledColor: Colors.blueAccent.withOpacity(0.6),
                 color: Colors.redAccent,
                 onPressed: () => ref.read(GlobalProvider).logout()));

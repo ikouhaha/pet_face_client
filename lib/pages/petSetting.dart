@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, avoid_print, file_names, unused_local_variable, unused_import
 
 import 'dart:convert';
 
@@ -30,13 +30,13 @@ Future<List<PetModel>> fetchPetProfile(
     {required  ref}) async {
   var token = ref.read(GlobalProvider).token;
   var response =
-      await Http.get(url: "/pets/profile", authorization: token, ref: ref);
+      await Http.get(url: "/pets/profile");
   List<PetModel> pets = petModelFromJson(json.encode(response.data));
   return pets;
 }
 
 final _getProfileProvider =
-    FutureProvider.autoDispose<List<PetModel>>((ref) async {
+    FutureProvider<List<PetModel>>((ref) async {
   return fetchPetProfile(ref: ref);
 });
 
@@ -103,7 +103,7 @@ class _SettingScreenState extends ConsumerState {
                             json.encode(response.data["result"]));
                         print(results);
                         //todo make it to multiple, currently just support a pet a image
-                        if (results.length > 0) {
+                        if (results.isNotEmpty) {
                           setState(() {
                             Image img = Helper.getImageByBase64orHttp(
                                 results[0].labelImg!);
@@ -132,7 +132,7 @@ class _SettingScreenState extends ConsumerState {
                   pet.cropImgBase64 = results[0].cropImgs![0];
                   pet.type = results[0].name;
                   Response response = await Http.put(
-                      ref: ref, url: "/pets/${pet.id}", data: pet.toJson());
+                       url: "/pets/${pet.id}", data: pet.toJson());
 
                   EasyLoading.showSuccess("update success");
                 }
@@ -145,7 +145,7 @@ class _SettingScreenState extends ConsumerState {
                 EasyLoading.dismiss();
               }
             },
-            child: Text(
+            child: const Text(
               "Submit",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
@@ -154,7 +154,7 @@ class _SettingScreenState extends ConsumerState {
   }
 
   Alert createAlert() {
-    PetModel pet = new PetModel();
+    PetModel pet = PetModel();
     //to do change it to form input
 
     List<PetDetectResponse> results = [];
@@ -180,7 +180,7 @@ class _SettingScreenState extends ConsumerState {
                             json.encode(response.data["result"]));
                         print(results);
                         //todo make it to multiple, currently just support a pet a image
-                        if (results.length > 0) {
+                        if (results.isNotEmpty) {
                           setState(() {
                             Image img = Helper.getImageByBase64orHttp(
                                 results[0].labelImg!);
@@ -212,8 +212,7 @@ class _SettingScreenState extends ConsumerState {
                   EasyLoading.showProgress(0.3, status: 'creating...');
                   pet.cropImgBase64 = results[0].cropImgs![0];
                   pet.type = results[0].name;
-                  Response response = await Http.post(
-                      ref: ref, url: "/pets", data: pet.toJson());
+                  Response response = await Http.post(url: "/pets", data: pet.toJson());
 
                  
                   Navigator.of(context, rootNavigator: true).pop();
@@ -230,7 +229,7 @@ class _SettingScreenState extends ConsumerState {
                 EasyLoading.dismiss();
               }
             },
-            child: Text(
+            child: const Text(
               "Submit",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
@@ -242,8 +241,8 @@ class _SettingScreenState extends ConsumerState {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-              title: Text('Delete'),
-              content: Text("Are you sure you want to delete this pet?"),
+              title: const Text('Delete'),
+              content: const Text("Are you sure you want to delete this pet?"),
               actions: [
                 TextButton(
                     onPressed: () async {
@@ -251,7 +250,7 @@ class _SettingScreenState extends ConsumerState {
                          Navigator.of(ctx).pop(false);
                         EasyLoading.showProgress(0.3, status: 'deleting...');
                         Response response =
-                            await Http.delete(ref: ref, url: "/pets/${pet.id}");
+                            await Http.delete(url: "/pets/${pet.id}");
                         EasyLoading.showSuccess("delete success");
                         loadPage();
                        
@@ -261,12 +260,11 @@ class _SettingScreenState extends ConsumerState {
                         EasyLoading.dismiss();
                       }
                     },
-                    child: Text("Yes"))
+                    child: const Text("Yes"))
               ],
             ));
   }
 
-  RouteState get _routeState => RouteStateScope.of(context);
 
   @override
   Widget build(BuildContext context) {
@@ -277,10 +275,17 @@ class _SettingScreenState extends ConsumerState {
     final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
     final double itemWidth = size.width / 2;
     return provider.when(
-        loading: () => Center(
+        loading: () => const Center(
               child: CircularProgressIndicator(),
             ),
-        error: (err, stack) => Text('Error: $err'),
+       error: (dynamic err, stack) {
+          if (err.message == "Unauthorized") {
+            ref.read(GlobalProvider).logout();
+            RouteStateScope.of(context).go("/signin");
+          }
+
+          return Text("Error: ${err}");
+        },
         data: (profiles) {
           print(profiles);
           return Scaffold(
@@ -305,20 +310,12 @@ class _SettingScreenState extends ConsumerState {
         });
   }
 
-  Widget _PetNameInputField() {
-    return AuthTextField(
-        controller: _name.ct,
-        icon: Icon(Icons.pets),
-        hint: 'Pet Name',
-        key: const Key('name'),
-        keyboardType: TextInputType.text);
-  }
 
   Widget _NameField() {
     return AuthTextField(
         key: const Key('email'),
         focusNode: _name.fn,
-        icon: Icon(Icons.pets),
+        icon: const Icon(Icons.pets),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         controller: _name.ct,
         hint: 'Name',
@@ -329,7 +326,7 @@ class _SettingScreenState extends ConsumerState {
   Widget _BreedsField() {
     return AuthDropDownField(
         key: const Key('breeds'),
-        icon: Icon(Icons.list),
+        icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Breeds',
         //validator: (value) => Validations.validateName(value),

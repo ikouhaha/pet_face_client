@@ -14,41 +14,24 @@ import 'package:pet_saver_client/router/route_state.dart';
 
 import 'scaffold_body.dart';
 
-final storeageProvider = FutureProvider.autoDispose<Storage>((ref) async {
+final storeageProvider = FutureProvider<Storage>((ref) async {
   Storage storage = await ref.read(GlobalProvider).getStorage();
   return storage;
 });
 
-class MyScaffold extends ConsumerStatefulWidget {
+class MyScaffold extends StatefulWidget {
+  const MyScaffold({Key? key}) : super(key: key);
+
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return MyScaffoldState();
-  }
+  MyScaffoldState createState() => MyScaffoldState();
+
 }
 
-class MyScaffoldState extends ConsumerState {
+class MyScaffoldState extends State<MyScaffold> {
   @override
   Widget build(BuildContext context) {
     final routeState = RouteStateScope.of(context);
     final selectedIndex = _getSelectedIndex(routeState.route.pathTemplate);
-
-    AsyncValue<Storage> storage = ref.watch(storeageProvider);
-
-
-    return storage.when(
-      loading: () => Center(
-        child: CircularProgressIndicator(),
-      ),
-      error: (err, stack) {        
-        return Text('Error: $err');
-      } ,
-      data: (config) {
-        var provider = ref.watch(GlobalProvider);
-
-        if (!provider.isAuthenticated) {
-          routeState.go("/signin");
-        }
-
         return Scaffold(
             drawer: Drawer(
                 child: ListView(
@@ -107,8 +90,7 @@ class MyScaffoldState extends ConsumerState {
                 ),
               ],
             ));
-      },
-    );
+     
   }
 
   int _getSelectedIndex(String pathTemplate) {

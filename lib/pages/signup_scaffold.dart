@@ -234,7 +234,7 @@ class _SignupFormState extends ConsumerState {
         if (_keyForm.currentState!.validate()) {
           EasyLoading.show(
               maskType: EasyLoadingMaskType.black, status: 'loading...');          
-          Response response = await Http.post(url: "/users", data: _user, ref: ref);
+          Response response = await Http.post(url: "/users", data: _user);
           EasyLoading.showSuccess('Sign up success!');
           RouteStateScope.of(context).go('/signin');
         }

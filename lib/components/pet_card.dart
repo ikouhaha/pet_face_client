@@ -160,6 +160,7 @@ class _PetCardState extends ConsumerState<PetCard>
   @override
   void dispose() {
     super.dispose();
+    _keyForm.currentState!.dispose();
   }
 }
       

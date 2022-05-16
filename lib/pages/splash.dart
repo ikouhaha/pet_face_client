@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../app.dart';
 
 
 class Splash extends StatefulWidget {
@@ -22,7 +21,7 @@ class _SplashState extends State<Splash> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset('assets/images/logo.png'),
+            Icon(Icons.local_dining),
             const SizedBox(
               height: 20,
             ),

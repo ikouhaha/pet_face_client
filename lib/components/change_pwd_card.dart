@@ -121,7 +121,7 @@ class _CardState extends ConsumerState<ChangePwdCard> {
               var token = ref.read(GlobalProvider).token;     
           Response response = await Http.put(url: "/users/p/"+_user.id.toString(), data: {
             "password": _user.password,
-          }, ref: ref,authorization: await token);
+          });
           EasyLoading.showSuccess('update successfully!');
           
         }
@@ -154,6 +154,7 @@ class _CardState extends ConsumerState<ChangePwdCard> {
     super.dispose();
     _password.dispose();
     _confirmPassword.dispose();
+    _keyForm.currentState!.dispose();
   }
 }
       

@@ -1,5 +1,7 @@
 
 
+// ignore_for_file: library_names
+
 library Config;
 
 

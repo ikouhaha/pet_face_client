@@ -1,6 +1,9 @@
+// ignore_for_file: avoid_print, unused_local_variable, unused_element, non_constant_identifier_names
+
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,34 +28,28 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
-import '../app.dart';
-import 'package:adaptive_navigation/adaptive_navigation.dart';
 
-Future<List<PetModel>> fetchPetProfile({required ref}) async {
-  var token = ref.read(GlobalProvider).token;
-  var response =
-      await Http.get(url: "/pets/profile", authorization: token, ref: ref);
-  List<PetModel> pets = petModelFromJson(json.encode(response.data));
-  return pets;
-}
+
 
 final _getProfileProvider =
     FutureProvider.autoDispose<List<PetModel>>((ref) async {
-  return fetchPetProfile(ref: ref);
+      var response = await Http.get(url: "/pets/profile");
+  List<PetModel> pets = petModelFromJson(json.encode(response.data));
+  
+  return pets;
 });
 
 
 class HomePage extends ConsumerStatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return _HomePageState();
-  }
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState {
+class _HomePageState extends ConsumerState<HomePage> {
   //final _petname = FormController();
   final _name = FormController();
-  final _editKeyForm = GlobalKey<FormState>();
   final _createKeyForm = GlobalKey<FormState>();
   bool load = false;
   XFile? file;
@@ -64,17 +61,16 @@ class _HomePageState extends ConsumerState {
 
   @override
   void dispose() {
-    super.dispose();
     _name.dispose();
+    
+    super.dispose();
+    _createKeyForm.currentState?.dispose();
+    
   }
 
-  @override
-  didChangeDependencies() {
-    super.didChangeDependencies();
-  }
 
   void loadPage() {
-    ref.refresh(_getProfileProvider);
+    //ref.refresh(_getProfileProvider);
   }
 
   Alert detectImageAlert() {
@@ -104,7 +100,7 @@ class _HomePageState extends ConsumerState {
                           json.encode(response.data["result"]));
                       print(results);
                       //todo make it to multiple, currently just support a pet a image
-                      if (results.length > 0) {
+                      if (results.isNotEmpty) {
                         setState(() {
                           Image img = Helper.getImageByBase64orHttp(
                               results[0].labelImg!);
@@ -113,6 +109,7 @@ class _HomePageState extends ConsumerState {
                       }
                       Navigator.of(context, rootNavigator: true).pop();
                     } catch (e) {
+
                       print(e);
                     } finally {
                       EasyLoading.dismiss();
@@ -153,7 +150,7 @@ class _HomePageState extends ConsumerState {
             onPressed: ()  {
              
             },
-            child: Text(
+            child: const Text(
               "Reset",
               style: TextStyle(fontSize: 20),
             ),
@@ -168,8 +165,6 @@ class _HomePageState extends ConsumerState {
                   EasyLoading.showProgress(0.3, status: 'creating...');
                   pet.cropImgBase64 = results[0].cropImgs![0];
                   pet.type = results[0].name;
-                  Response response = await Http.post(
-                      ref: ref, url: "/pets", data: pet.toJson());
 
                   Navigator.of(context, rootNavigator: true).pop();
                   await EasyLoading.showSuccess("create success");
@@ -185,7 +180,7 @@ class _HomePageState extends ConsumerState {
                 EasyLoading.dismiss();
               }
             },
-            child: Text(
+            child: const Text(
               "Submit",
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
@@ -195,22 +190,33 @@ class _HomePageState extends ConsumerState {
         ]);
   }
 
-  RouteState get _routeState => RouteStateScope.of(context);
 
   @override
   Widget build(BuildContext context) {
     var provider = ref.watch(_getProfileProvider);
+    
+    //return Text('data');
     var size = MediaQuery.of(context).size;
 
     /*24 is for notification bar on Android*/
-    final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
     final double itemWidth = size.width / 2;
     return provider.when(
-        loading: () => Center(
+        loading: () {
+          EasyLoading.show(status: "Loading...",maskType: EasyLoadingMaskType.black);
+          return Center(
               child: CircularProgressIndicator(),
-            ),
-        error: (err, stack) => Text('Error: $err'),
+            );
+        },
+        error: (dynamic err, stack) {
+          if (err.message == "Unauthorized") {
+            ref.read(GlobalProvider).logout();
+            RouteStateScope.of(context).go("/signin");
+          }
+
+          return Text("Error: ${err}");
+        },
         data: (profiles) {
+          EasyLoading.dismiss();
           print(profiles);
           return Scaffold(
             body: MasonryGridView.count(
@@ -231,7 +237,7 @@ class _HomePageState extends ConsumerState {
     return AuthTextField(
         isRequiredField: false,
         controller: _name.ct,
-        icon: Icon(Icons.pets),
+        icon: const Icon(Icons.pets),
         hint: 'Pet Name',
         key: const Key('name'),
         keyboardType: TextInputType.text);
@@ -242,7 +248,7 @@ class _HomePageState extends ConsumerState {
         isRequiredField: false,
         key: const Key('email'),
         focusNode: _name.fn,
-        icon: Icon(Icons.pets),
+        icon: const Icon(Icons.pets),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         controller: _name.ct,
         hint: 'Name',
@@ -288,7 +294,7 @@ class _HomePageState extends ConsumerState {
     return AuthDropDownField(
         isRequiredField: false,
         key: const Key('breeds'),
-        icon: Icon(Icons.list),
+        icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Breeds',
         //validator: (value) => Validations.validateName(value),
@@ -302,7 +308,7 @@ class _HomePageState extends ConsumerState {
     return AuthDropDownField(
         isRequiredField: false,
         key: const Key('region'),
-        icon: Icon(Icons.list),
+        icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Region',
         //validator: (value) => Validations.validateName(value),

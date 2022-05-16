@@ -190,7 +190,7 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
           EasyLoading.show(
               maskType: EasyLoadingMaskType.black, status: 'loading...');     
               var token = ref.read(GlobalProvider).token;     
-          Response response = await Http.put(url: "/users/"+_user.id.toString(), data: _user, ref: ref,authorization: await token);
+          Response response = await Http.put(url: "/users/"+_user.id.toString(), data: _user);
           EasyLoading.showSuccess('update successfully!');
           
         }

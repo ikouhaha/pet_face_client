@@ -51,7 +51,7 @@ class GlobalNotifier extends ChangeNotifier {
 
   Future<UserModel> fetchProfile({required  ref}) async {
     var token = await mobileStorage.read(key: "token");    
-    var response = await Http.get(url: "/users/profile",authorization: token,ref: ref);
+    var response = await Http.get(url: "/users/profile");
     this.token = token??"";
     UserModel userModel = UserModel.fromJson(response.data);
     return userModel;

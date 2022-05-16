@@ -17,13 +17,13 @@ import 'package:photo_view/photo_view.dart';
 Future<List<PetModel>> fetchPetProfile({required ref}) async {
   var token = ref.read(GlobalProvider).token;
   var response =
-      await Http.get(url: "/pets/profile", authorization: token, ref: ref);
+      await Http.get(url: "/pets/profile");
   List<PetModel> pets = petModelFromJson(json.encode(response.data));
   return pets;
 }
 
 final _getProfileProvider =
-    FutureProvider.autoDispose<List<PetModel>>((ref) async {
+    FutureProvider<List<PetModel>>((ref) async {
   return fetchPetProfile(ref: ref);
 });
 
@@ -88,7 +88,14 @@ class _PostScreenState extends ConsumerState {
         loading: () => Center(
               child: CircularProgressIndicator(),
             ),
-        error: (err, stack) => Text('Error: $err'),
+        error: (dynamic err, stack) {
+          if (err.message == "Unauthorized") {
+            ref.read(GlobalProvider).logout();
+            RouteStateScope.of(context).go("/signin");
+          }
+
+          return Text("Error: ${err}");
+        },
         data: (profile) {
  
 

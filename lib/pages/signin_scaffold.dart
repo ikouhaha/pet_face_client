@@ -70,7 +70,7 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
           maskType: EasyLoadingMaskType.black, status: 'loading...');
       await _auth.signInWithGoogle(context).whenComplete(() => null);
       String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
-      Response jwtToken = await Http.post(url: "/auth/google/token", data: {"access_token": token}, ref: ref);
+      Response jwtToken = await Http.post(url: "/auth/google/token", data: {"access_token": token});
       await ref.read(GlobalProvider).login(token: jwtToken.data);
       RouteStateScope.of(context).go("/");
     } catch (ex) {
@@ -82,7 +82,7 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
   Future<dynamic> googleSignIn(token) async {
     var data = {"access_token": token};
     Response response =
-        await Http.post(url: "/auth/google/token", data: data, ref: ref);
+        await Http.post(url: "/auth/google/token", data: data);
     return response.data;
   }
 
@@ -94,7 +94,7 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
         String auth = 'Basic ' +
             base64Encode(utf8.encode('${_username.ct.text}:${_password.ct.text}'));
         Response jwtToken =
-            await Http.post(url: "/auth", authorization: auth, ref: ref);
+            await Http.post(url: "/auth", authorization: auth);
         await ref.read(GlobalProvider).login(token: jwtToken.data);
         RouteStateScope.of(context).go("/");
       }

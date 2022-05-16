@@ -5,16 +5,15 @@ import 'package:pet_saver_client/router/delegate.dart';
 import 'package:pet_saver_client/router/parsed_route.dart';
 import 'package:pet_saver_client/router/parser.dart';
 import 'package:pet_saver_client/router/route_state.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class App extends ConsumerStatefulWidget {
+class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
   @override
   _BookstoreState createState() => _BookstoreState();
 }
 
-class _BookstoreState extends ConsumerState<App> {
+class _BookstoreState extends State<App> {
   final _navigatorKey = GlobalKey<NavigatorState>();
   late final RouteState _routeState;
   late final SimpleRouterDelegate _routerDelegate;
@@ -29,6 +28,7 @@ class _BookstoreState extends ConsumerState<App> {
     _routeParser = TemplateRouteParser(
       allowedPaths: [
         '/',
+        '/splash',
         '/signin',
         '/signup',
         '/post',

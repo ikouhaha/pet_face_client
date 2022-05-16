@@ -8,7 +8,7 @@ final authenticationProvider = Provider<Authentication>((ref) {
 });
 
 
-final authStateProvider = StreamProvider.autoDispose<User?>((ref) {
+final authStateProvider = StreamProvider<User?>((ref) {
   
   return ref
       .watch(authenticationProvider)

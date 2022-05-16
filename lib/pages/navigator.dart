@@ -2,8 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pet_saver_client/pages/signup_scaffold.dart';
 import 'package:pet_saver_client/router/route_state.dart';
@@ -29,31 +29,29 @@ class MyNavigator extends StatefulWidget {
 
 class _BookstoreNavigatorState extends State<MyNavigator> {
   final _signInKey = const ValueKey('Sign in');
+  final _signUpKey = const ValueKey('Sign up');
   final _scaffoldKey = const ValueKey('App scaffold');
-  final _bookDetailsKey = const ValueKey('Book details screen');
-  final _authorDetailsKey = const ValueKey('Author details screen');
-  
+
 
   @override
   Widget build(BuildContext context) {
     final routeState = RouteStateScope.of(context);
     
-    final pathTemplate = routeState.route.pathTemplate;
 
     return Navigator(
       key: widget.navigatorKey,
       onPopPage: (route, dynamic result) {
         // When a page that is stacked on top of the scaffold is popped, display
         // the /books or /authors tab in BookstoreScaffold.
-        if (route.settings is Page &&
-            (route.settings as Page).key == _bookDetailsKey) {
-          routeState.go('/');
-        }
+        // if (route.settings is Page &&
+        //     (route.settings as Page).key == _bookDetailsKey) {
+        //   routeState.go('/');
+        // }
       
-        if (route.settings is Page &&
-            (route.settings as Page).key == _authorDetailsKey) {
-          routeState.go('/authors');
-        }
+        // if (route.settings is Page &&
+        //     (route.settings as Page).key == _authorDetailsKey) {
+        //   routeState.go('/authors');
+        // }
         
         
         return route.didPop(result);
@@ -63,14 +61,14 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
           // Display the sign in screen.
           FadeTransitionPage<void>(
             key: _signInKey,
-            child: LoginScaffold()
+            child: const LoginScaffold()
             
           )
         else  if (routeState.route.pathTemplate == '/signup')
           // Display the sign in screen.
           FadeTransitionPage<void>(
-            key: _signInKey,
-            child:SignupScaffold()
+            key: _signUpKey,
+            child:const SignupScaffold()
             
           )
         else ...[
@@ -99,4 +97,5 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
       ],
     );
   }
+
 }

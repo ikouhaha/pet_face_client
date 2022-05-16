@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_saver_client/common/config.dart';
+import 'package:pet_saver_client/common/helper.dart';
 
 import 'package:pet_saver_client/providers/global_provider.dart';
 
@@ -51,7 +52,7 @@ class Http {
   }
 
   static Future<Response> get(
-      {required ref, required url, authorization}) async {
+      { required url, authorization}) async {
     try {
       //print(navigatorKey.currentContext);
 
@@ -59,14 +60,14 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await ref.read(GlobalProvider).token;
+        dio.options.headers["Authorization"] = await Helper.getToken();
       }
       Response response = await dio.get(Config.apiServer + url);
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
       if (ex.response != null && ex.response!.statusCode == 401) {
-        await ref.read(GlobalProvider).logout();
+       // await ref.read(GlobalProvider).logout();
       } else {
         EasyLoading.showError(errorMsg);
       }
@@ -76,20 +77,20 @@ class Http {
   }
 
   static Future<Response> post(
-      {required ref, required url, data, authorization}) async {
+      { required url, data, authorization}) async {
     try {
       var dio = Dio();
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await ref.read(GlobalProvider).token;
+        dio.options.headers["Authorization"] = await Helper.getToken();
       }
       Response response = await dio.post(Config.apiServer + url, data: data);
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
       if (ex.response != null && ex.response!.statusCode == 401) {
-        await ref.read(GlobalProvider).logout();
+        //await ref.read(GlobalProvider).logout();
         if (ex.response!.statusMessage != null) {
           EasyLoading.showError(ex.response!.statusMessage!);
         }
@@ -102,13 +103,13 @@ class Http {
   }
 
   static Future<Response> put(
-      {required ref, required url, data, authorization}) async {
+      { required url, data, authorization}) async {
     try {
       var dio = Dio();
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await ref.read(GlobalProvider).token;
+        dio.options.headers["Authorization"] = await Helper.getToken();
       }
 
       Response response = await dio.put(Config.apiServer + url, data: data);
@@ -116,7 +117,7 @@ class Http {
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
       if (ex.response != null && ex.response!.statusCode == 401) {
-        await ref.read(GlobalProvider).logout();
+        //await ref.read(GlobalProvider).logout();
         if (ex.response!.statusMessage != null) {
           EasyLoading.showError(ex.response!.statusMessage!);
         }
@@ -129,13 +130,13 @@ class Http {
   }
 
   static Future<Response> delete(
-      {required ref, required url, authorization}) async {
+      { required url, authorization}) async {
     try {
       var dio = Dio();
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await ref.read(GlobalProvider).token;
+        dio.options.headers["Authorization"] = await Helper.getToken();
       }
 
       Response response = await dio.delete(Config.apiServer + url);
@@ -143,14 +144,14 @@ class Http {
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
       if (ex.response != null && ex.response!.statusCode == 401) {
-        await ref.read(GlobalProvider).logout();
+        //await ref.read(GlobalProvider).logout();
         if (ex.response!.statusMessage != null) {
           EasyLoading.showError(ex.response!.statusMessage!);
         }
       } else {
         EasyLoading.showError(errorMsg);
       }
-
+    
       throw Exception(errorMsg);
     }
   }

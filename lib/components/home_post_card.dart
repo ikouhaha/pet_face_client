@@ -173,6 +173,7 @@ class _PostCardState extends ConsumerState<PostCard>
   @override
   void dispose() {
     super.dispose();
+    _keyForm.currentState!.dispose();
   }
 }
       
