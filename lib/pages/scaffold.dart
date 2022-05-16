@@ -67,21 +67,28 @@ class MyScaffoldState extends State<MyScaffold> {
               onDestinationSelected: (idx) {
                 print(idx);
                 if (idx == 0) routeState.go('/');
-                if (idx == 1) routeState.go('/new/post');
-                if (idx == 2) routeState.go('/mypost');
-                if (idx == 3) routeState.go('/settings');
+                 if (idx == 1) routeState.go('/message');
+                if (idx == 2) routeState.go('/new/post');
+               
+                if (idx == 3) routeState.go('/mypost');
+                if (idx == 4) routeState.go('/settings');
               },
               destinations: const [
                 AdaptiveScaffoldDestination(
                   title: 'Books',
                   icon: Icons.home,
                 ),
+                 AdaptiveScaffoldDestination(
+                  title: 'Message',
+                  icon: Icons.comment,
+                ),
                 AdaptiveScaffoldDestination(
                   title: 'Post',
                   icon: Icons.post_add,
                 ),
+               
                 AdaptiveScaffoldDestination(
-                  title: 'Pets',
+                  title: 'My Post',
                   icon: Icons.location_history,
                 ),
                   AdaptiveScaffoldDestination(
@@ -95,9 +102,11 @@ class MyScaffoldState extends State<MyScaffold> {
 
   int _getSelectedIndex(String pathTemplate) {
     if (pathTemplate == '/') return 0;
-    if (pathTemplate == '/new/post') return 1;
-    if (pathTemplate == '/mypost') return 2;
-    if (pathTemplate == '/settings') return 3;
+     if (pathTemplate == '/message') return 1;
+    if (pathTemplate == '/new/post') return 2;
+   
+    if (pathTemplate == '/mypost') return 3;
+    if (pathTemplate == '/settings') return 4;
     return 0;
   }
 }

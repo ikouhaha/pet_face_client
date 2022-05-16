@@ -20,7 +20,7 @@ import 'package:pet_saver_client/providers/global_provider.dart';
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class ChangePwdCard extends ConsumerStatefulWidget {
+class ChangePwdCard extends StatefulWidget {
   final UserModel user;
   const ChangePwdCard({Key? key, required this.user}) : super(key: key);
 
@@ -28,7 +28,7 @@ class ChangePwdCard extends ConsumerStatefulWidget {
   _CardState createState() => _CardState();
 }
 
-class _CardState extends ConsumerState<ChangePwdCard> {
+class _CardState extends State<ChangePwdCard> {
   final _keyForm = GlobalKey<FormState>();
   final _password = FormController();
   final _confirmPassword = FormController();
@@ -56,7 +56,7 @@ class _CardState extends ConsumerState<ChangePwdCard> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {  
     return Card(
       clipBehavior: Clip.antiAlias,
       child:Form(key:_keyForm, child: Column(
@@ -117,8 +117,7 @@ class _CardState extends ConsumerState<ChangePwdCard> {
       try {
         if (_keyForm.currentState!.validate()) {
           EasyLoading.show(
-              maskType: EasyLoadingMaskType.black, status: 'loading...');     
-              var token = ref.read(GlobalProvider).token;     
+              maskType: EasyLoadingMaskType.black, status: 'loading...');                       
           Response response = await Http.put(url: "/users/p/"+_user.id.toString(), data: {
             "password": _user.password,
           });
@@ -151,10 +150,12 @@ class _CardState extends ConsumerState<ChangePwdCard> {
   
   @override
   void dispose() {
+    
     super.dispose();
     _password.dispose();
     _confirmPassword.dispose();
-    _keyForm.currentState!.dispose();
+    _keyForm.currentState?.dispose();
+    
   }
 }
       

@@ -3,10 +3,11 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:pet_saver_client/pages/mypost.dart';
+import 'package:pet_saver_client/pages/message.dart';
+import 'package:pet_saver_client/pages/post.dart';
 import 'package:pet_saver_client/pages/home.dart';
 import 'package:pet_saver_client/pages/list.dart';
-import 'package:pet_saver_client/pages/petSetting.dart';
+import 'package:pet_saver_client/pages/mypost.dart';
 import 'package:pet_saver_client/pages/postDetail.dart';
 import 'package:pet_saver_client/pages/setting.dart';
 import 'package:pet_saver_client/pages/splash.dart';
@@ -46,8 +47,13 @@ class BookstoreScaffoldBody extends StatelessWidget {
           )
            else if (currentRoute.pathTemplate== '/mypost')
           const FadeTransitionPage<void>(
-            key: ValueKey('pets'),
+            key: ValueKey('mypost'),
             child: PostPage(),
+          )
+          else if (currentRoute.pathTemplate== '/message')
+          const FadeTransitionPage<void>(
+            key: ValueKey('message'),
+            child: MessagePage(),
           )
           else if (currentRoute.pathTemplate == '/new/post')
           const FadeTransitionPage<void>(

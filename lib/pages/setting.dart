@@ -17,21 +17,6 @@ final _getProfileProvider = FutureProvider.autoDispose<UserModel>((ref) async {
     return userModel;
 });
 
-class SettingPageState extends StateNotifier<int> {
-  SettingPageState() : super(0);
-
-
-
-  void setState(num) => {state = num};
-
- 
-
-  @override
-  String toString() {
-    return 'state：$state';
-  }
-}
-
 
 class SettingPage extends ConsumerStatefulWidget {
   const SettingPage({
@@ -53,7 +38,6 @@ class _SettingScreenState extends ConsumerState {
     super.dispose();
   }
 
-  RouteState get _routeState => RouteStateScope.of(context);
 
   // void _handleBookTapped(Book book) {
   //   _routeState.go('/book/${book.id}');
@@ -62,7 +46,7 @@ class _SettingScreenState extends ConsumerState {
   @override
   Widget build(BuildContext context) {
     var provider = ref.watch(_getProfileProvider);
-
+    
     return provider.when(
         loading: () => Center(
               child: CircularProgressIndicator(),
@@ -90,7 +74,7 @@ class _SettingScreenState extends ConsumerState {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           ProfileCard(user: profile),
-                          ChangePwdCard(user: profile),
+                          ChangePwdCard(user: profile,key: Key("pwd"),),
                           _LogoutButton(),
                           // const _SignUpButton(),
                         ],

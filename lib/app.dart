@@ -29,6 +29,7 @@ class _BookstoreState extends State<App> {
       allowedPaths: [
         '/',
         '/splash',
+        '/message',
         '/signin',
         '/signup',
         '/post',
