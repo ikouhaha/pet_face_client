@@ -99,7 +99,7 @@ class _PostScreenState extends ConsumerState {
               backgroundColor: Color(Colors.white.value),
               leading: GestureDetector(
             onTap: () {              
-              RouteStateScope.of(context).go("-1");
+              RouteStateScope.of(context).navigatorKey.currentState?.maybePop();
             },
             child: Icon(
               Icons.arrow_back, // add custom icons also

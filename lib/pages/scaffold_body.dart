@@ -31,34 +31,37 @@ class BookstoreScaffoldBody extends StatelessWidget {
     // need to be customized.
     return Navigator(
       key: navigatorKey,
-      onPopPage: (route, dynamic result) => route.didPop(result),
+      onPopPage: (route, dynamic result){
+        print(result);
+        return route.didPop(result);
+      },
       pages: [
-        if (currentRoute.pathTemplate == ('/'))
+        //if (currentRoute.pathTemplate == ('/'))
            FadeTransitionPage<void>(
             key: ValueKey('Home'),
             child: HomePage(),
-          )
-        else if (currentRoute.pathTemplate== '/settings')
-          const FadeTransitionPage<void>(
+         ),
+        // else if (currentRoute.pathTemplate== '/settings')
+           const FadeTransitionPage<void>(
             key: ValueKey('settings'),
             child: SettingPage(),
-          )
-           else if (currentRoute.pathTemplate== '/mypost')
+          ),
+          //  else if (currentRoute.pathTemplate== '/mypost')
           const FadeTransitionPage<void>(
             key: ValueKey('pets'),
             child: PostPage(),
-          )
-          else if (currentRoute.pathTemplate == '/new/post')
+          ),
+          // else if (currentRoute.pathTemplate == '/new/post')
           const FadeTransitionPage<void>(
-            key: ValueKey('pets'),
+            key: ValueKey('post'),
             child: CreatePostPage(),
-          )
+          ),
 
-          else if (currentRoute.pathTemplate == '/post/:id')
+          // else if (currentRoute.pathTemplate == '/post/:id')
           const FadeTransitionPage<void>(
-            key: ValueKey('pets'),
+            key: ValueKey('postDetail'),
             child: PostDetailPage(),
-          )
+          ),
 
         // Avoid building a Navigator with an empty `pages` list when the
         // RouteState is set to an unexpected path, such as /signin.
@@ -66,7 +69,7 @@ class BookstoreScaffoldBody extends StatelessWidget {
         // Since RouteStateScope is an InheritedNotifier, any change to the
         // route will result in a call to this build method, even though this
         // widget isn't built when those routes are active.
-        else
+        // else
           FadeTransitionPage<void>(
             key: const ValueKey('empty'),
             child: Container(),

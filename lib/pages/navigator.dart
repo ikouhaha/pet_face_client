@@ -32,6 +32,7 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
   final _scaffoldKey = const ValueKey('App scaffold');
   final _bookDetailsKey = const ValueKey('Book details screen');
   final _authorDetailsKey = const ValueKey('Author details screen');
+  
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
             (route.settings as Page).key == _bookDetailsKey) {
           routeState.go('/');
         }
-
+      
         if (route.settings is Page &&
             (route.settings as Page).key == _authorDetailsKey) {
           routeState.go('/authors');

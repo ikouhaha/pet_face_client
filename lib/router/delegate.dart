@@ -24,6 +24,7 @@ class SimpleRouterDelegate extends RouterDelegate<ParsedRoute>
     required this.navigatorKey,
   }) {
     routeState.addListener(notifyListeners);
+    routeState.setKey(navigatorKey);
   }
 
   @override

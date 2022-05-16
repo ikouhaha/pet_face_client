@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
+import 'package:pet_saver_client/providers/navigator_provider.dart';
 
 import 'parsed_route.dart';
 import 'parser.dart';
@@ -21,12 +22,19 @@ class RouteState extends ChangeNotifier {
 
   ParsedRoute get route => _route;
 
+  late GlobalKey<NavigatorState> navigatorKey;
+
   set route(ParsedRoute route) {
     // Don't notify listeners if the path hasn't changed.
     if (_route == route) return;
 
     _route = route;
+    
     notifyListeners();
+  }
+
+  setKey(GlobalKey<NavigatorState> key){
+    navigatorKey = key;
   }
 
   Future<void> go(String route) async {
