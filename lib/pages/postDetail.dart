@@ -100,19 +100,6 @@ class _PostScreenState extends ConsumerState {
  
 
           return Scaffold(
-            appBar: AppBar(
-              title: Text('Post Detail'),
-              foregroundColor: Color(Colors.black.value),
-              backgroundColor: Color(Colors.white.value),
-              leading: GestureDetector(
-            onTap: () {              
-              RouteStateScope.of(context).go("/");
-            },
-            child: Icon(
-              Icons.arrow_back, // add custom icons also
-            ),
-          ),
-            ),
             body: Stack(children: [
               Positioned.fill(
                   child: SingleChildScrollView(

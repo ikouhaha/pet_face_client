@@ -60,19 +60,6 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
   
     //return const Center(child: Text("asdsd"));
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Create Post'),
-          foregroundColor: Color(Colors.black.value),
-          backgroundColor: Color(Colors.white.value),
-          leading: GestureDetector(
-            onTap: () {
-              RouteStateScope.of(context).go("/");
-            },
-            child: const Icon(
-              Icons.arrow_back, // add custom icons also
-            ),
-          ),
-        ),
         body: Stack(children: [
           Positioned.fill(
               child: Card(
