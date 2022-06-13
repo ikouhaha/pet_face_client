@@ -68,6 +68,7 @@ class Http {
       String errorMsg = getErrorMsg(ex: ex);
       if (ex.response != null && ex.response!.statusCode == 401) {
        // await ref.read(GlobalProvider).logout();
+       throw Exception(ex.response!.statusCode);
       } else {
         EasyLoading.showError(errorMsg);
       }

@@ -69,21 +69,13 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
       EasyLoading.show(
           maskType: EasyLoadingMaskType.black, status: 'loading...');
       await _auth.signInWithGoogle(context).whenComplete(() => null);
-      String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
-      Response jwtToken = await Http.post(url: "/auth/google/token", data: {"access_token": token});
-      await ref.read(GlobalProvider).login(token: jwtToken.data);
+      // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
       RouteStateScope.of(context).go("/");
     } catch (ex) {
+      EasyLoading.showError(ex.toString());
     } finally {
       EasyLoading.dismiss();
     }
-  }
-
-  Future<dynamic> googleSignIn(token) async {
-    var data = {"access_token": token};
-    Response response =
-        await Http.post(url: "/auth/google/token", data: data);
-    return response.data;
   }
 
   Future<void> _login() async {

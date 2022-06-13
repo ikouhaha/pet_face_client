@@ -33,7 +33,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 final _getProfileProvider =
     FutureProvider.autoDispose<List<PetModel>>((ref) async {
-      var response = await Http.get(url: "/pets/profile");
+      var response = await Http.get(url: "/pets");
   List<PetModel> pets = petModelFromJson(json.encode(response.data));
   
   return pets;
@@ -136,11 +136,12 @@ class _HomePageState extends ConsumerState<HomePage> {
             key: _createKeyForm,
             child: Column(
               children: <Widget>[
-                _foundTypeField(),
+                
                 _typeField(),
-                _NameField(),
+               _postTypeField(),
                 _BreedsField(),
                 _RegionField(),
+                 _descriptionField(),
               ],
             )),
         buttons: [
@@ -242,6 +243,18 @@ class _HomePageState extends ConsumerState<HomePage> {
         keyboardType: TextInputType.text);
   }
 
+   Widget _descriptionField() {
+    return AuthTextField(
+        maxLines: 6,
+        key: const Key('description'),
+        icon: const Icon(Icons.comment),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        hint: 'Description',
+        keyboardType: TextInputType.multiline,
+        validator: (value) => Validations.validateText(value));
+  }
+
+
   Widget _NameField() {
     return AuthTextField(
         isRequiredField: false,
@@ -250,10 +263,25 @@ class _HomePageState extends ConsumerState<HomePage> {
         icon: const Icon(Icons.pets),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         controller: _name.ct,
-        hint: 'Name',
+        hint: 'Post Name',
         keyboardType: TextInputType.text,
         validator: (value) => Validations.validateName(value));
   }
+
+  Widget _postTypeField() {
+    return AuthDropDownField(
+        key: const Key('post type'),
+        icon: const Icon(Icons.list),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'Post Type',
+        //validator: (value) => Validations.validateName(value),
+        options: [
+          Option(name: "cat", value: "cat"),
+          Option(name: "dog", value: "dog"),
+          Option(name: "dog", value: "dog")
+        ]);
+  }
+
 
   Widget _foundTypeField() {
     return AuthRadioField(
@@ -288,6 +316,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               // _role.ct.text = value;
             }));
   }
+  
 
   Widget _BreedsField() {
     return AuthDropDownField(

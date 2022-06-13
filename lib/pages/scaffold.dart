@@ -143,7 +143,7 @@ class MyScaffoldState extends State<MyScaffold> {
           },
           destinations: const [
             AdaptiveScaffoldDestination(
-              title: 'Books',
+              title: 'Home',
               icon: Icons.home,
             ),
             AdaptiveScaffoldDestination(

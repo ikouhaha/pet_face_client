@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'dart:html';
 
-import 'package:dio/dio.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/config.dart';
@@ -17,7 +16,7 @@ import 'package:photo_view/photo_view.dart';
 Future<List<PetModel>> fetchPetProfile({required ref}) async {
   var token = ref.read(GlobalProvider).token;
   var response =
-      await Http.get(url: "/pets/profile");
+      await Http.get(url: "/pets");
   List<PetModel> pets = petModelFromJson(json.encode(response.data));
   return pets;
 }

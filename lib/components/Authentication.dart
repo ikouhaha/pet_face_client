@@ -90,31 +90,31 @@ class Authentication {
     _googleToken = googleAuth.accessToken;
     _googleUser = googleUser;
     // Create a new credential
-    // final credential = GoogleAuthProvider.credential(
-    //   accessToken: googleAuth.accessToken,
-    //   idToken: googleAuth.idToken,
-    // );
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
 
-    // try {
-    //   await _auth.signInWithCredential(credential);
-    // } on FirebaseAuthException catch (e) {
-    //   await showDialog(
-    //     context: context,
-    //     builder: (ctx) => AlertDialog(
-    //       title: Text('Error Occured'),
-    //       content: Text(e.toString()),
-    //       actions: [
-    //         TextButton(
-    //             onPressed: () {
-    //               Navigator.of(ctx).pop();
-    //             },
-    //             child: Text("OK"))
-    //       ],
-    //     ),
-    //   );
-    // } finally {
+    try {
+      await _auth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text('Error Occured'),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.of(ctx).pop();
+                },
+                child: Text("OK"))
+          ],
+        ),
+      );
+    } finally {
       
-    // }
+    }
   }
 
   //  SignOut the current user

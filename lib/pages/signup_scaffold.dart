@@ -316,6 +316,7 @@ class _SignupFormState extends ConsumerState {
       
         }
       } catch (ex) {
+        EasyLoading.showError(ex.toString());
       } finally {
         EasyLoading.dismiss();
       }

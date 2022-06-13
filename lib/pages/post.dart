@@ -74,6 +74,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   _petTypeField(),
+                                   
                                   _postTypeField(),
                                   _BreedsField(),
                                   _imageField(),

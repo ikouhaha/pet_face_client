@@ -52,7 +52,7 @@ class _SettingScreenState extends ConsumerState {
               child: CircularProgressIndicator(),
             ),
         error: (dynamic err, stack) {
-          if (err.message == "Unauthorized") {
+          if (err.message == 401) {
             ref.read(GlobalProvider).logout();
             RouteStateScope.of(context).go("/signin");
           }
@@ -103,7 +103,11 @@ class _LogoutButton extends ConsumerWidget {
                 child: Text('Logout'),
                 disabledColor: Colors.blueAccent.withOpacity(0.6),
                 color: Colors.redAccent,
-                onPressed:()=> ref.read(GlobalProvider).logout()));
+                onPressed:(){
+                  ref.read(GlobalProvider).logout();
+                  RouteStateScope.of(context).go("/");
+
+                }));
       },
     );
   }
