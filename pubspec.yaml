@@ -29,7 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_secure_storage: ^5.0.2
+  shared_preferences: ^2.0.15
   fluttertoast: ^8.0.9
   equatable: ^2.0.3
   formz: ^0.4.1

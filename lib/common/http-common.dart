@@ -60,7 +60,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await Helper.getToken();
+        // dio.options.headers["Authorization"] = await Helper.getToken();
       }
       Response response = await dio.get(Config.apiServer + url);
       return response;
@@ -84,7 +84,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await Helper.getToken();
+        // dio.options.headers["Authorization"] = await Helper.getToken();
       }
       Response response = await dio.post(Config.apiServer + url, data: data);
       return response;
@@ -110,7 +110,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await Helper.getToken();
+        // dio.options.headers["Authorization"] = await Helper.getToken();
       }
 
       Response response = await dio.put(Config.apiServer + url, data: data);
@@ -137,7 +137,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await Helper.getToken();
+        // dio.options.headers["Authorization"] = await Helper.getToken();
       }
 
       Response response = await dio.delete(Config.apiServer + url);

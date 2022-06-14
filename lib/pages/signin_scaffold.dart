@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/inputDecoration.dart';
 import 'package:pet_saver_client/common/validations.dart';
@@ -14,6 +15,7 @@ import 'package:pet_saver_client/formz/email.dart';
 import 'package:pet_saver_client/formz/name.dart';
 import 'package:pet_saver_client/formz/password.dart';
 import 'package:pet_saver_client/models/formController.dart';
+import 'package:pet_saver_client/models/user.dart';
 import 'package:pet_saver_client/providers/auth_provider.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +23,6 @@ import 'package:formz/formz.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pet_saver_client/router/route_state.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
 // Future<dynamic> signIn({required ref}) async {
@@ -69,6 +70,9 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
       EasyLoading.show(
           maskType: EasyLoadingMaskType.black, status: 'loading...');
       await _auth.signInWithGoogle(context).whenComplete(() => null);
+      var response = await Http.get(url: "/users/profile");
+      UserModel userModel = UserModel.fromJson(response.data);
+    
       // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
       RouteStateScope.of(context).go("/");
     } catch (ex) {

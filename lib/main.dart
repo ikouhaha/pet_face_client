@@ -1,11 +1,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/app.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/pages/home.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
-
 
 class Logger extends ProviderObserver {
   @override
@@ -27,6 +28,7 @@ class Logger extends ProviderObserver {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferencesService.sharedPrefs  = await SharedPreferences.getInstance();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

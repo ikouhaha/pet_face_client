@@ -5,11 +5,11 @@ library Helper;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/models/storage.dart';
+import 'package:pet_saver_client/models/user.dart';
 
 class Helper {
   static String uuid() {
@@ -49,19 +49,7 @@ class Helper {
     }
   }
 
-  static Future<Storage> getStorage() async {
-    var fstore = new FlutterSecureStorage();
-    var token = await fstore.read(key: 'token');
 
-    Storage storage = Storage(token: token ?? '');
-    return storage;
-  }
-
-  static Future<String> getToken() async {
-    var fstore = new FlutterSecureStorage();
-    var token = await fstore.read(key: 'token');
-    return token??"";
-  }
 
   static Image getPetImage(int? id) {
     return Image.network(Config.apiServer + "/pets/image/${id}");

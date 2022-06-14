@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:formz/formz.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pet_saver_client/common/helper.dart';
@@ -20,7 +19,7 @@ final ChangeNotifierProvider<GlobalNotifier> GlobalProvider =
     ChangeNotifierProvider((_) => GlobalNotifier());
 
 class GlobalNotifier extends ChangeNotifier {
-  final mobileStorage = new FlutterSecureStorage();  
+
   AuthenticationStatus _status = AuthenticationStatus.authenticated;
   String token = "";
    
@@ -30,7 +29,7 @@ class GlobalNotifier extends ChangeNotifier {
 
 
   Future<void> login({bool? isRegister,token}) async{
-    await mobileStorage.write(key: "token", value: token);
+  
     this._status = AuthenticationStatus.authenticated;    
     this.token = token;
     notifyListeners();
@@ -43,28 +42,18 @@ class GlobalNotifier extends ChangeNotifier {
 
 
   void logout() async {
-    await mobileStorage.delete(key: "token");
+  
     this.token = "";
     this._status = AuthenticationStatus.unauthenticated;
     notifyListeners();
   }
 
   Future<UserModel> fetchProfile({required  ref}) async {
-    var token = await mobileStorage.read(key: "token");    
+   
     var response = await Http.get(url: "/users/profile");
     this.token = token??"";
     UserModel userModel = UserModel.fromJson(response.data);
     return userModel;
-  }
-
-
-
-  Future<Storage> getStorage() async {
-     var fstore = new FlutterSecureStorage();
-      var token = await fstore.read(key: 'token');
-      this.token = token??"";
-      Storage storage = new Storage(token: token??'');
-      return storage;
   }
 
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/config.dart';
@@ -63,7 +64,9 @@ class _PostScreenState extends ConsumerState {
   void initState() {
     
     super.initState();
-    
+      if(FirebaseAuth.instance.currentUser==null){
+      Navigator.of(context).pushNamed('/login');
+    }
   }
 
  

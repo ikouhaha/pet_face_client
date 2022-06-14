@@ -4,20 +4,9 @@
 
 import 'package:adaptive_navigation/adaptive_navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pet_saver_client/models/storage.dart';
-import 'package:pet_saver_client/models/user.dart';
-import 'package:pet_saver_client/pages/signin_scaffold.dart';
-import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 
 import 'scaffold_body.dart';
-
-final storeageProvider = FutureProvider<Storage>((ref) async {
-  Storage storage = await ref.read(GlobalProvider).getStorage();
-  return storage;
-});
 
 class MyScaffold extends StatefulWidget {
   const MyScaffold({Key? key}) : super(key: key);
