@@ -65,7 +65,7 @@ class _PostScreenState extends ConsumerState {
     
     super.initState();
       if(FirebaseAuth.instance.currentUser==null){
-      Navigator.of(context).pushNamed('/login');
+      RouteStateScope.of(context).go("/signin");
     }
   }
 

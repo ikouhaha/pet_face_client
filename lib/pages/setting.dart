@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/components/change_pwd_card.dart';
 import 'package:pet_saver_client/components/profile_card.dart';
 import 'package:pet_saver_client/models/user.dart';
@@ -25,11 +26,7 @@ class _SettingScreenState extends ConsumerState {
   @override
   void initState() {
     super.initState();
-    if (FirebaseAuth.instance.currentUser == null) {
-      Navigator.of(context).pushNamed('/login');
-    }else{
-      
-    }
+  
     
   }
 
@@ -44,6 +41,11 @@ class _SettingScreenState extends ConsumerState {
 
   @override
   Widget build(BuildContext context) {
+      if (FirebaseAuth.instance.currentUser == null) {
+      RouteStateScope.of(context).go("/signin");
+    }else{
+      profile = SharedPreferencesService.getProfile();
+    }
     return Scaffold(
       body: Stack(children: [
         Positioned.fill(
@@ -55,13 +57,13 @@ class _SettingScreenState extends ConsumerState {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        // ProfileCard(user: profile),
-                        // ChangePwdCard(
-                        //   user: profile,
-                        //   key: Key("pwd"),
-                        // ),
-                        // _LogoutButton(),
-                        // const _SignUpButton(),
+                        ProfileCard(user: profile!!),
+                        ChangePwdCard(
+                          user: profile!!,
+                          key: Key("pwd"),
+                        ),
+                        _LogoutButton(),
+                        //const _SignUpButton(),
                       ],
                     ))))
       ]),
@@ -85,8 +87,8 @@ class _LogoutButton extends ConsumerWidget {
                 child: Text('Logout'),
                 disabledColor: Colors.blueAccent.withOpacity(0.6),
                 color: Colors.redAccent,
-                onPressed: () {
-                  ref.read(GlobalProvider).logout();
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
                   RouteStateScope.of(context).go("/");
                 }));
       },

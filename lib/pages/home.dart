@@ -58,9 +58,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    if(FirebaseAuth.instance.currentUser==null){
-      Navigator.of(context).pushNamed('/login');
-    }
   }
 
   @override

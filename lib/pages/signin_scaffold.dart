@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/inputDecoration.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
 import 'package:pet_saver_client/formz/email.dart';
@@ -46,7 +47,7 @@ class LoginScaffold extends ConsumerStatefulWidget {
 class _LoginFormState extends ConsumerState<LoginScaffold> {
   final _keyForm = GlobalKey<FormState>();
   final _password = FormController();
-  final _username = FormController();  
+  final _emailName = FormController();  
   
 
   @override
@@ -59,7 +60,7 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    _username.dispose();
+    _emailName.dispose();
     _password.dispose();
   }
 
@@ -70,9 +71,10 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
       EasyLoading.show(
           maskType: EasyLoadingMaskType.black, status: 'loading...');
       await _auth.signInWithGoogle(context).whenComplete(() => null);
-      var response = await Http.get(url: "/users/profile");
+      String? token = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+      var response = await Http.get(url: "/users/profile",authorization: token);
       UserModel userModel = UserModel.fromJson(response.data);
-    
+      SharedPreferencesService.saveProfile(userModel);
       // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
       RouteStateScope.of(context).go("/");
     } catch (ex) {
@@ -83,19 +85,22 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
   }
 
   Future<void> _login() async {
+    final _auth = ref.watch(authenticationProvider);
     try {
       if (_keyForm.currentState!.validate()) {
         EasyLoading.show(
             maskType: EasyLoadingMaskType.black, status: 'loading...');
-        String auth = 'Basic ' +
-            base64Encode(utf8.encode('${_username.ct.text}:${_password.ct.text}'));
-        Response jwtToken =
-            await Http.post(url: "/auth", authorization: auth);
-        await ref.read(GlobalProvider).login(token: jwtToken.data);
-        RouteStateScope.of(context).go("/");
+       await _auth.signInWithEmailAndPassword(_emailName.ct.text,_password.ct.text).whenComplete(() => null);
+           String? token = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+      var response = await Http.get(url: "/users/profile",authorization: token);
+      UserModel userModel = UserModel.fromJson(response.data);
+      SharedPreferencesService.saveProfile(userModel);
+      // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
+      RouteStateScope.of(context).go("/");
+        // RouteStateScope.of(context).go("/");
       }
     } catch (ex) {
-      print(ex);
+      EasyLoading.showError(ex.toString());
     } finally {
       EasyLoading.dismiss();
     }
@@ -130,7 +135,7 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           _WelcomeText(),
-                          _UsernameInputField(),
+                          _EmailInputField(),
                           //_PasswordInputField(),
                           _PasswordInputField(),
                           _LoginButton(),
@@ -153,18 +158,17 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
     );
   }
 
-  Widget _UsernameInputField() {
+  Widget _EmailInputField() {
     return AuthTextField(
-        focusNode: _username.fn,
-        controller: _username.ct,
-        icon: Icon(Icons.person),
+        focusNode: _emailName.fn,
+        controller: _emailName.ct,
+        icon: Icon(Icons.email),
         padding: const EdgeInsets.symmetric(vertical: 20),
-        hint: 'Username',
-        key: const Key('loginForm_usernameInput_textField'),
-        keyboardType: TextInputType.text,
-        validator: (value) => Validations.validateName(value));
+        hint: 'Email',
+        key: const Key('loginForm_emailInput_textField'),
+        keyboardType: TextInputType.emailAddress,
+        validator: (value) => Validations.validateEmail(value));
   }
-
   Widget _LoginButton() {
     return Padding(
         padding: EdgeInsets.only(top: 20),
