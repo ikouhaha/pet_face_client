@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_saver_client/common/config.dart';
@@ -61,7 +62,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = SharedPreferencesService.getProfile();
+         dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
       Response response = await dio.get(Config.apiServer + url);
       return response;
@@ -85,7 +86,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = SharedPreferencesService.getProfile();
+        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
       Response response = await dio.post(Config.apiServer + url, data: data);
       return response;
@@ -111,7 +112,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = SharedPreferencesService.getProfile();
+       dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
 
       Response response = await dio.put(Config.apiServer + url, data: data);
@@ -138,7 +139,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] =  SharedPreferencesService.getProfile();
+        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
 
       Response response = await dio.delete(Config.apiServer + url);

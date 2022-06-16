@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 
 import 'package:flutter/cupertino.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 
 
 import 'package:pet_saver_client/common/validations.dart';
@@ -37,9 +38,7 @@ class ProfileCard extends ConsumerStatefulWidget {
 class _ProfileCardState extends ConsumerState<ProfileCard> {
   final _keyForm = GlobalKey<FormState>();
   final _email = FormController();
-  final _username = FormController();
-  final _firstName = FormController();
-  final _lastName = FormController();
+  final _displayName = FormController();
   final _companyCode = FormController();
   final _role = FormController();
   late UserModel _user;
@@ -52,26 +51,15 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
     _email.ct.addListener(() {
       _user = _user.copyWith(email: _email.ct.text);
     });
-    _username.ct.addListener(() {
-      _user = _user.copyWith(username: _username.ct.text);
-    });
     _role.ct.addListener(() {
       _user = _user.copyWith(role: _role.ct.text);
     });
-    _firstName.ct.addListener(() {
-      _user = _user.copyWith(firstName: _firstName.ct.text);
-    });
-    _lastName.ct.addListener(() {
-      _user = _user.copyWith(lastName: _lastName.ct.text);
-    });
-    _companyCode.ct.addListener(() {
-      _user = _user.copyWith(companyCode: _companyCode.ct.text);
+    _displayName.ct.addListener(() {
+      _user = _user.copyWith(displayName: _displayName.ct.text);
     });
 
     _email.ct.text = _user.email ?? "";
-    _username.ct.text = _user.username ?? "";
-    _firstName.ct.text = _user.firstName ?? "";
-    _lastName.ct.text = _user.lastName ?? "";
+    _displayName.ct.text = _user.displayName ?? "";
     _companyCode.ct.text = _user.companyCode ?? "";
     _role.ct.text = _user.role ?? "";
   }
@@ -85,18 +73,15 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
       Column(
         children: [
           ListTile(
-            leading: Helper.getImageByBase64orHttp(_user.avatarUrl!),
+            leading: _user.avatarUrl==null?Icon(Icons.person):Helper.getImageByBase64orHttp(_user.avatarUrl!),
             title: const Text('Profile'),
             subtitle: Text(
-              "${_user.firstName} ${_user.lastName}",
+              "${_user.displayName}",
               style: TextStyle(color: Colors.black.withOpacity(0.6)),
             ),
           ),
           _EmailInputField(),
-          
-          _UsernameInputField(),
-          _firstNameField(),
-          _lastNameField(),
+          _displayNameField(),
           _RoleRadioField(),
           _CompanyCodeInputField(),
           _GoogleSignInButton(),
@@ -119,18 +104,6 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
         hint: 'Email',
         keyboardType: TextInputType.emailAddress,
         validator: (value) => Validations.validateEmail(value));
-  }
-
-  Widget _UsernameInputField() {
-    return AuthTextField(
-        key: const Key('username'),
-        focusNode: _username.fn,
-        controller: _username.ct,
-        icon: const Icon(Icons.person),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        hint: 'Username',
-        keyboardType: TextInputType.text,
-        validator: (value) => Validations.validateName(value));
   }
 
   Widget _RoleRadioField() {
@@ -161,25 +134,14 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
         validator: (value) => Validations.validateText(value));
   }
 
-  Widget _firstNameField() {
+  Widget _displayNameField() {
     return AuthTextField(
-        key: const Key('firstName'),
-        focusNode: _firstName.fn,
-        controller: _firstName.ct,
+        key: const Key('Name'),
+        focusNode: _displayName.fn,
+        controller: _displayName.ct,
         icon: const Icon(Icons.person),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        hint: 'First Name',
-        keyboardType: TextInputType.text);
-  }
-
-  Widget _lastNameField() {
-    return AuthTextField(
-        key: const Key('lastName'),
-        focusNode: _lastName.fn,
-        controller: _lastName.ct,
-        icon: const Icon(Icons.person),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        hint: 'First Name',
+        hint: 'Display Name',
         keyboardType: TextInputType.text);
   }
 
@@ -188,9 +150,13 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
       try {
         if (_keyForm.currentState!.validate()) {
           EasyLoading.show(
-              maskType: EasyLoadingMaskType.black, status: 'loading...');     
-              var token = ref.read(GlobalProvider).token;     
+              maskType: EasyLoadingMaskType.black, status: 'loading...');        
           Response response = await Http.put(url: "/users/"+_user.id.toString(), data: _user);
+
+              response = await Http.get(url: "/users/profile");
+              UserModel userModel = UserModel.fromJson(response.data);
+            SharedPreferencesService.saveProfile(userModel);
+
           EasyLoading.showSuccess('update successfully!');
           
         }
@@ -256,10 +222,8 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
   void dispose() {
     super.dispose();
     _email.dispose();
-    _username.dispose();
     _role.dispose();
-    _firstName.dispose();
-    _lastName.dispose();
+    _displayName.dispose();
     _companyCode.dispose();
   }
 }

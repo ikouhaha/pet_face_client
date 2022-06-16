@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 
 
 
@@ -62,10 +64,10 @@ class _CardState extends State<ChangePwdCard> {
       child:Form(key:_keyForm, child: Column(
         children: [
           ListTile(
-            leading: getProfileImage(_user.avatarUrl!),
+            leading: _user.avatarUrl==null?const Icon(Icons.person):Helper.getImageByBase64orHttp(_user.avatarUrl!),
             title: const Text('Change Password'),
             subtitle: Text(
-              "${_user.firstName} ${_user.lastName}",
+              "${_user.displayName}",
               style: TextStyle(color: Colors.black.withOpacity(0.6)),
             ),
           ),
@@ -121,6 +123,11 @@ class _CardState extends State<ChangePwdCard> {
           Response response = await Http.put(url: "/users/p/"+_user.id.toString(), data: {
             "password": _user.password,
           });
+
+           response = await Http.get(url: "/users/profile");
+              UserModel userModel = UserModel.fromJson(response.data);
+            SharedPreferencesService.saveProfile(userModel);
+
           EasyLoading.showSuccess('update successfully!');
           
         }

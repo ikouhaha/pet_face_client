@@ -1,13 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pet_saver_client/common/helper.dart';
-import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/components/change_pwd_card.dart';
 import 'package:pet_saver_client/components/profile_card.dart';
-import 'package:pet_saver_client/models/user.dart';
-import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +18,7 @@ class SettingPage extends ConsumerStatefulWidget {
 }
 
 class _SettingScreenState extends ConsumerState {
-  UserModel? profile;
+ 
   @override
   void initState() {
     super.initState();
@@ -43,26 +39,28 @@ class _SettingScreenState extends ConsumerState {
   Widget build(BuildContext context) {
       if (FirebaseAuth.instance.currentUser == null) {
       RouteStateScope.of(context).go("/signin");
-    }else{
-      profile = SharedPreferencesService.getProfile();
+      return Container();
     }
+    var profile = SharedPreferencesService.getProfile()!;
+     
     return Scaffold(
       body: Stack(children: [
         Positioned.fill(
             child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(38.0, 0, 38.0, 8.0),
                 child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 30.0),
+                    margin: const EdgeInsets.symmetric(vertical: 30.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        ProfileCard(user: profile!!),
+                        ProfileCard(user: profile),
                         ChangePwdCard(
-                          user: profile!!,
-                          key: Key("pwd"),
+                          key: const Key("pwd"),
+                          user: profile
+                         
                         ),
-                        _LogoutButton(),
+                        const _LogoutButton(),
                         //const _SignUpButton(),
                       ],
                     ))))

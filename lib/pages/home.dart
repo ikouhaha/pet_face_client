@@ -13,6 +13,7 @@ import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/image_field.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_dropdown_field.dart';
 import 'package:pet_saver_client/components/auth_radio_field.dart';
@@ -210,9 +211,10 @@ class _HomePageState extends ConsumerState<HomePage> {
             );
         },
         error: (dynamic err, stack) {
-          if (err.message == "Unauthorized") {
-            ref.read(GlobalProvider).logout();
+          if (err.message == 401) {
+            FirebaseAuth.instance.signOut();
             RouteStateScope.of(context).go("/signin");
+            
           }
 
           return Text("Error: ${err}");

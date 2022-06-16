@@ -16,8 +16,7 @@ class UserModel {
         this.email,
         this.password,
         this.username,
-        this.firstName,
-        this.lastName,
+        this.displayName,
         this.role,
         this.companyCode,
         this.avatarUrl,
@@ -30,8 +29,7 @@ class UserModel {
     String? email;
     String? password;
     String? username;
-    String? firstName;
-    String? lastName;
+    String? displayName;
     String? role;
     String? companyCode;
     String? avatarUrl;
@@ -44,8 +42,7 @@ class UserModel {
         String? email,
         String? password,
         String? username,
-        String? firstName,
-        String? lastName,
+        String? displayName,
         String? role,
         String? companyCode,
         String? avatarUrl,
@@ -58,8 +55,7 @@ class UserModel {
             email: email ?? this.email,
             password: password ?? this.password,
             username: username ?? this.username,
-            firstName: firstName ?? this.firstName,
-            lastName: lastName ?? this.lastName,
+            displayName: displayName ?? this.displayName,
             role: role ?? this.role,
             companyCode: companyCode ?? this.companyCode??"",
             avatarUrl: avatarUrl ?? this.avatarUrl,
@@ -75,8 +71,7 @@ class UserModel {
         email: json["email"],
         password: json["password"],
         username: json["username"],
-        firstName: json["firstName"],
-        lastName: json["lastName"],
+        displayName: json["displayName"],
         role: json["role"],
         companyCode: json["companyCode"],
         avatarUrl: json["avatarUrl"],
@@ -89,8 +84,7 @@ class UserModel {
         "email": email,
         "password": password,
         "username": username,
-        "firstName": firstName,
-        "lastName": lastName,
+        "displayName": displayName,
         "role": role,
         "companyCode": companyCode,
         "avatarUrl": avatarUrl,

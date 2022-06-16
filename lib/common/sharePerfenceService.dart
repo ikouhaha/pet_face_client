@@ -6,18 +6,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPreferencesService {
   static SharedPreferences? sharedPrefs;
 
-  static save(String key, dynamic value) {
+  static save(String key, dynamic value) async {
     if (value is bool) {
-      sharedPrefs?.setBool(key, value);
+      await sharedPrefs?.setBool(key, value);
     } else if (value is String) {
-      sharedPrefs?.setString(key, value);
+      await sharedPrefs?.setString(key, value);
     } else if (value is int) {
-      sharedPrefs?.setInt(key, value);
+      await sharedPrefs?.setInt(key, value);
     } else if (value is double) {
-      sharedPrefs?.setDouble(key, value);
+      await sharedPrefs?.setDouble(key, value);
     } else if (value is List<String>) {
-      sharedPrefs?.setStringList(key, value);
+      await sharedPrefs?.setStringList(key, value);
     }
+  }
+
+   static getString(String key) {
+   
+      return sharedPrefs?.getString(key);
+  }
+
+  static remove(String key) async {
+      await sharedPrefs?.remove(key);
   }
 
   static saveProfile(UserModel profile) {
