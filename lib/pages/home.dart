@@ -95,8 +95,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                       EasyLoading.showProgress(0.3, status: 'detecting...');
                       Response response = await Http.postImage(
                           server: Config.pythonApiServer,
-                          url: "/detectBase64",
-                          imageFile: file);
+                          url: "/detectBase64/0",
+                          imageFile: file,
+                          );
                       pet.imageBase64 = await Helper.imageToBase64(file);
                       results = petDetectResponseFromJson(
                           json.encode(response.data["result"]));

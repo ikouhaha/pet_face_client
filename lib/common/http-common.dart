@@ -160,14 +160,18 @@ class Http {
   }
 
   static Future<Response> postImage(
-      {required url, required XFile imageFile, String? server}) async {
+      {required url, required XFile imageFile, String? server, String? name}) async {
     try {
       var dio = Dio();
-      FormData body = new FormData();
+      FormData body = FormData();
       var bytes = await imageFile.readAsBytes();
       final MultipartFile file = MultipartFile.fromBytes(bytes, filename: "picture");
       MapEntry<String, MultipartFile> imageEntry = MapEntry("image", file);
       body.files.add(imageEntry);
+      if(name!=null){
+        body.fields.add(MapEntry("name", name));
+      }
+    
       // get file length
       var length = await imageFile.length();
       String _server = server ?? Config.apiServer;

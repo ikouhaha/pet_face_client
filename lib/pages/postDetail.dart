@@ -64,9 +64,6 @@ class _PostScreenState extends ConsumerState {
   void initState() {
     
     super.initState();
-      if(FirebaseAuth.instance.currentUser==null){
-      RouteStateScope.of(context).go("/signin");
-    }
   }
 
  
@@ -83,7 +80,10 @@ class _PostScreenState extends ConsumerState {
 
   @override
   Widget build(BuildContext context) {
-    
+     if (FirebaseAuth.instance.currentUser == null) {
+      RouteStateScope.of(context).go("/signin");
+      return Container();
+    }
     var provider = ref.watch(_getProfileProvider);
 
     return provider.when(

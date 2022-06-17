@@ -37,6 +37,7 @@ class CreatePostPage extends ConsumerStatefulWidget {
 }
 
 class _PostScreenState extends ConsumerState<CreatePostPage> {
+  String key = UniqueKey().toString();
   PetModel pet = PetModel();
   final _keyForm = GlobalKey<FormState>();
 
@@ -44,9 +45,6 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
   @override
   void initState() {
     super.initState();
-      if(FirebaseAuth.instance.currentUser==null){
-      RouteStateScope.of(context).go("/signin");
-    }
   }
 
   @override
@@ -61,7 +59,10 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-  
+     if (FirebaseAuth.instance.currentUser == null) {
+      RouteStateScope.of(context).go("/signin");
+      return Container();
+    }
     //return const Center(child: Text("asdsd"));
     return Scaffold(
         body: Stack(children: [
@@ -102,7 +103,9 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
             Response response = await Http.postImage(
                 server: Config.pythonApiServer,
                 url: "/detectBase64",
-                imageFile: file);
+                imageFile: file,
+                name: key
+                );
             pet.imageBase64 = await Helper.imageToBase64(file);
             results =
                 petDetectResponseFromJson(json.encode(response.data["result"]));

@@ -56,15 +56,14 @@ class _SettingScreenState extends ConsumerState {
   final _name = FormController();
   final _editKeyForm = GlobalKey<FormState>();
   final _createKeyForm = GlobalKey<FormState>();
+  String key = UniqueKey().toString();
   bool load = false;
   XFile? file;
 
   @override
   void initState() {
     super.initState();
-      if(FirebaseAuth.instance.currentUser==null){
-      RouteStateScope.of(context).go("/signin");
-    }
+    
   }
 
   @override
@@ -100,8 +99,10 @@ class _SettingScreenState extends ConsumerState {
                         EasyLoading.showProgress(0.3, status: 'detecting...');
                         Response response = await Http.postImage(
                             server: Config.pythonApiServer,
-                            url: "/detectBase64",
-                            imageFile: file);
+                            url: "/detectBase64/1",
+                            imageFile: file,
+                            name: key
+                            );
                         pet.imageBase64 = await Helper.imageToBase64(file);
                         results = petDetectResponseFromJson(
                             json.encode(response.data["result"]));
@@ -178,7 +179,9 @@ class _SettingScreenState extends ConsumerState {
                         Response response = await Http.postImage(
                             server: Config.pythonApiServer,
                             url: "/detectBase64",
-                            imageFile: file);
+                            imageFile: file,
+                            name: key
+                            );
                         pet.imageBase64 = await Helper.imageToBase64(file);
                         results = petDetectResponseFromJson(
                             json.encode(response.data["result"]));
@@ -272,8 +275,13 @@ class _SettingScreenState extends ConsumerState {
 
   @override
   Widget build(BuildContext context) {
+     if (FirebaseAuth.instance.currentUser == null) {
+      RouteStateScope.of(context).go("/signin");
+      return Container();
+    }
     var provider = ref.watch(_getProfileProvider);
     var size = MediaQuery.of(context).size;
+    
     
     /*24 is for notification bar on Android*/
     final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
