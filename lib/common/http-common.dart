@@ -165,7 +165,8 @@ class Http {
       var dio = Dio();
       FormData body = FormData();
       var bytes = await imageFile.readAsBytes();
-      final MultipartFile file = MultipartFile.fromBytes(bytes, filename: "picture");
+      final MultipartFile file = MultipartFile.fromBytes(bytes, filename: imageFile.name);
+      String orginalImageBase64 = base64Encode(bytes);
       MapEntry<String, MultipartFile> imageEntry = MapEntry("image", file);
       body.files.add(imageEntry);
       if(name!=null){
@@ -181,6 +182,7 @@ class Http {
       _server+url,
       data: body,
     );
+      response.data["orginalImageBase64"] = orginalImageBase64;
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);      

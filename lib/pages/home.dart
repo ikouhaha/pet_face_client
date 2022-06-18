@@ -22,7 +22,7 @@ import 'package:pet_saver_client/components/home_post_card.dart';
 
 import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/options.dart';
-import 'package:pet_saver_client/models/pet.dart';
+import 'package:pet_saver_client/models/post.dart';
 import 'package:pet_saver_client/models/petDetect.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
@@ -34,9 +34,9 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 
 final _getProfileProvider =
-    FutureProvider.autoDispose<List<PetModel>>((ref) async {
+    FutureProvider.autoDispose<List<PostModel>>((ref) async {
       var response = await Http.get(url: "/pets");
-  List<PetModel> pets = petModelFromJson(json.encode(response.data));
+  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
   
   return pets;
 });
@@ -76,7 +76,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Alert detectImageAlert() {
-    PetModel pet = PetModel();
+    PostModel pet = PostModel();
     //to do change it to form input
 
     List<PetDetectResponse> results = [];
@@ -127,7 +127,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Alert createAlert() {
-    PetModel pet = PetModel();
+    PostModel pet = PostModel();
     //to do change it to form input
 
     List<PetDetectResponse> results = [];
@@ -163,11 +163,11 @@ class _HomePageState extends ConsumerState<HomePage> {
             onPressed: () async {
               try {
                 if (_createKeyForm.currentState!.validate()) {
-                  pet.name = _name.ct.text;
+                  pet.type = _name.ct.text;
                   pet.about = "about";
                   pet.breedId = 1;
                   EasyLoading.showProgress(0.3, status: 'creating...');
-                  pet.cropImgBase64 = results[0].cropImgs![0];
+                  
                   pet.type = results[0].name;
 
                   Navigator.of(context, rootNavigator: true).pop();

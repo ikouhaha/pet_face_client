@@ -6,16 +6,16 @@ import 'package:pet_saver_client/router/route_state.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:pet_saver_client/common/config.dart';
 
-import 'package:pet_saver_client/models/pet.dart';
+import 'package:pet_saver_client/models/post.dart';
 
 import 'package:pet_saver_client/providers/global_provider.dart';
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class PetCard extends StatefulWidget {
-  final PetModel profile;
-  final ValueChanged<PetModel>? editCallback;
-  final ValueChanged<PetModel>? deleteCallback;
+  final PostModel profile;
+  final ValueChanged<PostModel>? editCallback;
+  final ValueChanged<PostModel>? deleteCallback;
   
   const PetCard({Key? key, required this.profile, this.editCallback,this.deleteCallback})
       : super(key: key);
@@ -28,7 +28,7 @@ class _PetCardState extends State<PetCard>{
   
 
   late AnimationController _controller;
-  late PetModel _pet;
+  late PostModel _pet;
 
   @override
   void initState() {

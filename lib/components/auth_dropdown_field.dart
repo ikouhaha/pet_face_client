@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pet_saver_client/models/options.dart';
 
 class AuthDropDownField extends StatelessWidget {
-  final String? initialValue;
+  final String? value;
   final String hint;
-  final ValueChanged<void>? onChanged;  
+  final ValueChanged<String>? onChanged;  
   final bool isPasswordField;
   final bool isRequiredField;
   final String? error;
@@ -31,7 +31,7 @@ class AuthDropDownField extends StatelessWidget {
     this.focusNode = null,
     this.padding = const EdgeInsets.all(0),
     this.icon = null,
-    this.initialValue = null,
+    this.value = null,
     required this.options,
     
   }):super(key: key);
@@ -55,7 +55,8 @@ class AuthDropDownField extends StatelessWidget {
         visible: visible,
         child: Padding(
           padding: padding,
-          child: DropdownButtonFormField(     
+          child: DropdownButtonFormField( 
+            value: value,    
             items: items,
             autovalidateMode: AutovalidateMode.onUserInteraction,    
             focusNode: focusNode,
@@ -74,7 +75,9 @@ class AuthDropDownField extends StatelessWidget {
               errorText: error,
               floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
-            onChanged: onChanged,
+            onChanged: (value){
+              onChanged?.call(value.toString());
+            },
             validator: (value){
               
               if(validator != null){

@@ -8,22 +8,22 @@ import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
-import 'package:pet_saver_client/models/pet.dart';
+import 'package:pet_saver_client/models/post.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 
-Future<List<PetModel>> fetchPetProfile({required ref}) async {
+Future<List<PostModel>> fetchPetProfile({required ref}) async {
   var token = ref.read(GlobalProvider).token;
   var response =
       await Http.get(url: "/pets");
-  List<PetModel> pets = petModelFromJson(json.encode(response.data));
+  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
   return pets;
 }
 
 final _getProfileProvider =
-    FutureProvider<List<PetModel>>((ref) async {
+    FutureProvider<List<PostModel>>((ref) async {
   return fetchPetProfile(ref: ref);
 });
 
@@ -122,7 +122,7 @@ class _PostScreenState extends ConsumerState {
         });
   }
 
-  Widget PostCard(PetModel profile){
+  Widget PostCard(PostModel profile){
   return Card(
       clipBehavior: Clip.antiAlias,
       child:  Column(
@@ -168,7 +168,7 @@ class _PostScreenState extends ConsumerState {
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.edit),
-                title: Text("${profile.name}"),
+                title: Text("${profile.type}"),
                 subtitle: Text("${profile.about}"),
               ),
               
@@ -190,7 +190,7 @@ class _PostScreenState extends ConsumerState {
 }
 
 
-   Widget CommentCard(PetModel profile){
+   Widget CommentCard(PostModel profile){
   return Form(
        key: _keyForm,
     child: Card(

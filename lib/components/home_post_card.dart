@@ -3,14 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/config.dart';
 
-import 'package:pet_saver_client/models/pet.dart';
+import 'package:pet_saver_client/models/post.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:photo_view/photo_view.dart';
 
 class PostCard extends StatefulWidget {
-  final PetModel profile;
-  final ValueChanged<PetModel>? editCallback;
-  final ValueChanged<PetModel>? deleteCallback;
+  final PostModel profile;
+  final ValueChanged<PostModel>? editCallback;
+  final ValueChanged<PostModel>? deleteCallback;
   const PostCard(
       {Key? key, required this.profile, this.editCallback, this.deleteCallback})
       : super(key: key);
@@ -22,7 +22,7 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   // final _keyForm = GlobalKey<FormState>();
 
-  late PetModel _pet;
+  late PostModel _pet;
 
   @override
   void initState() {

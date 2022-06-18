@@ -13,13 +13,14 @@ import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/image_field.dart';
+import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_dropdown_field.dart';
 import 'package:pet_saver_client/components/auth_radio_field.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
 import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/options.dart';
-import 'package:pet_saver_client/models/pet.dart';
+import 'package:pet_saver_client/models/post.dart';
 import 'package:pet_saver_client/models/petDetect.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
@@ -37,20 +38,63 @@ class CreatePostPage extends ConsumerStatefulWidget {
 }
 
 class _PostScreenState extends ConsumerState<CreatePostPage> {
-  String key = UniqueKey().toString();
-  PetModel pet = PetModel();
+  String imageName = Helper.uuid();
+  PostModel post = PostModel();
   final _keyForm = GlobalKey<FormState>();
+  final _petType = FormController();
+  final _postType = FormController();
+  final _breeds = FormController();
+   List<Option> dogBreeds = [];
+   List<Option> catBreeds = [];
+    List<Option> postTypes = [];
 
   List<PetDetectResponse> results = [];
   @override
   void initState() {
     super.initState();
+    _petType.ct.text = "cat"; //default value
+    var profile = SharedPreferencesService.getProfile()!;
+    dogBreeds.add(Option(value: "shiba_inu",name: "Shiba Inu") );
+    dogBreeds.add(Option(value: "corgi",name:"Corgi") );
+    dogBreeds.add(Option(value: "husky",name:"Husky") );
+    dogBreeds.add(Option(value: "others",name:"Others") );
+
+    catBreeds.add(Option(value: "calico",name:"Calico") );
+    catBreeds.add(Option(value: "tuxedo",name:"Tuxedo"));
+    catBreeds.add(Option(value: "tortoiseshell",name:"Tortoiseshell") );
+    catBreeds.add(Option(value: "others",name:"Others"));
+
+    _petType.ct.addListener(() {
+      post.petType = _petType.ct.text;
+      _breeds.ct.text = "";
+    });
+
+    _breeds.ct.addListener(() {
+      post.breed = _breeds.ct.text;
+    });
+
+    _postType.ct.addListener(() {
+      post.type = _postType.ct.text;
+    });
+
+    if(profile.role=="user"){
+      postTypes.add(Option(value: "lost",name:"Lost"));
+      postTypes.add(Option(value: "found",name:"Found"));
+    }else if(profile.role=="staff"){
+      postTypes.add(Option(value: "lost",name:"Lost"));
+      postTypes.add(Option(value: "found",name:"Found"));
+      postTypes.add(Option(value: "adopt",name:"Adoption"));
+    }
+
   }
 
   @override
   void dispose() {
     super.dispose();
     _keyForm.currentState?.dispose();
+    _breeds.dispose();
+    _postType.dispose();
+    _petType.dispose();
   }
 
   // void _handleBookTapped(Book book) {
@@ -97,16 +141,19 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
   Widget _imageField() {
     return ImageField(
         image: null,
+        validator: (value){
+          return  Validations.validateText(value);
+        },
         callback: (file, setImg) async {
           try {
             EasyLoading.showProgress(0.3, status: 'detecting...');
             Response response = await Http.postImage(
                 server: Config.pythonApiServer,
-                url: "/detectBase64",
+                url: "/detectBase64/1",
                 imageFile: file,
-                name: key
+                name: imageName
                 );
-            pet.imageBase64 = await Helper.imageToBase64(file);
+            post.imageBase64 = await Helper.imageToBase64(file);
             results =
                 petDetectResponseFromJson(json.encode(response.data["result"]));
             print(results);
@@ -130,21 +177,24 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
   Widget _postTypeField() {
     return AuthDropDownField(
         key: const Key('post type'),
-        icon: const Icon(Icons.list),
+        icon: const Icon(Icons.question_mark),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Post Type',
-        //validator: (value) => Validations.validateName(value),
-        options: [
-          Option(name: "cat", value: "cat"),
-          Option(name: "dog", value: "dog"),
-          Option(name: "dog", value: "dog")
-        ]);
+        validator: (value) => Validations.validateText(value),
+        options:postTypes,
+          onChanged: (value) {
+          setState(() {
+            _postType.ct.text = value;
+          });
+        });
+
   }
 
   Widget _petTypeField() {
     return AuthRadioField(
       type: RadioWidget.row,
       key: const Key('pet type'),
+      controller: _petType.ct,
       icon: const Icon(Icons.list),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       hint: 'Post Type',
@@ -153,21 +203,44 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
         Option(name: "cat", value: "cat"),
         Option(name: "dog", value: "dog")
       ],
-      onChanged: (value) {},
+       onChanged: (value) => setState(() {
+              _petType.ct.text = value;
+            })
     );
   }
 
   Widget _BreedsField() {
-    return AuthDropDownField(
-        key: const Key('breeds'),
+    if( _petType.ct.text=="cat"){
+        return AuthDropDownField(
+        key: const Key('breedsCat'),
+        icon: const Icon(Icons.list),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'Breeds',
+        validator: (value) => Validations.validateName(value),
+        options: catBreeds,
+        value:_breeds.ct.text.isEmpty? null: _breeds.ct.text,
+        onChanged: (value) {
+          setState(() {
+            _breeds.ct.text = value;
+          });
+        });
+    }else{
+        return AuthDropDownField(
+        key: const Key('breedsDog'),
         icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Breeds',
         //validator: (value) => Validations.validateName(value),
-        options: [
-          Option(name: "cat", value: "cat"),
-          Option(name: "dog", value: "dog")
-        ]);
+        options: dogBreeds,
+        value:_breeds.ct.text.isEmpty? null: _breeds.ct.text,
+        onChanged: (value) {
+            setState(() {
+            _breeds.ct.text = value;
+          });
+        },
+        );
+    }
+  
   }
 
   Widget _descriptionField() {
