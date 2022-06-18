@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 class Validations {
@@ -40,7 +42,17 @@ class Validations {
      
      if (value == null || value.isEmpty) {
        
-      return "Please fill the  field";
+      return "Please fill the field";
+    }
+
+    return null;
+  }
+
+   static String? validateInt(Int? value) {
+     
+     if (value == null) {
+       
+      return "Please fill the field";
     }
 
     return null;

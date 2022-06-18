@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/validations.dart';
 
 class ImageField extends StatefulWidget {
@@ -29,6 +30,7 @@ class ImageField extends StatefulWidget {
 class ImageFromGalleryExState extends State<ImageField> {
   var _image;
   var imagePicker;
+  var value;
 
   ImageFromGalleryExState();
 
@@ -51,58 +53,13 @@ class ImageFromGalleryExState extends State<ImageField> {
     });
   }
 
-  // List<Widget> getImageWidgets() {
-  //   var widgets = <Widget>[];
-  //   widgets.add(Center(
-  //     child: GestureDetector(
-  //       onTap: () async {
-  //         var source = ImageSource.gallery;
-
-  //         XFile image = await imagePicker.pickImage(
-  //             source: source,
-  //             imageQuality: 50,
-  //             preferredCameraDevice: CameraDevice.front);
-  //         setState(() {
-  //           //_image = getImg(image.path);
-  //           widget.callback(image, setImg);
-  //         });
-  //       },
-  //       child: Container(
-  //         width: 224,
-  //         height: 224,
-  //         decoration: BoxDecoration(color: Colors.grey[200]),
-  //         child: _image != null
-  //             ? _image
-  //             : Container(
-  //                 decoration: BoxDecoration(color: Colors.grey[200]),
-  //                 width: 224,
-  //                 height: 224,
-  //                 child: Icon(
-  //                   Icons.camera_alt,
-  //                   color: Colors.grey[800],
-  //                 ),
-  //               ),
-  //       ),
-  //     ),
-  //   ));
-
-  //   if (widget.error != null && widget.error!.isNotEmpty) {
-  //     widgets.add(
-  //       Text(
-  //         widget.error!,
-  //         style: TextStyle(color: Colors.red),
-  //       ),
-  //     );
-  //   }
-
-  //   return widgets;
-  // }
 
   @override
   Widget build(BuildContext context) {
     return ImageFormField(
       image: _image,
       callback: widget.callback,
+      initialValue: value??"",
       validator: (value) {
         if (widget.validator != null) {
           String? result = widget.validator!(value);
@@ -124,6 +81,7 @@ class ImageFromGalleryExState extends State<ImageField> {
             preferredCameraDevice: CameraDevice.front);
         setState(() {
           //_image = getImg(image.path);
+          value = image.path;
           widget.callback(image, setImg);
         });
       },

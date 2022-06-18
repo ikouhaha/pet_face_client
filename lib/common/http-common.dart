@@ -67,6 +67,7 @@ class Http {
       Response response = await dio.get(Config.apiServer + url);
       return response;
     } on DioError catch (ex) {
+      print(ex);
       String errorMsg = getErrorMsg(ex: ex);
       if (ex.response != null && ex.response!.statusCode == 401) {
        // await ref.read(GlobalProvider).logout();

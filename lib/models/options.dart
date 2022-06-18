@@ -11,11 +11,11 @@ class Option {
     });
 
     String? name;
-    String? value;
+    dynamic value;
 
     Option copyWith({
         String? name,
-        String? value,
+        dynamic value,
     }) => 
         Option(
             name: name ?? this.name,

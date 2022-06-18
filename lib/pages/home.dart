@@ -282,7 +282,6 @@ class _HomePageState extends ConsumerState<HomePage> {
         options: [
           Option(name: "cat", value: "cat"),
           Option(name: "dog", value: "dog"),
-          Option(name: "dog", value: "dog")
         ]);
   }
 

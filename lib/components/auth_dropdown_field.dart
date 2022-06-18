@@ -1,7 +1,14 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+
 import 'package:pet_saver_client/models/options.dart';
+enum AuthDropDownFieldType {
+String,Int
+}
 
 class AuthDropDownField extends StatelessWidget {
+  
   final String? value;
   final String hint;
   final ValueChanged<String>? onChanged;  
@@ -9,6 +16,7 @@ class AuthDropDownField extends StatelessWidget {
   final bool isRequiredField;
   final String? error;
   final bool visible;
+  
 
   final EdgeInsets padding;
   final Icon? icon;
@@ -16,7 +24,7 @@ class AuthDropDownField extends StatelessWidget {
   final Function? validator;
   final FocusNode? focusNode;
   final List<Option> options;
-  
+  final AuthDropDownFieldType optionType;
 
   const AuthDropDownField({
     required Key key,
@@ -32,19 +40,34 @@ class AuthDropDownField extends StatelessWidget {
     this.padding = const EdgeInsets.all(0),
     this.icon = null,
     this.value = null,
+    this.optionType = AuthDropDownFieldType.String,
     required this.options,
     
   }):super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<DropdownMenuItem<String>> items = [];
-    options.forEach((Option options) {
-      items.add(DropdownMenuItem(
+    List<DropdownMenuItem<String>> stringItems = [];
+    List<DropdownMenuItem<Int>> intItems = [];
+    if( optionType==AuthDropDownFieldType.Int){
+         options.forEach((Option options) {
+      intItems.add(DropdownMenuItem(
         child: Text(options.name!),
         value: options.value,
       ));
     });
+    }else{
+    
+        options.forEach((Option options) {
+      stringItems.add(DropdownMenuItem(
+        child: Text(options.name!),
+        value: options.value.toString(),
+      ));
+    });
+
+    }
+   
+  
 
     // print(this.error);
     UnderlineInputBorder border = UnderlineInputBorder(
@@ -57,7 +80,7 @@ class AuthDropDownField extends StatelessWidget {
           padding: padding,
           child: DropdownButtonFormField( 
             value: value,    
-            items: items,
+            items: optionType==AuthDropDownFieldType.Int?intItems:stringItems,
             autovalidateMode: AutovalidateMode.onUserInteraction,    
             focusNode: focusNode,
             autofocus: false,            
