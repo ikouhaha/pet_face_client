@@ -29,23 +29,23 @@ import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PostLoadingData {
-  final List<Breed> catBreeds;
-  final List<Breed> dogBreeds;
+  final List<Option> catBreeds;
+  final List<Option> dogBreeds;
+  final List<Option> districts;
 
-  PostLoadingData(this.catBreeds, this.dogBreeds);
+  PostLoadingData(this.catBreeds, this.dogBreeds,this.districts);
 }
 
-Future<PostLoadingData> _fetchData() async {
-  var response = await Http.get(url: "/breeds/cat");
-  var catBreeds = BreedFromJson(json.encode(response.data));
-  response = await Http.get(url: "/breeds/dog");
-  var dogBreeds = BreedFromJson(json.encode(response.data));
 
-  return PostLoadingData(catBreeds, dogBreeds);
-}
 
 final _getDataProvider = FutureProvider<PostLoadingData>((ref) async {
-  return _fetchData();
+     var response = await Http.get(url: "/options/breeds/cat");
+  var catBreeds = optionsFromJson(json.encode(response.data));
+  response = await Http.get(url: "/options/breeds/dog");
+  var dogBreeds = optionsFromJson(json.encode(response.data));
+  response = await Http.get(url: "/options/districts");
+  var districts = optionsFromJson(json.encode(response.data));
+  return PostLoadingData(catBreeds, dogBreeds,districts);
 });
 
 class CreatePostPage extends ConsumerStatefulWidget {
@@ -58,24 +58,27 @@ class CreatePostPage extends ConsumerStatefulWidget {
 }
 
 class _PostScreenState extends ConsumerState<CreatePostPage> {
-  String imageName = Helper.uuid();
   PostModel post = PostModel();
   final _keyForm = GlobalKey<FormState>();
   final _petType = FormController();
   final _postType = FormController();
   final _breeds = FormController();
   final _about = FormController();
+  final _district = FormController();
   List<Option> dogBreeds = [];
   List<Option> catBreeds = [];
   List<Option> postTypes = [];
-
+  List<Option> districts = [];
   List<PetDetectResponse> results = [];
   @override
   void initState() {
     super.initState();
-    _petType.ct.text = "cat"; //default value
+    //_petType.ct.text = "cat"; //default value
     var profile = SharedPreferencesService.getProfile()!;
 
+    _district.ct.addListener(() {
+        post.district = _district.ct.text; 
+    });
     _petType.ct.addListener(() {
       post.petType = _petType.ct.text;
       
@@ -112,6 +115,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
     _postType.dispose();
     _petType.dispose();
     _about.dispose();
+    _district.dispose();
   }
 
   // void _handleBookTapped(Book book) {
@@ -141,13 +145,10 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
           return Text("Error: ${err}");
         },
         data: (data) {
-          for (var element in data.dogBreeds) {
-            dogBreeds.add(Option(value: element.id, name: element.name));
-          }
-          for (var element in data.catBreeds) {
-            catBreeds.add(Option(value: element.id, name: element.name));
-          }
-
+          dogBreeds = data.dogBreeds;
+          catBreeds = data.catBreeds;
+          districts = data.districts;
+          
           return Scaffold(
             body: Stack(children: [
               Positioned.fill(
@@ -169,6 +170,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
                                       _postTypeField(),
                                       _BreedsField(),
                                       _imageField(),
+                                      _districtField(),
                                       _descriptionField(),
                                       _submitButton(),
                                       // const _SignUpButton(),
@@ -190,18 +192,26 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
             EasyLoading.showProgress(0.3, status: 'detecting...');
             Response response = await Http.postImage(
                 server: Config.pythonApiServer,
-                url: "/detectBase64/1",
-                imageFile: file,
-                name: imageName);
+                url: "/detectBase64/0",
+                imageFile: file
+                );
             post.imageBase64 = await Helper.imageToBase64(file);
-            post.imageFilename = imageName;
+            post.imageFilename = Helper.uuid()+".jpg";
             results =
                 petDetectResponseFromJson(json.encode(response.data["result"]));
             print(results);
             for (var result in results) {
               if (result.name != null) {
+                if(result.name!=post.petType){
+                  _breeds.ct.text = "";
+                }
                 _petType.ct.text = result.name!;
-                _breeds.ct.text = "";
+                post.petType = result.name!;
+                for(var crop in result.cropImgs!){
+                     post.cropImageBase64 = crop;
+                  }
+               
+                
               }
             }
             //todo make it to multiple, currently just support a pet a image
@@ -218,6 +228,21 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
           }
 
           //ref.read(RegisterProvider).setImage(value)
+        });
+  }
+
+  Widget _districtField() {
+    return AuthDropDownField(
+        key: const Key('_districtField'),
+        icon: const Icon(Icons.map),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'District',
+        validator: (value) => Validations.validateText(value),
+        options: districts,
+        onChanged: (value) {
+          setState(() {
+            _district.ct.text = value;
+          });
         });
   }
 
@@ -269,7 +294,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
               _breeds.ct.text = value;
             });
           });
-    } else {
+    } else if(_petType.ct.text == "dog") {
       return AuthDropDownField(
         key: const Key('breedsDog'),
         icon: const Icon(Icons.list),
@@ -283,6 +308,17 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
             _breeds.ct.text = value;
           });
         },
+      );
+    }else{
+       return AuthDropDownField(
+        key: const Key('breedsEmpty'),
+        icon: const Icon(Icons.list),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'Please upload a image',
+        validator: (value) => Validations.validateText(value),
+        options: [],
+        value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
+        onChanged: null,
       );
     }
   }
@@ -310,7 +346,16 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
             // you'd often call a server or save the information in a database.
             try {
               EasyLoading.showProgress(0.3, status: 'Processing...');
-              Response response = await Http.post(url: "/posts", data: post);
+              Response response = await Http.post(url: "/posts", data: post.toJson());
+              //save image after success save the post to the database
+              await Http.post(
+                server: Config.pythonApiServer,
+                url: "/image",
+                data: {
+                  "name": post.imageFilename,
+                  "type": post.petType,
+                  "imageBase64":post.imageBase64
+                });
               RouteStateScope.of(context).go("/");
               EasyLoading.showSuccess("create success");
             } catch (e) {

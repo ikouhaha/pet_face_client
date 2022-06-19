@@ -31,11 +31,16 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 
+class DataFilter {
+  static int page = 1;
+  static int limit = 10;
+}
 
 
-final _getProfileProvider =
+
+final _getDataProvider =
     FutureProvider.autoDispose<List<PostModel>>((ref) async {
-      var response = await Http.get(url: "/pets");
+      var response = await Http.get(url: "/posts?page=${DataFilter.page}&limit=${DataFilter.limit}");
   List<PostModel> pets = PostModelFromJson(json.encode(response.data));
   
   return pets;
@@ -197,7 +202,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var provider = ref.watch(_getProfileProvider);
+    var provider = ref.watch(_getDataProvider);
     
     //return Text('data');
     var size = MediaQuery.of(context).size;
@@ -220,16 +225,16 @@ class _HomePageState extends ConsumerState<HomePage> {
 
           return Text("Error: ${err}");
         },
-        data: (profiles) {
+        data: (data) {
           return Scaffold(
             body: MasonryGridView.count(
               addAutomaticKeepAlives: true,
               crossAxisCount: 2,
               mainAxisSpacing: 2,
               crossAxisSpacing: 2,
-              itemCount: profiles.length,
+              itemCount: data.length,
               itemBuilder: (context, index) {
-                return PostCard(profile: profiles[index]);
+                return PostCard(profile: data[index]);
               },
             ),
             floatingActionButton: _createButton(),

@@ -22,12 +22,12 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   // final _keyForm = GlobalKey<FormState>();
 
-  late PostModel _pet;
+  late PostModel _post;
 
   @override
   void initState() {
     super.initState();
-    _pet = widget.profile;
+    _post = widget.profile;
   }
 
   @override
@@ -49,7 +49,7 @@ class _PostCardState extends State<PostCard> {
               
               // customSize: Size(MediaQuery.of(context).size.width,150),
               imageProvider:
-                  NetworkImage(Config.apiServer + "/pets/image/${_pet.id}"),
+                  NetworkImage(Config.apiServer + "/posts/image/${_post.id}"),
 
               // initialScale: PhotoViewComputedScale.contained,
             ),
@@ -57,14 +57,14 @@ class _PostCardState extends State<PostCard> {
           ListTile(
             minLeadingWidth: 2,
             leading: const Icon(Icons.question_mark),
-            title: _pet.type == "cat"
+            title: _post.type == "cat"
                 ? const Text("Lost")
                 : const Text("Adoption"),
           ),
           ListTile(
             minLeadingWidth: 2,
             leading: const Icon(Icons.pets),
-            title: Text("${_pet.type}"),
+            title: Text("${_post.type}"),
           ),
           const ListTile(
             minLeadingWidth: 2,
@@ -78,7 +78,7 @@ class _PostCardState extends State<PostCard> {
           ),
           CupertinoButton(
                 onPressed: (){
-                   RouteStateScope.of(context).go("/post/${_pet.id}");
+                   RouteStateScope.of(context).go("/post/${_post.id}");
                 },
                 child:Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -104,14 +104,14 @@ class _PostCardState extends State<PostCard> {
         FlatButton(
           textColor: const Color(0xFF6200EE),
           onPressed: () =>
-              widget.editCallback == null ? null : widget.editCallback!(_pet),
+              widget.editCallback == null ? null : widget.editCallback!(_post),
           child: const Text('edit'),
         ),
         FlatButton(
           textColor: const Color(0xFF6200EE),
           onPressed: () => widget.deleteCallback == null
               ? null
-              : widget.deleteCallback!(_pet),
+              : widget.deleteCallback!(_post),
           child: const Text('delete'),
         )
       ],

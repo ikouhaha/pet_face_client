@@ -19,9 +19,12 @@ class PostModel {
       this.createdBy,
       this.id,
       this.breed,
+      this.createBy,
       this.companyCode,
       this.imageFilename,
-      this.petType
+      this.petType,
+      this.cropImageBase64,
+      this.district
       
       });
 
@@ -29,13 +32,16 @@ class PostModel {
   String? about;
   int? breedId;
   String? imageBase64;
+  String? cropImageBase64;
 
   int? createdBy;
   int? id;
   String? companyCode;
   String? imageFilename;
    String? petType;
-  dynamic? breed;
+   String? district;
+  dynamic breed;
+  dynamic createBy;
 
   PostModel copyWith({
     String? name,
@@ -49,6 +55,8 @@ class PostModel {
     String? companyCode,
     String? imageFilename,
     String? petType,
+    String? district
+    
   }) =>
       PostModel(
         about: about ?? this.about,
@@ -61,6 +69,8 @@ class PostModel {
         companyCode: companyCode ?? this.companyCode,
         imageFilename: imageFilename ?? this.imageFilename,
         petType: petType ?? this.petType,
+        cropImageBase64: cropImageBase64?? this.cropImageBase64,
+        district: district ?? this.district
       );
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
@@ -74,6 +84,9 @@ class PostModel {
         companyCode: json["companyCode"],
         imageFilename: json["imageFilename"],
         petType: json["petType"],
+        createBy: json["createBy"],
+        cropImageBase64: json["cropImageBase64"],
+        district: json["district"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -86,5 +99,7 @@ class PostModel {
         "companyCode": companyCode,
         "imageFilename": imageFilename,
         "petType": petType,
+        "cropImageBase64" : cropImageBase64,
+        "district": district
       };
 }

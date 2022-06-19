@@ -49,7 +49,7 @@ class _PetCardState extends State<PetCard>{
               child: PhotoView(
                 // customSize: Size(MediaQuery.of(context).size.width,150),
                 imageProvider:
-                    NetworkImage(Config.apiServer + "/pets/image/${_pet.id}"),
+                    NetworkImage(Config.apiServer + "/posts/image/${_pet.id}"),
 
                 initialScale: PhotoViewComputedScale.contained,
               ),

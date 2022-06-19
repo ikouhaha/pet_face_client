@@ -178,7 +178,7 @@ class _PostScreenState extends ConsumerState {
                 child: PhotoView(
                   // customSize: Size(MediaQuery.of(context).size.width,150),
                   imageProvider:
-                      NetworkImage(Config.apiServer + "/pets/image/${profile.id}"),
+                      NetworkImage(Config.apiServer + "/posts/image/${profile.id}"),
 
                   initialScale: PhotoViewComputedScale.contained,
                 ),

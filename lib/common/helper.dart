@@ -52,7 +52,7 @@ class Helper {
 
 
   static Image getPetImage(int? id) {
-    return Image.network(Config.apiServer + "/pets/image/${id}");
+    return Image.network(Config.apiServer + "/posts/image/${id}");
   }
 
   static Future<String> imageToBase64(XFile file) async {

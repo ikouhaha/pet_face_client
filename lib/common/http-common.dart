@@ -54,7 +54,7 @@ class Http {
   }
 
   static Future<Response> get(
-      { required url, authorization}) async {
+      { required url, authorization, String? server}) async {
     try {
       //print(navigatorKey.currentContext);
 
@@ -64,7 +64,7 @@ class Http {
       }else{
          dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
-      Response response = await dio.get(Config.apiServer + url);
+      Response response = await dio.get((server ?? Config.apiServer )+ url);
       return response;
     } on DioError catch (ex) {
       print(ex);
@@ -81,7 +81,7 @@ class Http {
   }
 
   static Future<Response> post(
-      { required url, data, authorization}) async {
+      { required url, data, authorization, String? server}) async {
     try {
       var dio = Dio();
       if (authorization != null) {
@@ -89,7 +89,7 @@ class Http {
       }else{
         dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
-      Response response = await dio.post(Config.apiServer + url, data: data);
+      Response response = await dio.post((server ?? Config.apiServer )+ url, data: data);
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
@@ -107,7 +107,7 @@ class Http {
   }
 
   static Future<Response> put(
-      { required url, data, authorization}) async {
+      { required url, data, authorization, String? server}) async {
     try {
       var dio = Dio();
       if (authorization != null) {
@@ -116,7 +116,7 @@ class Http {
        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
 
-      Response response = await dio.put(Config.apiServer + url, data: data);
+      Response response = await dio.put((server ?? Config.apiServer )+ url, data: data);
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
@@ -134,7 +134,7 @@ class Http {
   }
 
   static Future<Response> delete(
-      { required url, authorization}) async {
+      { required url, authorization, String? server}) async {
     try {
       var dio = Dio();
       if (authorization != null) {
@@ -143,7 +143,7 @@ class Http {
         dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
 
-      Response response = await dio.delete(Config.apiServer + url);
+      Response response = await dio.delete((server ?? Config.apiServer )+ url);
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);
