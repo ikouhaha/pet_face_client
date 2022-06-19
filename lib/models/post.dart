@@ -19,13 +19,14 @@ class PostModel {
       this.createdBy,
       this.id,
       this.breed,
-      this.createBy,
+      this.createdByName,
       this.companyCode,
       this.imageFilename,
       this.petType,
       this.cropImageBase64,
-      this.district
-      
+      this.district,
+      this.districtId,
+      this.createdOn
       });
 
   String? type;
@@ -36,12 +37,16 @@ class PostModel {
 
   int? createdBy;
   int? id;
+  int? districtId;
   String? companyCode;
   String? imageFilename;
-   String? petType;
-   String? district;
-  dynamic breed;
-  dynamic createBy;
+  String? petType;
+   
+  String? district;
+  String? breed;
+  String? createdByName;
+  DateTime? createdOn;
+
 
   PostModel copyWith({
     String? name,
@@ -51,11 +56,13 @@ class PostModel {
     int? createdBy,
     int? id,
     String? type,
-    dynamic? breed,
+    String? breed,
     String? companyCode,
     String? imageFilename,
     String? petType,
-    String? district
+    String? district,
+    int? districtId,
+    DateTime? createdOn,
     
   }) =>
       PostModel(
@@ -70,7 +77,10 @@ class PostModel {
         imageFilename: imageFilename ?? this.imageFilename,
         petType: petType ?? this.petType,
         cropImageBase64: cropImageBase64?? this.cropImageBase64,
-        district: district ?? this.district
+        district: district ?? this.district,
+        districtId: districtId ?? this.districtId,
+        createdOn: createdOn ?? this.createdOn,
+
       );
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
@@ -84,9 +94,11 @@ class PostModel {
         companyCode: json["companyCode"],
         imageFilename: json["imageFilename"],
         petType: json["petType"],
-        createBy: json["createBy"],
+        createdByName: json["createdByName"],
         cropImageBase64: json["cropImageBase64"],
-        district: json["district"]
+        district: json["district"],
+        districtId: json["districtId"],
+        createdOn: DateTime.parse(json["createdOn"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -100,6 +112,6 @@ class PostModel {
         "imageFilename": imageFilename,
         "petType": petType,
         "cropImageBase64" : cropImageBase64,
-        "district": district
+        "districtId": districtId,
       };
 }

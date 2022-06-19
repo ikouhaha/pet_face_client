@@ -2,10 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/config.dart';
+import 'package:pet_saver_client/common/helper.dart';
 
 import 'package:pet_saver_client/models/post.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:photo_view/photo_view.dart';
+
+
 
 class PostCard extends StatefulWidget {
   final PostModel profile;
@@ -30,6 +33,8 @@ class _PostCardState extends State<PostCard> {
     _post = widget.profile;
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -37,10 +42,10 @@ class _PostCardState extends State<PostCard> {
       child:  Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const ListTile(
+          ListTile(
             minLeadingWidth: 2,
             leading: Icon(Icons.person),
-            title: Text("Riz Wong"),
+            title: Text(_post.createdByName??''),
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width,
@@ -57,24 +62,22 @@ class _PostCardState extends State<PostCard> {
           ListTile(
             minLeadingWidth: 2,
             leading: const Icon(Icons.question_mark),
-            title: _post.type == "cat"
-                ? const Text("Lost")
-                : const Text("Adoption"),
+            title: Text(_post.type??''),
           ),
           ListTile(
             minLeadingWidth: 2,
             leading: const Icon(Icons.pets),
-            title: Text("${_post.type}"),
+            title: Text(_post.petType??''),
           ),
-          const ListTile(
+           ListTile(
             minLeadingWidth: 2,
             leading: Icon(Icons.lock_clock),
-            title: Text("a day ago"),
+            title: Text(Helper.getTimeAgo(_post.createdOn)),
           ),
-          const ListTile(
+           ListTile(
             minLeadingWidth: 2,
             leading: Icon(Icons.location_on_rounded),
-            title: Text("Tuen Mun District"),
+            title: Text(_post.district??''),
           ),
           CupertinoButton(
                 onPressed: (){

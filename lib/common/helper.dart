@@ -10,11 +10,21 @@ import 'package:image_picker/image_picker.dart';
 import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/models/storage.dart';
 import 'package:pet_saver_client/models/user.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class Helper {
   static String uuid() {
     // ignore: unnecessary_new
     return new DateTime.now().millisecondsSinceEpoch.toString();
+  }
+
+  static String getTimeAgo(DateTime? dateTime) {
+    if(dateTime==null){
+      return "";
+    }
+    //final fifteenAgo = dateTime!.subtract(new Duration(minutes: 15));
+
+    return (timeago.format(dateTime)); // 15 minutes ago
   }
 
   static void showErrorToast({msg}) {

@@ -153,7 +153,7 @@ class _PostScreenState extends ConsumerState {
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.list),
-                title: Text("${profile.breed["bred_for"]}"),
+                title: Text("${profile.breed}"),
               ),
                ListTile(
                 minLeadingWidth: 2,

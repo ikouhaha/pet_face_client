@@ -48,13 +48,6 @@ class GlobalNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<UserModel> fetchProfile({required  ref}) async {
-   
-    var response = await Http.get(url: "/users/profile");
-    this.token = token??"";
-    UserModel userModel = UserModel.fromJson(response.data);
-    return userModel;
-  }
 
 
   @override

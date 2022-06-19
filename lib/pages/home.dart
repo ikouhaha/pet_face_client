@@ -37,7 +37,6 @@ class DataFilter {
 }
 
 
-
 final _getDataProvider =
     FutureProvider.autoDispose<List<PostModel>>((ref) async {
       var response = await Http.get(url: "/posts?page=${DataFilter.page}&limit=${DataFilter.limit}");

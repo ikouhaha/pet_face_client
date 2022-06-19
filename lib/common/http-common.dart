@@ -62,7 +62,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-         dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       }
       Response response = await dio.get((server ?? Config.apiServer )+ url);
       return response;
