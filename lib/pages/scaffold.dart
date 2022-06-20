@@ -87,30 +87,35 @@ class MyScaffoldState extends State<MyScaffold> {
               title: const Text('Home'),
               onTap: () {
                 routeState.go('/');
+                Navigator.of(context).pop();
               },
             ),
             ListTile(
               title: const Text('Message'),
               onTap: () {
                 routeState.go('/message');
+                Navigator.of(context).pop();
               },
             ),
             ListTile(
               title: const Text('Add Post'),
               onTap: () {
-                routeState.go('/post');
+                routeState.go('/new/post');
+                Navigator.of(context).pop();
               },
             ),
             ListTile(
               title: const Text('My Post'),
               onTap: () {
                 routeState.go('/mypost');
+                Navigator.of(context).pop();
               },
             ),
             ListTile(
               title: const Text('Setting'),
               onTap: () {
                 routeState.go('/settings');
+                Navigator.of(context).pop();
               },
             ),
           ],

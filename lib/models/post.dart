@@ -7,6 +7,9 @@ import 'dart:convert';
 List<PostModel> PostModelFromJson(String str) =>
     List<PostModel>.from(json.decode(str).map((x) => PostModel.fromJson(x)));
 
+PostModel PostModelObjFromJson(String str) => PostModel.fromJson(json.decode(str));
+
+
 String PostModelToJson(List<PostModel> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
@@ -87,7 +90,7 @@ class PostModel {
         about: json["about"],
         breedId: json["breedID"],
         imageBase64: json["imageBase64"],
-        createdBy: json["createdBy"],
+        createdBy: json["createdBy"],  
         id: json["id"],
         type: json["type"],
         breed: json["breed"],

@@ -218,7 +218,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         error: (dynamic err, stack) {
           if (err.message == 401) {
             FirebaseAuth.instance.signOut();
-            RouteStateScope.of(context).go("/signin");
+            RouteStateScope.of(context).go("/");
             
           }
 

@@ -16,7 +16,7 @@ import 'package:pet_saver_client/common/image_field.dart';
 import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_dropdown_field.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
-import 'package:pet_saver_client/components/pet_card.dart';
+import 'package:pet_saver_client/components/post_card.dart';
 import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/options.dart';
 import 'package:pet_saver_client/models/post.dart';
@@ -27,18 +27,13 @@ import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-Future<List<PostModel>> fetchPetProfile(
-    {required  ref}) async {
-  var token = ref.read(GlobalProvider).token;
-  var response =
-      await Http.get(url: "/pets");
-  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
-  return pets;
-}
 
-final _getProfileProvider =
+final _getDataProvider =
     FutureProvider.autoDispose<List<PostModel>>((ref) async {
-  return fetchPetProfile(ref: ref);
+      var response = await Http.get(url: "/posts/me");
+  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
+  
+  return pets;
 });
 
 
@@ -79,7 +74,7 @@ class _SettingScreenState extends ConsumerState {
     
   }
   void loadPage() {
-    ref.refresh(_getProfileProvider);
+    ref.refresh(_getDataProvider);
   }
   Alert editAlert(PostModel pet) {
     _name.ct.text = pet.type!;
@@ -279,7 +274,7 @@ class _SettingScreenState extends ConsumerState {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }
-    var provider = ref.watch(_getProfileProvider);
+    var provider = ref.watch(_getDataProvider);
     var size = MediaQuery.of(context).size;
     
     
@@ -291,9 +286,10 @@ class _SettingScreenState extends ConsumerState {
               child: CircularProgressIndicator(),
             ),
        error: (dynamic err, stack) {
-          if (err.message == "Unauthorized") {
-            ref.read(GlobalProvider).logout();
-            RouteStateScope.of(context).go("/signin");
+         if (err.message == 401) {
+            FirebaseAuth.instance.signOut();
+            RouteStateScope.of(context).go("/");
+            
           }
 
           return Text("Error: ${err}");

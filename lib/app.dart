@@ -36,6 +36,7 @@ class _BookstoreState extends State<App> {
         '/settings',
         '/mypost',
         '/new/post',
+        '/edit/post',
         '/post/:id'
       ],
       guard: _guard,

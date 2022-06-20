@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/config.dart';
+import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/validations.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
@@ -14,51 +15,34 @@ import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
 
-Future<List<PostModel>> fetchPetProfile({required ref}) async {
-  var token = ref.read(GlobalProvider).token;
-  var response =
-      await Http.get(url: "/pets");
-  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
-  return pets;
-}
 
-final _getProfileProvider =
-    FutureProvider<List<PostModel>>((ref) async {
-  return fetchPetProfile(ref: ref);
+
+
+final _getDataProvider = 
+    FutureProvider.autoDispose.family<PostModel, String>((ref,id) async {
+ 
+      var response = await Http.get(url: "/posts/$id");
+  PostModel post = PostModelObjFromJson(json.encode(response.data));
+  
+  return post;
 });
 
-final StateNotifierProvider<PostDetailPageState, int> SettingPageProvider =
-    StateNotifierProvider<PostDetailPageState, int>(
-        (_) => PostDetailPageState());
-
-
-
-class PostDetailPageState extends StateNotifier<int> {
-  PostDetailPageState() : super(0);
-
-
-
-  void setState(num) => {state = num};
-
- 
-
-  @override
-  String toString() {
-    return 'state：$state';
-  }
-}
 
 
 class PostDetailPage extends ConsumerStatefulWidget {
+  
   const PostDetailPage({
     Key? key,
   }) : super(key: key);
+
+  
 
   @override
   _PostScreenState createState() => _PostScreenState();
 }
 
 class _PostScreenState extends ConsumerState {
+  
   final _keyForm = GlobalKey<FormState>();
   @override
   void initState() {
@@ -70,8 +54,10 @@ class _PostScreenState extends ConsumerState {
   @override
   void dispose() {
     super.dispose();
+    
   }
   RouteState get _routeState => RouteStateScope.of(context);
+  
   
 
   // void _handleBookTapped(Book book) {
@@ -84,21 +70,26 @@ class _PostScreenState extends ConsumerState {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }
-    var provider = ref.watch(_getProfileProvider);
-
+    var id = _routeState.route.parameters['id'];
+    if (id == null) {
+    
+      return Container();
+    }
+    var provider = ref.watch(_getDataProvider(id));
     return provider.when(
         loading: () => Center(
               child: CircularProgressIndicator(),
             ),
         error: (dynamic err, stack) {
-          if (err.message == "Unauthorized") {
-            ref.read(GlobalProvider).logout();
+           if (err.message == 401) {
+            FirebaseAuth.instance.signOut();
             RouteStateScope.of(context).go("/signin");
+            
           }
 
           return Text("Error: ${err}");
         },
-        data: (profile) {
+        data: (data) {
  
 
           return Scaffold(
@@ -112,8 +103,8 @@ class _PostScreenState extends ConsumerState {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          PostCard(profile[0]),
-                          CommentCard(profile[0]),
+                          PostCard(data),
+                          CommentCard(data),
                           // const _SignUpButton(),
                         ],
                       ))))
@@ -122,7 +113,8 @@ class _PostScreenState extends ConsumerState {
         });
   }
 
-  Widget PostCard(PostModel profile){
+  Widget PostCard(PostModel post){
+    
   return Card(
       clipBehavior: Clip.antiAlias,
       child:  Column(
@@ -131,45 +123,40 @@ class _PostScreenState extends ConsumerState {
                ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.person),
-                title: Text("Riz Wong"),
+                title: Text(post.createdByName??''),
               ),
               
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.question_mark),
-                title: profile.type=="cat"?Text("Lost"):Text("Adoption"),
+                title:Text(post.type??''),
               ),
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.pets),
-                title: Text("${profile.type}"),
+                title: Text(post.petType??''),
                 
               ),
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.lock_clock),
-                title: Text("a day ago"),
+                title: Text(Helper.getTimeAgo(post.createdOn)),
               ),
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.list),
-                title: Text("${profile.breed}"),
+                title: Text(post.breed??''),
               ),
                ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.location_on_rounded),
-                title: Text("Tuen Mun District"),
-              ),
-              ListTile(
-                minLeadingWidth: 2,
-                leading: Icon(Icons.map),
-                title: Text("Tuen Mun"),
+                title: Text(post.district??''),
               ),
               ListTile(
                 minLeadingWidth: 2,
                 leading: Icon(Icons.edit),
-                title: Text("${profile.type}"),
-                subtitle: Text("${profile.about}"),
+                title: Text("Description "),
+                subtitle: Text(post.about??''),
               ),
               
               Container(
@@ -178,7 +165,7 @@ class _PostScreenState extends ConsumerState {
                 child: PhotoView(
                   // customSize: Size(MediaQuery.of(context).size.width,150),
                   imageProvider:
-                      NetworkImage(Config.apiServer + "/posts/image/${profile.id}"),
+                      NetworkImage(Config.apiServer + "/posts/image/${post.id}"),
 
                   initialScale: PhotoViewComputedScale.contained,
                 ),
