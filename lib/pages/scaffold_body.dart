@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:pet_saver_client/pages/editPost.dart';
 import 'package:pet_saver_client/pages/message.dart';
 import 'package:pet_saver_client/pages/post.dart';
 import 'package:pet_saver_client/pages/home.dart';
@@ -60,10 +61,10 @@ class BookstoreScaffoldBody extends StatelessWidget {
             key: ValueKey('post'),
             child: CreatePostPage(),
           )
-         else if (currentRoute.pathTemplate == '/edit/post')
+         else if (currentRoute.pathTemplate == '/edit/post/:id')
           const FadeTransitionPage<void>(
-            key: ValueKey('post'),
-            child: CreatePostPage(),
+            key: ValueKey('editPost'),
+            child: EditPostPage(),
           )
           else if (currentRoute.pathTemplate == '/post/:id')
           const FadeTransitionPage<void>(

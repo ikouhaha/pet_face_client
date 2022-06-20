@@ -55,10 +55,11 @@ class Http {
 
   static Future<Response> get(
       { required url, authorization, String? server}) async {
+        var dio = Dio();
     try {
       //print(navigatorKey.currentContext);
 
-      var dio = Dio();
+      
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
@@ -77,13 +78,16 @@ class Http {
       }
 
       throw Exception(errorMsg);
+    }finally{
+      dio.close();
     }
   }
 
   static Future<Response> post(
       { required url, data, authorization, String? server}) async {
+         var dio = Dio();
     try {
-      var dio = Dio();
+     
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
@@ -103,13 +107,16 @@ class Http {
       }
 
       throw Exception(errorMsg);
+    }finally{
+      dio.close();
     }
   }
 
   static Future<Response> put(
       { required url, data, authorization, String? server}) async {
+        var dio = Dio();
     try {
-      var dio = Dio();
+    
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
@@ -130,13 +137,16 @@ class Http {
       }
 
       throw Exception(errorMsg);
+    }finally{
+      dio.close();
     }
   }
 
   static Future<Response> delete(
       { required url, authorization, String? server}) async {
+        var dio = Dio();
     try {
-      var dio = Dio();
+     
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
@@ -157,13 +167,17 @@ class Http {
       }
     
       throw Exception(errorMsg);
+    }finally{
+      dio.close();
     }
   }
 
   static Future<Response> postImage(
       {required url, required XFile imageFile, String? server, String? name}) async {
+    var dio = Dio();
     try {
-      var dio = Dio();
+      
+      dio.options.headers["Connection"] ="Keep-Alive" ;
       FormData body = FormData();
       var bytes = await imageFile.readAsBytes();
       final MultipartFile file = MultipartFile.fromBytes(bytes, filename: imageFile.name);
@@ -173,6 +187,8 @@ class Http {
       if(name!=null){
         body.fields.add(MapEntry("name", name));
       }
+      
+     
     
       // get file length
       var length = await imageFile.length();
@@ -184,11 +200,14 @@ class Http {
       data: body,
     );
       response.data["orginalImageBase64"] = orginalImageBase64;
+      
       return response;
     } on DioError catch (ex) {
       String errorMsg = getErrorMsg(ex: ex);      
       EasyLoading.showError(errorMsg);
       throw Exception(errorMsg);
+    }finally{
+      dio.close();
     }
   }
 }

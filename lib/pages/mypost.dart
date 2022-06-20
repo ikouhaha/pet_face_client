@@ -27,15 +27,13 @@ import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-
 final _getDataProvider =
     FutureProvider.autoDispose<List<PostModel>>((ref) async {
-      var response = await Http.get(url: "/posts/me");
-  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
-  
-  return pets;
-});
+  var response = await Http.get(url: "/posts/me");
+  List<PostModel> posts = PostModelFromJson(json.encode(response.data));
 
+  return posts;
+});
 
 class PostPage extends ConsumerStatefulWidget {
   const PostPage({
@@ -58,7 +56,6 @@ class _SettingScreenState extends ConsumerState {
   @override
   void initState() {
     super.initState();
-    
   }
 
   @override
@@ -66,180 +63,17 @@ class _SettingScreenState extends ConsumerState {
     super.dispose();
     _name.dispose();
   }
-  @override
-  didChangeDependencies(){
-    super.didChangeDependencies();
 
- 
-    
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
   }
+
   void loadPage() {
     ref.refresh(_getDataProvider);
   }
-  Alert editAlert(PostModel pet) {
-    _name.ct.text = pet.type!;
-    List<PetDetectResponse> results = [];
 
-    return Alert(
-        context: context,
-        title: "Submit",
-        content: Form(
-            key: _editKeyForm,
-            child: Column(
-              children: <Widget>[
-                ImageField(
-                    image: null,
-                    callback: (file, setImg) async {
-                      try {
-                        EasyLoading.showProgress(0.3, status: 'detecting...');
-                        Response response = await Http.postImage(
-                            server: Config.pythonApiServer,
-                            url: "/detectBase64/1",
-                            imageFile: file,
-                            name: key
-                            );
-                        pet.imageBase64 = await Helper.imageToBase64(file);
-                        results = petDetectResponseFromJson(
-                            json.encode(response.data["result"]));
-                        print(results);
-                        //todo make it to multiple, currently just support a pet a image
-                        if (results.isNotEmpty) {
-                          setState(() {
-                            Image img = Helper.getImageByBase64orHttp(
-                                results[0].labelImg!);
-                            setImg(img);
-                          });
-                        }
-                      } catch (e) {
-                        print(e);
-                      } finally {
-                        EasyLoading.dismiss();
-                      }
-
-                      //ref.read(RegisterProvider).setImage(value)
-                    }),
-                _NameField(),
-                _BreedsField(),
-              ],
-            )),
-        buttons: [
-          DialogButton(
-            width: 300,
-            onPressed: () async {
-              try {
-                if (_editKeyForm.currentState!.validate()) {
-                  EasyLoading.showProgress(0.3, status: 'updating...');
-                  
-                  pet.type = results[0].name;
-                  Response response = await Http.put(
-                       url: "/pets/${pet.id}", data: pet.toJson());
-
-                  EasyLoading.showSuccess("update success");
-                }
-
-                //todo make it to multiple, currently just support a pet a image
-
-              } catch (e) {
-                EasyLoading.showError(e.toString());
-              } finally {
-                EasyLoading.dismiss();
-              }
-            },
-            child: const Text(
-              "Submit",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ]);
-  }
-
-  Alert createAlert() {
-    PostModel pet = PostModel();
-    //to do change it to form input
-
-    List<PetDetectResponse> results = [];
-
-    return Alert(
-        context: context,
-        title: "Submit",
-        content: Form(
-            key: _createKeyForm,
-            child: Column(
-              children: <Widget>[
-                ImageField(
-                    image: null,
-                    callback: (file, setImg) async {
-                      try {
-                        EasyLoading.showProgress(0.3, status: 'detecting...');
-                        Response response = await Http.postImage(
-                            server: Config.pythonApiServer,
-                            url: "/detectBase64",
-                            imageFile: file,
-                            name: key
-                            );
-                        pet.imageBase64 = await Helper.imageToBase64(file);
-                        results = petDetectResponseFromJson(
-                            json.encode(response.data["result"]));
-                        print(results);
-                        //todo make it to multiple, currently just support a pet a image
-                        if (results.isNotEmpty) {
-                          setState(() {
-                            Image img = Helper.getImageByBase64orHttp(
-                                results[0].labelImg!);
-                            setImg(img);
-                          });
-                        }
-                        
-                      } catch (e) {
-                        print(e);
-                      } finally {
-                        EasyLoading.dismiss();
-                      }
-
-                      //ref.read(RegisterProvider).setImage(value)
-                    }),
-                _NameField(),
-                _BreedsField(),
-              ],
-            )),
-        buttons: [
-          DialogButton(
-            width: 300,
-            onPressed: () async {
-              try {
-                if (_createKeyForm.currentState!.validate()) {
-                  pet.type = _name.ct.text;
-                  pet.about = "about";
-                  pet.breedId = 1;
-                  EasyLoading.showProgress(0.3, status: 'creating...');
-                
-                  pet.type = results[0].name;
-                  Response response = await Http.post(url: "/pets", data: pet.toJson());
-
-                 
-                  Navigator.of(context, rootNavigator: true).pop();
-                  await EasyLoading.showSuccess("create success");
-                  
-                  loadPage();
-                }
-
-                //todo make it to multiple, currently just support a pet a image
-
-              } catch (e) {
-                EasyLoading.showError(e.toString());
-              } finally {
-                EasyLoading.dismiss();
-              }
-            },
-            child: const Text(
-              "Submit",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          )
-        ]);
-  }
-
-  showConfirmDelete(PostModel pet) {
+  showConfirmDelete(PostModel post) {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -249,13 +83,15 @@ class _SettingScreenState extends ConsumerState {
                 TextButton(
                     onPressed: () async {
                       try {
-                         Navigator.of(ctx).pop(false);
+                        Navigator.of(ctx).pop(false);
                         EasyLoading.showProgress(0.3, status: 'deleting...');
-                        Response response =
-                            await Http.delete(url: "/pets/${pet.id}");
+                        await Http.delete(
+                          server: Config.pythonApiServer,
+                          url: "/image/${post.imageFilename}",
+                        );
+                        await Http.delete(url: "/posts/${post.id}");
                         EasyLoading.showSuccess("delete success");
                         loadPage();
-                       
                       } catch (e) {
                         EasyLoading.showError(e.toString());
                       } finally {
@@ -267,17 +103,15 @@ class _SettingScreenState extends ConsumerState {
             ));
   }
 
-
   @override
   Widget build(BuildContext context) {
-     if (FirebaseAuth.instance.currentUser == null) {
+    if (FirebaseAuth.instance.currentUser == null) {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }
     var provider = ref.watch(_getDataProvider);
     var size = MediaQuery.of(context).size;
-    
-    
+
     /*24 is for notification bar on Android*/
     final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
     final double itemWidth = size.width / 2;
@@ -285,39 +119,35 @@ class _SettingScreenState extends ConsumerState {
         loading: () => const Center(
               child: CircularProgressIndicator(),
             ),
-       error: (dynamic err, stack) {
-         if (err.message == 401) {
+        error: (dynamic err, stack) {
+          if (err.message == 401) {
             FirebaseAuth.instance.signOut();
             RouteStateScope.of(context).go("/");
-            
           }
 
           return Text("Error: ${err}");
         },
-        data: (profiles) {
-          print(profiles);
+        data: (posts) {
+          print(posts);
           return Scaffold(
-            body: MasonryGridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 2,
-              itemCount: profiles.length,
-              itemBuilder: (context, index) {
-                 return PetCard(
-                    profile: profiles[index],
-                    editCallback: (profile) {
-                      print(profile);
-                      editAlert(profile).show();
-                    },
-                    deleteCallback: (profile) {
-                      showConfirmDelete(profile);
-                    });
-              },
-            )
-          );
+              body: MasonryGridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              return PostCard(
+                  profile: posts[index],
+                  editCallback: (post) {
+                    RouteStateScope.of(context).go("/edit/post/${post.id}");
+                  },
+                  deleteCallback: (post) {
+                    showConfirmDelete(post);
+                  });
+            },
+          ));
         });
   }
-
 
   Widget _NameField() {
     return AuthTextField(
@@ -343,7 +173,4 @@ class _SettingScreenState extends ConsumerState {
           Option(name: "dog", value: "dog")
         ]);
   }
-
- 
-
 }

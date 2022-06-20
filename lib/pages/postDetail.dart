@@ -58,12 +58,6 @@ class _PostScreenState extends ConsumerState {
   }
   RouteState get _routeState => RouteStateScope.of(context);
   
-  
-
-  // void _handleBookTapped(Book book) {
-  //   _routeState.go('/book/${book.id}');
-  // }
-
   @override
   Widget build(BuildContext context) {
      if (FirebaseAuth.instance.currentUser == null) {

@@ -57,8 +57,17 @@ class MyScaffoldState extends State<MyScaffold> {
           ),
         );
       }
+    }else if(path =="/edit/post/:id"){
+      return GestureDetector(
+        onTap: () {
+          RouteStateScope.of(context).go("/mypost");
+        },
+        child: const Icon(
+          Icons.arrow_back, // add custom icons also
+        ),
+      );
     }
-    if (idx == 0 && path == "/post/:id") {}
+   
 
     return null;
   }

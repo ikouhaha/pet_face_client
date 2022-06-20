@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,21 +12,20 @@ import 'package:pet_saver_client/providers/global_provider.dart';
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-class PetCard extends StatefulWidget {
+class PostCard extends StatefulWidget {
   final PostModel profile;
   final ValueChanged<PostModel>? editCallback;
   final ValueChanged<PostModel>? deleteCallback;
-  
-  const PetCard({Key? key, required this.profile, this.editCallback,this.deleteCallback})
+
+  const PostCard(
+      {Key? key, required this.profile, this.editCallback, this.deleteCallback})
       : super(key: key);
 
   @override
   _postCardState createState() => _postCardState();
 }
 
-class _postCardState extends State<PetCard>{
-  
-
+class _postCardState extends State<PostCard> {
   late AnimationController _controller;
   late PostModel _post;
 
@@ -37,12 +35,12 @@ class _postCardState extends State<PetCard>{
     this._post = widget.profile;
   }
 
- 
   @override
   Widget build(BuildContext context) {
     return Card(
         clipBehavior: Clip.antiAlias,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: MediaQuery.of(context).size.width,
@@ -75,35 +73,31 @@ class _postCardState extends State<PetCard>{
   Widget _saveButtons() {
     return ButtonBar(
       alignment: MainAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: Icon(Icons.edit),
-              onPressed: () {
-                widget.editCallback?.call(_post);
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () { 
-                widget.deleteCallback?.call(_post);
-              },
-            ),
-             IconButton(
-              highlightColor: Color(0xFFF44336),
-              icon: Icon(Icons.remove_red_eye),
-              onPressed: () {
-                RouteStateScope.of(context).go("/post/${_post.id}");
-              },
-            ),
-
-          ],
-        ),
-        
-       
-      ],
-    );
+        mainAxisSize: MainAxisSize.min,
+        // alignment: MainAxisAlignment.start,
+        children: [
+          IconButton(
+            color: Colors.blue,
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              widget.editCallback?.call(_post);
+            },
+          ),
+          IconButton(
+            color: Colors.blue,
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              widget.deleteCallback?.call(_post);
+            },
+          ),
+          IconButton(
+            color: Colors.blue,
+            icon: Icon(Icons.remove_red_eye),
+            onPressed: () {
+              RouteStateScope.of(context).go("/post/${_post.id}");
+            },
+          ),
+        ]);
   }
 
   @override

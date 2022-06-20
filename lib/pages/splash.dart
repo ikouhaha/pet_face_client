@@ -21,7 +21,7 @@ class _SplashState extends State<Splash> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.local_dining),
+            Icon(Icons.circle),
             const SizedBox(
               height: 20,
             ),
