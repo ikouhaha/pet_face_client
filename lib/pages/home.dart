@@ -19,6 +19,7 @@ import 'package:pet_saver_client/components/auth_dropdown_field.dart';
 import 'package:pet_saver_client/components/auth_radio_field.dart';
 import 'package:pet_saver_client/components/auth_text_field.dart';
 import 'package:pet_saver_client/components/home_post_card.dart';
+import 'package:pet_saver_client/models/findSimilarity.dart';
 
 import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/options.dart';
@@ -30,21 +31,51 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
+class PostLoadingData {
+  final List<Option> catBreeds;
+  final List<Option> dogBreeds;
+  final List<Option> districts;
+  final List<PostModel> posts ;
 
-class DataFilter {
-  static int page = 1;
-  static int limit = 10;
+  PostLoadingData(this.catBreeds, this.dogBreeds,this.districts,this.posts);
 }
 
 
-final _getDataProvider =
-    FutureProvider.autoDispose<List<PostModel>>((ref) async {
-      var response = await Http.get(url: "/posts?page=${DataFilter.page}&limit=${DataFilter.limit}");
-  List<PostModel> pets = PostModelFromJson(json.encode(response.data));
-  
-  return pets;
-});
+class DataFilter {
+  static String url = "/posts?";
+  static Map<String, String> params = <String, String>{
+    'page': "1",
+    'limit': "10",
+  };
+  static reset() {
+    params.clear();
+    params['page'] = "1";
+    params['limit'] = "10";
+    url = "/posts?";
+  }
+}
 
+final _getDataProvider =
+    FutureProvider.autoDispose<PostLoadingData>((ref) async {
+  List<PostModel> pets = [];
+
+  String paramsUrl = "";
+  DataFilter.params.forEach((key, value) {
+    paramsUrl += "$key=$value&";
+  });
+
+  var response = await Http.get(url: DataFilter.url + paramsUrl);
+  pets = PostModelFromJson(json.encode(response.data));
+  response = await Http.get(url: "/options/breeds/cat");
+  var catBreeds = optionsFromJson(json.encode(response.data));
+  response = await Http.get(url: "/options/breeds/dog");
+  var dogBreeds = optionsFromJson(json.encode(response.data));
+  response = await Http.get(url: "/options/districts");
+  var districts = optionsFromJson(json.encode(response.data));
+
+
+   return PostLoadingData(catBreeds, dogBreeds,districts,pets);
+});
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -56,82 +87,137 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   //final _petname = FormController();
   final _name = FormController();
-  final _createKeyForm = GlobalKey<FormState>();
+  final _filterKeyForm = GlobalKey<FormState>();
   bool load = false;
   XFile? file;
+    final _petType = FormController();
+  final _postType = FormController();
+  final _breeds = FormController();
+  final _about = FormController();
+  final _district = FormController();
+   final _role = FormController();
+
+  List<Option> dogBreeds = [];
+  List<Option> catBreeds = [];
+  List<Option> postTypes = [];
+  List<Option> districts = [];
 
   @override
   void initState() {
     super.initState();
+    postTypes.add(Option(value: "lost", name: "Lost"));
+    postTypes.add(Option(value: "found", name: "Found"));
+    postTypes.add(Option(value: "adopt", name: "Adoption"));
+    
+  
   }
 
   @override
   void dispose() {
     _name.dispose();
-    
+    DataFilter.reset();
     super.dispose();
-    _createKeyForm.currentState?.dispose();
-    
+    _filterKeyForm.currentState?.dispose();
   }
 
+  void controllersReset(){
+      _petType.ct.text = "";
+      _postType.ct.text = "";
+      _breeds.ct.text = "";
+      _about.ct.text = "";
+      _district.ct.text = "";
+  }
 
   void loadPage() {
-    //ref.refresh(_getProfileProvider);
+    ref.refresh(_getDataProvider);
   }
 
   Alert detectImageAlert() {
-    PostModel pet = PostModel();
+    PostModel post = PostModel();
     //to do change it to form input
 
     List<PetDetectResponse> results = [];
 
     return Alert(
-      context: context,
-      title: "Detect loss pet",
-      content: Form(
-          key: _createKeyForm,
-          child: Column(
-            children: <Widget>[
-              ImageField(
-                  image: null,
-                  callback: (file, setImg) async {
-                    try {
-                      EasyLoading.showProgress(0.3, status: 'detecting...');
-                      Response response = await Http.postImage(
+        context: context,
+        title: "Detect loss pet",
+        content: Form(
+            key: _filterKeyForm,
+            child: Column(
+              children: <Widget>[
+                ImageField(
+                    image: null,
+                    callback: (file, setImg) async {
+                      try {
+                        EasyLoading.showProgress(0.3, status: 'detecting...');
+                        Response response = await Http.postImage(
                           server: Config.pythonApiServer,
                           url: "/detectBase64/0",
                           imageFile: file,
-                          );
-                      pet.imageBase64 = await Helper.imageToBase64(file);
-                      results = petDetectResponseFromJson(
-                          json.encode(response.data["result"]));
-                      print(results);
-                      //todo make it to multiple, currently just support a pet a image
-                      if (results.isNotEmpty) {
-                        setState(() {
-                          Image img = Helper.getImageByBase64orHttp(
-                              results[0].labelImg!);
-                          setImg(img);
-                        });
+                        );
+                        post.imageBase64 = await Helper.imageToBase64(file);
+                        results = petDetectResponseFromJson(
+                            json.encode(response.data["result"]));
+
+                        //todo make it to multiple, currently just support a pet a image
+                        if (results.isNotEmpty) {
+                          setState(() {
+                            Image img = Helper.getImageByBase64orHttp(
+                                results[0].labelImg!);
+                            setImg(img);
+                          });
+
+                          if (results[0].cropImgs != null &&
+                              results[0].cropImgs!.isNotEmpty) {
+                            DataFilter.reset();
+                            DataFilter.params["petType"] = results[0].name!;
+                            response = await Http.post(
+                              server: Config.pythonApiServer,
+                              url: "/findSimilarity",
+                              data: {
+                                "type": DataFilter.params["petType"],
+                                "imageBase64": results[0].cropImgs![0],
+                              },
+                            );
+
+                            var findResults = findSimilarityResponseFromJson(
+                                json.encode(response.data["result"]));
+
+                            String url = "/posts/filter/inames?";
+                            findResults.asMap().forEach((index, value) {
+                              if (index == 0) {
+                                url += "name=${value.filename}";
+                              } else {
+                                url += "&name=${value.filename}";
+                              }
+                            });
+                            DataFilter.url = url;
+                          }
+                          loadPage();
+                        }
+                        Navigator.of(context, rootNavigator: true).pop();
+                      } catch (e) {
+                        print(e);
+                      } finally {
+                        EasyLoading.dismiss();
                       }
-                      Navigator.of(context, rootNavigator: true).pop();
-                    } catch (e) {
 
-                      print(e);
-                    } finally {
-                      EasyLoading.dismiss();
-                    }
-
-                    //ref.read(RegisterProvider).setImage(value)
-                  })
-            ],
-          )),
-      buttons: []
-    );
+                      //ref.read(RegisterProvider).setImage(value)
+                    })
+              ],
+            )),
+        buttons: []);
   }
 
-  Alert createAlert() {
-    PostModel pet = PostModel();
+  void setFilterValue(String key, dynamic value) {
+    if(value!=null&&value!=""){
+      DataFilter.params[key] = value;
+    }
+
+  }
+
+  Alert filterAlert() {
+    PostModel post = PostModel();
     //to do change it to form input
 
     List<PetDetectResponse> results = [];
@@ -140,14 +226,14 @@ class _HomePageState extends ConsumerState<HomePage> {
         title: "Find",
         padding:EdgeInsets.zero ,
         content: Form(
-            key: _createKeyForm,
+            key: _filterKeyForm,
             child: Column(
               children: <Widget>[
                 
-                _typeField(),
+                _petTypeField(),
                _postTypeField(),
                 _BreedsField(),
-                _RegionField(),
+                _districtField(),
                  _descriptionField(),
               ],
             )),
@@ -156,7 +242,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           DialogButton(
             color: Colors.transparent,
             onPressed: ()  {
-             
+                controllersReset();
             },
             child: const Text(
               "Reset",
@@ -166,16 +252,27 @@ class _HomePageState extends ConsumerState<HomePage> {
             DialogButton(
             onPressed: () async {
               try {
-                if (_createKeyForm.currentState!.validate()) {
-                  pet.type = _name.ct.text;
-                  pet.about = "about";
-                  pet.breedId = 1;
-                  EasyLoading.showProgress(0.3, status: 'creating...');
+                if (_filterKeyForm.currentState!.validate()) {
+                  EasyLoading.showProgress(0.3, status: 'detecting...');
+                  post.petType = _petType.ct.text;
+                  post.type = _postType.ct.text;
+                  if(_breeds.ct.text.isNotEmpty){
+                    post.breedId = int?.parse(_breeds.ct.text);
+                  }
+                   if(_district.ct.text.isNotEmpty){
+                    post.districtId = int?.parse(_district.ct.text);
+                  }
                   
-                  pet.type = results[0].name;
+                  post.about = _about.ct.text;
+                  
+                  setFilterValue("type", post.type);
+                  setFilterValue("petType", post.petType);
+                  setFilterValue("about", post.about);
+                  setFilterValue("districtId", post.districtId);
+                  setFilterValue("breedId", post.breedId);
 
                   Navigator.of(context, rootNavigator: true).pop();
-                  await EasyLoading.showSuccess("create success");
+                  
 
                   loadPage();
                 }
@@ -198,159 +295,172 @@ class _HomePageState extends ConsumerState<HomePage> {
         ]);
   }
 
-
   @override
   Widget build(BuildContext context) {
     var provider = ref.watch(_getDataProvider);
-    
+
     //return Text('data');
     var size = MediaQuery.of(context).size;
 
     /*24 is for notification bar on Android*/
     final double itemWidth = size.width / 2;
-    return provider.when(
-        loading: () {
-          
-          return Center(
-              child: CircularProgressIndicator(),
-            );
-        },
-        error: (dynamic err, stack) {
-          if (err.message == 401) {
-            FirebaseAuth.instance.signOut();
-            RouteStateScope.of(context).go("/");
-            
-          }
+    return provider.when(loading: () {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }, error: (dynamic err, stack) {
+      if (err.message == 401) {
+        FirebaseAuth.instance.signOut();
+        RouteStateScope.of(context).go("/");
+      }
 
-          return Text("Error: ${err}");
-        },
-        data: (data) {
-          return Scaffold(
-            body: MasonryGridView.count(
-              addAutomaticKeepAlives: true,
-              crossAxisCount: 2,
-              mainAxisSpacing: 2,
-              crossAxisSpacing: 2,
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                return PostCard(profile: data[index]);
-              },
-            ),
-            floatingActionButton: _createButton(),
-          );
-        });
+      return Text("Error: ${err}");
+    }, data: (data) {
+      var posts = data.posts;
+      dogBreeds = data.dogBreeds;
+      catBreeds = data.catBreeds;
+      districts = data.districts;
+      
+      return Scaffold(
+        body: MasonryGridView.count(
+          addAutomaticKeepAlives: true,
+          crossAxisCount: 2,
+          mainAxisSpacing: 2,
+          crossAxisSpacing: 2,
+          itemCount: posts.length,
+          itemBuilder: (context, index) {
+            return PostCard(profile: posts[index]);
+          },
+        ),
+        floatingActionButton: _createButton(),
+      );
+    });
   }
 
-  Widget _PetNameInputField() {
-    return AuthTextField(
-        isRequiredField: false,
-        controller: _name.ct,
-        icon: const Icon(Icons.pets),
-        hint: 'Pet Name',
-        key: const Key('name'),
-        keyboardType: TextInputType.text);
-  }
 
-   Widget _descriptionField() {
+
+  Widget _descriptionField() {
     return AuthTextField(
+      isRequiredField: false,
         maxLines: 6,
+         controller: _about.ct,
         key: const Key('description'),
         icon: const Icon(Icons.comment),
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         hint: 'Description',
-        keyboardType: TextInputType.multiline,
-        validator: (value) => Validations.validateText(value));
+        keyboardType: TextInputType.multiline
+    );
   }
 
+ 
 
-  Widget _NameField() {
-    return AuthTextField(
-        isRequiredField: false,
-        key: const Key('email'),
-        focusNode: _name.fn,
-        icon: const Icon(Icons.pets),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        controller: _name.ct,
-        hint: 'Post Name',
-        keyboardType: TextInputType.text,
-        validator: (value) => Validations.validateName(value));
-  }
-
-  Widget _postTypeField() {
+Widget _postTypeField() {
     return AuthDropDownField(
         key: const Key('post type'),
-        icon: const Icon(Icons.list),
+        icon: const Icon(Icons.question_mark),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Post Type',
-        //validator: (value) => Validations.validateName(value),
-        options: [
-          Option(name: "cat", value: "cat"),
-          Option(name: "dog", value: "dog"),
-        ]);
+        options: postTypes,
+        onChanged: (value) {
+          setState(() {
+            _postType.ct.text = value;
+          });
+        });
   }
 
 
-  Widget _foundTypeField() {
+   Widget _RoleRadioField() {
     return AuthRadioField(
-        isRequiredField: false,
-        key: const Key('found_type'),
-        //controller: _role.ct,
-        type: RadioWidget.row,
+        key: const Key('role'),
+        controller: _role.ct,
         options: [
-          Option(name: "Found", value: "found"),
-          Option(name: "Adopt", value: "adopt")
+          Option(name: "User", value: "user"),
+          Option(name: "Staff", value: "staff")
         ],
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        hint: 'Type',
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'Role',
         onChanged: (value) => setState(() {
-              // _role.ct.text = value;
+              _role.ct.text = value;
             }));
   }
 
-  Widget _typeField() {
-    return AuthRadioField(
-        isRequiredField: false,
-        key: const Key('pet_type'),
-        //controller: _role.ct,
-        type: RadioWidget.row,
-        options: [
-          Option(name: "Cat", value: "cat"),
-          Option(name: "Dog", value: "dog")
-        ],
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        hint: 'Pet',
-        onChanged: (value) => setState(() {
-              // _role.ct.text = value;
-            }));
-  }
-  
 
-  Widget _BreedsField() {
-    return AuthDropDownField(
-        isRequiredField: false,
-        key: const Key('breeds'),
+
+   Widget _petTypeField() {
+    return AuthRadioField(
+        type: RadioWidget.row,
+        key: const Key('pet type'),
+        controller: _petType.ct,
         icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        hint: 'Breeds',
+        hint: 'Pet Type',
         //validator: (value) => Validations.validateName(value),
         options: [
           Option(name: "cat", value: "cat"),
           Option(name: "dog", value: "dog")
-        ]);
+        ],
+        onChanged: (value) => setState(() {
+              _petType.ct.text = value;
+            }));
   }
 
-  Widget _RegionField() {
-    return AuthDropDownField(
+  Widget _BreedsField() {
+    if (_petType.ct.text == "cat") {
+      return AuthDropDownField(
         isRequiredField: false,
-        key: const Key('region'),
+          key: const Key('breedsCat'),
+          icon: const Icon(Icons.list),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          hint: 'Breeds',
+          options: catBreeds,
+          value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
+          onChanged: (value) {
+            setState(() {
+              _breeds.ct.text = value;
+            });
+          });
+    } else if(_petType.ct.text == "dog") {
+      return AuthDropDownField(
+        isRequiredField: false,
+        key: const Key('breedsDog'),
         icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-        hint: 'Region',
-        //validator: (value) => Validations.validateName(value),
-        options: [
-          Option(name: "Hong Kong Island", value: "hkl"),
-          Option(name: "Kowloon", value: "kowloon")
-        ]);
+        hint: 'Breeds',
+        options: dogBreeds,
+        value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
+        onChanged: (value) {
+          setState(() {
+            _breeds.ct.text = value;
+          });
+        },
+      );
+    }else{
+       return AuthDropDownField(
+        isRequiredField: false,
+        key: const Key('breedsEmpty'),
+        icon: const Icon(Icons.list),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'Breeds',
+        options: [],
+        value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
+        onChanged: null,
+      );
+    }
+  }
+
+  Widget _districtField() {
+    return AuthDropDownField(
+        key: const Key('_districtField'),
+        icon: const Icon(Icons.map),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        hint: 'District',
+        validator: (value) => Validations.validateText(value),
+        options: districts,
+        onChanged: (value) {
+          setState(() {
+            _district.ct.text = value;
+          });
+        });
   }
 
   Widget _createButton() {
@@ -364,7 +474,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             label: 'filters',
             backgroundColor: Colors.blue,
             onTap: () {
-              createAlert().show();
+              filterAlert().show();
             },
           ),
           SpeedDialChild(

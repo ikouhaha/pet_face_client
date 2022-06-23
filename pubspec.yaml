@@ -55,6 +55,7 @@ dependencies:
   flutter_speed_dial: ^6.0.0
   
   pinch_zoom: ^1.0.0
+  firebase_database: ^9.0.16
 
 dependency_overrides:
   photo_view:

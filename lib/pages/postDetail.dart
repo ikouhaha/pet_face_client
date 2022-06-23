@@ -14,7 +14,7 @@ import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:photo_view/photo_view.dart';
-
+import 'package:firebase_database/firebase_database.dart';
 
 
 
@@ -42,8 +42,9 @@ class PostDetailPage extends ConsumerStatefulWidget {
 }
 
 class _PostScreenState extends ConsumerState {
-  
+  FirebaseDatabase database = FirebaseDatabase.instance;
   final _keyForm = GlobalKey<FormState>();
+
   @override
   void initState() {
     
@@ -54,6 +55,7 @@ class _PostScreenState extends ConsumerState {
   @override
   void dispose() {
     super.dispose();
+    database.goOffline();
     
   }
   RouteState get _routeState => RouteStateScope.of(context);

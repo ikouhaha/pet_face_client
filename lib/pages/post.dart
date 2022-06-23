@@ -194,7 +194,8 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
             Response response = await Http.postImage(
                 server: Config.pythonApiServer,
                 url: "/detectBase64/0",
-                imageFile: file
+                imageFile: file,
+                name: ""
                 );
             post.imageBase64 = await Helper.imageToBase64(file);
             post.imageFilename = Helper.uuid()+".jpg";

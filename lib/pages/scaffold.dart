@@ -3,6 +3,8 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:adaptive_navigation/adaptive_navigation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 
@@ -34,6 +36,26 @@ class MyScaffoldState extends State<MyScaffold> {
     }
 
     return Text(title);
+  }
+
+  ListTile getSigninout(){
+      if(FirebaseAuth.instance.currentUser==null){
+        return ListTile(
+          title: Text("Sign In"),
+          onTap: (){
+             RouteStateScope.of(context).go("/signin");
+    
+          },
+        );
+      }else{
+        return ListTile(
+          title: Text("Sign Out",style: TextStyle(color: Colors.redAccent)),
+          onTap: (){
+            FirebaseAuth.instance.signOut();
+            RouteStateScope.of(context).go("/signin");
+          }
+        );
+      }
   }
 
   GestureDetector? getLeading(String path, int idx) {
@@ -127,6 +149,7 @@ class MyScaffoldState extends State<MyScaffold> {
                 Navigator.of(context).pop();
               },
             ),
+            getSigninout()
           ],
         )),
         appBar: AppBar(
