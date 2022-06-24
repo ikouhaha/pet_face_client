@@ -35,11 +35,10 @@ class PostLoadingData {
   final List<Option> catBreeds;
   final List<Option> dogBreeds;
   final List<Option> districts;
-  final List<PostModel> posts ;
+  final List<PostModel> posts;
 
-  PostLoadingData(this.catBreeds, this.dogBreeds,this.districts,this.posts);
+  PostLoadingData(this.catBreeds, this.dogBreeds, this.districts, this.posts);
 }
-
 
 class DataFilter {
   static String url = "/posts?";
@@ -73,8 +72,7 @@ final _getDataProvider =
   response = await Http.get(url: "/options/districts");
   var districts = optionsFromJson(json.encode(response.data));
 
-
-   return PostLoadingData(catBreeds, dogBreeds,districts,pets);
+  return PostLoadingData(catBreeds, dogBreeds, districts, pets);
 });
 
 class HomePage extends ConsumerStatefulWidget {
@@ -90,12 +88,13 @@ class _HomePageState extends ConsumerState<HomePage> {
   final _filterKeyForm = GlobalKey<FormState>();
   bool load = false;
   XFile? file;
-    final _petType = FormController();
+  final _petType = FormController();
   final _postType = FormController();
   final _breeds = FormController();
   final _about = FormController();
   final _district = FormController();
-   final _role = FormController();
+  final _role = FormController();
+  GlobalKey<_HomePageState> petTypeKey = GlobalKey();
 
   List<Option> dogBreeds = [];
   List<Option> catBreeds = [];
@@ -108,8 +107,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     postTypes.add(Option(value: "lost", name: "Lost"));
     postTypes.add(Option(value: "found", name: "Found"));
     postTypes.add(Option(value: "adopt", name: "Adoption"));
-    
-  
   }
 
   @override
@@ -120,12 +117,12 @@ class _HomePageState extends ConsumerState<HomePage> {
     _filterKeyForm.currentState?.dispose();
   }
 
-  void controllersReset(){
-      _petType.ct.text = "";
-      _postType.ct.text = "";
-      _breeds.ct.text = "";
-      _about.ct.text = "";
-      _district.ct.text = "";
+  void controllersReset() {
+    _petType.ct.text = "";
+    _postType.ct.text = "";
+    _breeds.ct.text = "";
+    _about.ct.text = "";
+    _district.ct.text = "";
   }
 
   void loadPage() {
@@ -210,89 +207,159 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   void setFilterValue(String key, dynamic value) {
-    if(value!=null&&value!=""){
+    if (value != null && value != "") {
       DataFilter.params[key] = value;
     }
-
   }
 
-  Alert filterAlert() {
+  void filterAlert() {
     PostModel post = PostModel();
     //to do change it to form input
+    controllersReset();
+    DataFilter.reset();
+    showDialog(
+      context: context,
+      builder: (context) {
+        String contentText = "Content of Dialog";
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Title of Dialog"),
+              content: Form(
+                  key: _filterKeyForm,
+                  child: Column(
+                    children: <Widget>[
+                      _petTypeField(setState),
+                      _postTypeField(),
+                      _BreedsField(),
+                      _districtField(),
+                      _descriptionField(),
+                    ],
+                  )),
+              actions: <Widget>[
+                TextButton(
+                  
+                  onPressed: () {
+                    DataFilter.reset();
+                    Navigator.pop(context);
+                  } ,
+                  child: Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    try {
+                      if (_filterKeyForm.currentState!.validate()) {
+                        EasyLoading.showProgress(0.3, status: 'detecting...');
+                        post.petType = _petType.ct.text;
+                        post.type = _postType.ct.text;
+                        if (_breeds.ct.text.isNotEmpty) {
+                          post.breedId = int?.parse(_breeds.ct.text);
+                        }
+                        if (_district.ct.text.isNotEmpty) {
+                          post.districtId = int?.parse(_district.ct.text);
+                        }
+
+                        post.about = _about.ct.text;
+
+                        setFilterValue("type", post.type);
+                        setFilterValue("petType", post.petType);
+                        setFilterValue("about", post.about);
+                        setFilterValue("districtId", post.districtId);
+                        setFilterValue("breedId", post.breedId);
+
+                        Navigator.pop(context);
+
+                        loadPage();
+                      }
+
+                      //todo make it to multiple, currently just support a pet a image
+
+                    } catch (e) {
+                      EasyLoading.showError(e.toString());
+                    } finally {
+                      EasyLoading.dismiss();
+                    }
+                  },
+                  child: Text("Search"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
 
     List<PetDetectResponse> results = [];
-    return Alert(
-        context: context,
-        title: "Find",
-        padding:EdgeInsets.zero ,
-        content: Form(
-            key: _filterKeyForm,
-            child: Column(
-              children: <Widget>[
-                
-                _petTypeField(),
-               _postTypeField(),
-                _BreedsField(),
-                _districtField(),
-                 _descriptionField(),
-              ],
-            )),
-        buttons: [
-        
-          DialogButton(
-            color: Colors.transparent,
-            onPressed: ()  {
-                controllersReset();
-            },
-            child: const Text(
-              "Reset",
-              style: TextStyle(fontSize: 20),
-            ),
-          ),
-            DialogButton(
-            onPressed: () async {
-              try {
-                if (_filterKeyForm.currentState!.validate()) {
-                  EasyLoading.showProgress(0.3, status: 'detecting...');
-                  post.petType = _petType.ct.text;
-                  post.type = _postType.ct.text;
-                  if(_breeds.ct.text.isNotEmpty){
-                    post.breedId = int?.parse(_breeds.ct.text);
-                  }
-                   if(_district.ct.text.isNotEmpty){
-                    post.districtId = int?.parse(_district.ct.text);
-                  }
-                  
-                  post.about = _about.ct.text;
-                  
-                  setFilterValue("type", post.type);
-                  setFilterValue("petType", post.petType);
-                  setFilterValue("about", post.about);
-                  setFilterValue("districtId", post.districtId);
-                  setFilterValue("breedId", post.breedId);
+    // return Alert(
+    //     context: context,
+    //     title: "Find",
+    //     padding:EdgeInsets.zero ,
+    //     content: Form(
+    //         key: _filterKeyForm,
+    //         child: Column(
+    //           children: <Widget>[
 
-                  Navigator.of(context, rootNavigator: true).pop();
-                  
+    //             _petTypeField(),
+    //            _postTypeField(),
+    //             _BreedsField(),
+    //             _districtField(),
+    //              _descriptionField(),
+    //           ],
+    //         )),
+    //     buttons: [
 
-                  loadPage();
-                }
+    //       DialogButton(
+    //         color: Colors.transparent,
+    //         onPressed: ()  {
+    //             controllersReset();
+    //         },
+    //         child: const Text(
+    //           "Reset",
+    //           style: TextStyle(fontSize: 20),
+    //         ),
+    //       ),
+    //         DialogButton(
+    //         onPressed: () async {
+    //           try {
+    //             if (_filterKeyForm.currentState!.validate()) {
+    //               EasyLoading.showProgress(0.3, status: 'detecting...');
+    //               post.petType = _petType.ct.text;
+    //               post.type = _postType.ct.text;
+    //               if(_breeds.ct.text.isNotEmpty){
+    //                 post.breedId = int?.parse(_breeds.ct.text);
+    //               }
+    //                if(_district.ct.text.isNotEmpty){
+    //                 post.districtId = int?.parse(_district.ct.text);
+    //               }
 
-                //todo make it to multiple, currently just support a pet a image
+    //               post.about = _about.ct.text;
 
-              } catch (e) {
-                EasyLoading.showError(e.toString());
-              } finally {
-                EasyLoading.dismiss();
-              }
-            },
-            child: const Text(
-              "Submit",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-          ),
-        
-        
-        ]);
+    //               setFilterValue("type", post.type);
+    //               setFilterValue("petType", post.petType);
+    //               setFilterValue("about", post.about);
+    //               setFilterValue("districtId", post.districtId);
+    //               setFilterValue("breedId", post.breedId);
+
+    //               Navigator.of(context, rootNavigator: true).pop();
+
+    //               loadPage();
+    //             }
+
+    //             //todo make it to multiple, currently just support a pet a image
+
+    //           } catch (e) {
+    //             EasyLoading.showError(e.toString());
+    //           } finally {
+    //             EasyLoading.dismiss();
+    //           }
+    //         },
+    //         child: const Text(
+    //           "Submit",
+    //           style: TextStyle(color: Colors.white, fontSize: 20),
+    //         ),
+    //       ),
+
+    //     ]);
   }
 
   @override
@@ -311,16 +378,23 @@ class _HomePageState extends ConsumerState<HomePage> {
     }, error: (dynamic err, stack) {
       if (err.message == 401) {
         FirebaseAuth.instance.signOut();
-        RouteStateScope.of(context).go("/");
+        // RouteStateScope.of(context).go("/");
+        loadPage();
+      }else if(err.code=="no-current-user"||err.code=="user-not-found"){
+        FirebaseAuth.instance.signOut();
+        // RouteStateScope.of(context).go("/");
+        loadPage();
+      }else{
+        return Text("Error: ${err}");
       }
-
-      return Text("Error: ${err}");
+      return Container();
+      
     }, data: (data) {
       var posts = data.posts;
       dogBreeds = data.dogBreeds;
       catBreeds = data.catBreeds;
       districts = data.districts;
-      
+
       return Scaffold(
         body: MasonryGridView.count(
           addAutomaticKeepAlives: true,
@@ -337,28 +411,23 @@ class _HomePageState extends ConsumerState<HomePage> {
     });
   }
 
-
-
   Widget _descriptionField() {
     return AuthTextField(
-      isRequiredField: false,
+        isRequiredField: false,
         maxLines: 6,
-         controller: _about.ct,
+        controller: _about.ct,
         key: const Key('description'),
         icon: const Icon(Icons.comment),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         hint: 'Description',
-        keyboardType: TextInputType.multiline
-    );
+        keyboardType: TextInputType.multiline);
   }
 
- 
-
-Widget _postTypeField() {
+  Widget _postTypeField() {
     return AuthDropDownField(
         key: const Key('post type'),
         icon: const Icon(Icons.question_mark),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         hint: 'Post Type',
         options: postTypes,
         onChanged: (value) {
@@ -368,8 +437,7 @@ Widget _postTypeField() {
         });
   }
 
-
-   Widget _RoleRadioField() {
+  Widget _RoleRadioField() {
     return AuthRadioField(
         key: const Key('role'),
         controller: _role.ct,
@@ -377,22 +445,20 @@ Widget _postTypeField() {
           Option(name: "User", value: "user"),
           Option(name: "Staff", value: "staff")
         ],
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         hint: 'Role',
         onChanged: (value) => setState(() {
               _role.ct.text = value;
             }));
   }
 
-
-
-   Widget _petTypeField() {
+  Widget _petTypeField(setState) {
     return AuthRadioField(
         type: RadioWidget.row,
-        key: const Key('pet type'),
+        key: petTypeKey,
         controller: _petType.ct,
         icon: const Icon(Icons.list),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         hint: 'Pet Type',
         //validator: (value) => Validations.validateName(value),
         options: [
@@ -407,10 +473,10 @@ Widget _postTypeField() {
   Widget _BreedsField() {
     if (_petType.ct.text == "cat") {
       return AuthDropDownField(
-        isRequiredField: false,
+          isRequiredField: false,
           key: const Key('breedsCat'),
           icon: const Icon(Icons.list),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           hint: 'Breeds',
           options: catBreeds,
           value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
@@ -419,12 +485,12 @@ Widget _postTypeField() {
               _breeds.ct.text = value;
             });
           });
-    } else if(_petType.ct.text == "dog") {
+    } else if (_petType.ct.text == "dog") {
       return AuthDropDownField(
         isRequiredField: false,
         key: const Key('breedsDog'),
         icon: const Icon(Icons.list),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         hint: 'Breeds',
         options: dogBreeds,
         value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
@@ -434,12 +500,12 @@ Widget _postTypeField() {
           });
         },
       );
-    }else{
-       return AuthDropDownField(
+    } else {
+      return AuthDropDownField(
         isRequiredField: false,
         key: const Key('breedsEmpty'),
         icon: const Icon(Icons.list),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         hint: 'Breeds',
         options: [],
         value: _breeds.ct.text.isEmpty ? null : _breeds.ct.text,
@@ -450,11 +516,12 @@ Widget _postTypeField() {
 
   Widget _districtField() {
     return AuthDropDownField(
+        isRequiredField: false,
         key: const Key('_districtField'),
         icon: const Icon(Icons.map),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         hint: 'District',
-        validator: (value) => Validations.validateText(value),
+        //validator: (value) => Validations.validateText(value),
         options: districts,
         onChanged: (value) {
           setState(() {
@@ -474,7 +541,7 @@ Widget _postTypeField() {
             label: 'filters',
             backgroundColor: Colors.blue,
             onTap: () {
-              filterAlert().show();
+              filterAlert();
             },
           ),
           SpeedDialChild(

@@ -35,6 +35,7 @@ class Authentication {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
+      print(e);
       // await showDialog(
       //     context: context,
       //     builder: (ctx) => AlertDialog(

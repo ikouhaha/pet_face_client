@@ -7,7 +7,6 @@ class AuthRadioField extends StatelessWidget {
   final String hint;
   final ValueChanged<dynamic> onChanged;
   final bool isRequiredField;
-
   final String? value;
   final RadioWidget? type;
   final Icon? icon;

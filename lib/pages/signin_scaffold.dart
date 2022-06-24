@@ -70,6 +70,7 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
     try {
       EasyLoading.show(
           maskType: EasyLoadingMaskType.black, status: 'loading...');
+          
       await _auth.signInWithGoogle(context).whenComplete(() => null);
       String? token = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       var response = await Http.get(url: "/users/profile",authorization: token);

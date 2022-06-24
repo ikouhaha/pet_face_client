@@ -161,21 +161,21 @@ class _SignupFormState extends ConsumerState {
   }
 
   Widget _SignupButton() {
-    final _auth = ref.watch(authenticationProvider);
     Future<void> _signup() async {
       try {
         if (_keyForm.currentState!.validate()) {
           EasyLoading.show(
               maskType: EasyLoadingMaskType.black, status: 'loading...');
-             await _auth.signUpWithEmailAndPassword(_email.ct.text,_password.ct.text).whenComplete(() => null);
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(email:_email.ct.text, password:_password.ct.text);
+            
           String? token =
-            await FirebaseAuth.instance.currentUser?.getIdToken(true);
-        var response =
-            await Http.get(url: "/users/profile", authorization: token);
-        UserModel userModel = UserModel.fromJson(response.data);
-        SharedPreferencesService.saveProfile(userModel);
-        // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;
-        RouteStateScope.of(context).go("/");
+              await FirebaseAuth.instance.currentUser?.getIdToken(false);
+          var response =
+              await Http.get(url: "/users/profile", authorization: token);
+          UserModel userModel = UserModel.fromJson(response.data);
+          SharedPreferencesService.saveProfile(userModel);
+          // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;
+          RouteStateScope.of(context).go("/");
         }
       } catch (ex) {
       } finally {

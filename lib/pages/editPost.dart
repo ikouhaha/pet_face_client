@@ -391,7 +391,7 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
                   "type": post.petType,
                   "imageBase64":post.imageBase64
                 });
-              RouteStateScope.of(context).go("/");
+              RouteStateScope.of(context).go("/mypost");
               EasyLoading.showSuccess("create success");
             } catch (e) {
               print(e);
