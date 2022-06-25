@@ -33,19 +33,17 @@ class PostLoadingData {
   final List<Option> dogBreeds;
   final List<Option> districts;
 
-  PostLoadingData(this.catBreeds, this.dogBreeds,this.districts);
+  PostLoadingData(this.catBreeds, this.dogBreeds, this.districts);
 }
 
-
-
 final _getDataProvider = FutureProvider<PostLoadingData>((ref) async {
-     var response = await Http.get(url: "/options/breeds/cat");
+  var response = await Http.get(url: "/options/breeds/cat");
   var catBreeds = optionsFromJson(json.encode(response.data));
   response = await Http.get(url: "/options/breeds/dog");
   var dogBreeds = optionsFromJson(json.encode(response.data));
   response = await Http.get(url: "/options/districts");
   var districts = optionsFromJson(json.encode(response.data));
-  return PostLoadingData(catBreeds, dogBreeds,districts);
+  return PostLoadingData(catBreeds, dogBreeds, districts);
 });
 
 class CreatePostPage extends ConsumerStatefulWidget {
@@ -77,12 +75,11 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
     var profile = SharedPreferencesService.getProfile()!;
     post.createdBy = profile.id;
     _district.ct.addListener(() {
-         int? value = int?.parse(_district.ct.text);
-        post.districtId = value; 
+      int? value = int?.parse(_district.ct.text);
+      post.districtId = value;
     });
     _petType.ct.addListener(() {
       post.petType = _petType.ct.text;
-      
     });
 
     _breeds.ct.addListener(() {
@@ -149,7 +146,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
           dogBreeds = data.dogBreeds;
           catBreeds = data.catBreeds;
           districts = data.districts;
-          
+
           return Scaffold(
             body: Stack(children: [
               Positioned.fill(
@@ -195,25 +192,22 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
                 server: Config.pythonApiServer,
                 url: "/detectBase64/0",
                 imageFile: file,
-                name: ""
-                );
+                name: "");
             post.imageBase64 = await Helper.imageToBase64(file);
-            post.imageFilename = Helper.uuid()+".jpg";
+            post.imageFilename = Helper.uuid() + ".jpg";
             results =
                 petDetectResponseFromJson(json.encode(response.data["result"]));
             print(results);
             for (var result in results) {
               if (result.name != null) {
-                if(result.name!=post.petType){
+                if (result.name != post.petType) {
                   _breeds.ct.text = "";
                 }
                 _petType.ct.text = result.name!;
                 post.petType = result.name!;
-                for(var crop in result.cropImgs!){
-                     post.cropImageBase64 = crop;
-                  }
-               
-                
+                for (var crop in result.cropImgs!) {
+                  post.cropImageBase64 = crop;
+                }
               }
             }
             //todo make it to multiple, currently just support a pet a image
@@ -296,7 +290,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
               _breeds.ct.text = value;
             });
           });
-    } else if(_petType.ct.text == "dog") {
+    } else if (_petType.ct.text == "dog") {
       return AuthDropDownField(
         key: const Key('breedsDog'),
         icon: const Icon(Icons.list),
@@ -311,8 +305,8 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
           });
         },
       );
-    }else{
-       return AuthDropDownField(
+    } else {
+      return AuthDropDownField(
         key: const Key('breedsEmpty'),
         icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -348,16 +342,20 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
             // you'd often call a server or save the information in a database.
             try {
               EasyLoading.showProgress(0.3, status: 'Processing...');
-              Response response = await Http.post(url: "/posts", data: post.toJson());
+              Response response =
+                  await Http.post(url: "/posts", data: post.toJson());
               //save image after success save the post to the database
-              await Http.post(
-                server: Config.pythonApiServer,
-                url: "/image",
-                data: {
-                  "name": post.imageFilename,
-                  "type": post.petType,
-                  "imageBase64":post.imageBase64
-                });
+              if (post.cropImageBase64 != null && post.cropImageBase64!.isNotEmpty) {
+                await Http.post(
+                    server: Config.pythonApiServer,
+                    url: "/image",
+                    data: {
+                      "name": post.imageFilename,
+                      "type": post.petType,
+                      "imageBase64": post.cropImageBase64
+                    });
+              }
+
               RouteStateScope.of(context).go("/");
               EasyLoading.showSuccess("create success");
             } catch (e) {

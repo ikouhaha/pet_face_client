@@ -21,11 +21,7 @@ class Http {
         //EasyLoading.showError(errorMessage);
 
       }
-    } else if (ex.response != null &&
-        ex.response.statusCode != null &&
-        ex.response.statusCode == 404) {
-      //navigate("/404")
-    } else if (ex.response != null &&
+    }  else if (ex.response != null &&
         ex.response.data != null &&
         !(ex.response.data is String) &&
         ex.response.data["stack"] != null) {

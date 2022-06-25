@@ -44,12 +44,12 @@ class DataFilter {
   static String url = "/posts?";
   static Map<String, String> params = <String, String>{
     'page': "1",
-    'limit': "10",
+    'limit': "1000",
   };
   static reset() {
     params.clear();
     params['page'] = "1";
-    params['limit'] = "10";
+    params['limit'] = "1000";
     url = "/posts?";
   }
 }
@@ -84,9 +84,10 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   //final _petname = FormController();
+  List<PostModel> posts = [];
   final _name = FormController();
   final _filterKeyForm = GlobalKey<FormState>();
-  bool load = false;
+  bool refresh = false;
   XFile? file;
   final _petType = FormController();
   final _postType = FormController();
@@ -129,6 +130,22 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.refresh(_getDataProvider);
   }
 
+  Future<Null> _onRefresh() async {
+    DataFilter.reset();
+    String paramsUrl = "";
+    DataFilter.params.forEach((key, value) {
+      paramsUrl += "$key=$value&";
+    });
+    // loadPage();
+    var response = await Http.get(url: DataFilter.url + paramsUrl);
+    setState(() {
+        refresh = true;
+        posts = PostModelFromJson(json.encode(response.data));
+
+    });
+    
+  }
+
   Alert detectImageAlert() {
     PostModel post = PostModel();
     //to do change it to form input
@@ -151,6 +168,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           server: Config.pythonApiServer,
                           url: "/detectBase64/0",
                           imageFile: file,
+                          name:""
                         );
                         post.imageBase64 = await Helper.imageToBase64(file);
                         results = petDetectResponseFromJson(
@@ -174,6 +192,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               data: {
                                 "type": DataFilter.params["petType"],
                                 "imageBase64": results[0].cropImgs![0],
+                                
                               },
                             );
 
@@ -224,25 +243,25 @@ class _HomePageState extends ConsumerState<HomePage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
+              scrollable: true,
               title: Text("Title of Dialog"),
               content: Form(
                   key: _filterKeyForm,
                   child: Column(
                     children: <Widget>[
                       _petTypeField(setState),
-                      _postTypeField(),
-                      _BreedsField(),
-                      _districtField(),
-                      _descriptionField(),
+                      _postTypeField(setState),
+                      _BreedsField(setState),
+                      _districtField(setState),
+                      _descriptionField(setState),
                     ],
                   )),
               actions: <Widget>[
                 TextButton(
-                  
                   onPressed: () {
                     DataFilter.reset();
                     Navigator.pop(context);
-                  } ,
+                  },
                   child: Text("Cancel"),
                 ),
                 TextButton(
@@ -380,38 +399,59 @@ class _HomePageState extends ConsumerState<HomePage> {
         FirebaseAuth.instance.signOut();
         // RouteStateScope.of(context).go("/");
         loadPage();
-      }else if(err.code=="no-current-user"||err.code=="user-not-found"){
+      } else if (err.code == "no-current-user" ||
+          err.code == "user-not-found") {
         FirebaseAuth.instance.signOut();
         // RouteStateScope.of(context).go("/");
         loadPage();
-      }else{
+      } else {
         return Text("Error: ${err}");
       }
       return Container();
-      
     }, data: (data) {
-      var posts = data.posts;
+      if(!refresh){
+          posts = data.posts;
+      }else{
+        refresh = false;
+      }
+      
       dogBreeds = data.dogBreeds;
       catBreeds = data.catBreeds;
       districts = data.districts;
 
       return Scaffold(
-        body: MasonryGridView.count(
-          addAutomaticKeepAlives: true,
-          crossAxisCount: 2,
-          mainAxisSpacing: 2,
-          crossAxisSpacing: 2,
-          itemCount: posts.length,
-          itemBuilder: (context, index) {
-            return PostCard(profile: posts[index]);
-          },
-        ),
+        body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: MasonryGridView.count(
+              addAutomaticKeepAlives: true,
+              crossAxisCount: 2,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                return PostCard(profile: posts[index]);
+              },
+            )),
         floatingActionButton: _createButton(),
       );
+
+      // return Scaffold(
+      //   body: MasonryGridView.count(
+      //     addAutomaticKeepAlives: true,
+      //     crossAxisCount: 2,
+      //     mainAxisSpacing: 2,
+      //     crossAxisSpacing: 2,
+      //     itemCount: posts.length,
+      //     itemBuilder: (context, index) {
+      //       return PostCard(profile: posts[index]);
+      //     },
+      //   ),
+      //   floatingActionButton: _createButton(),
+      // );
     });
   }
 
-  Widget _descriptionField() {
+  Widget _descriptionField(setState) {
     return AuthTextField(
         isRequiredField: false,
         maxLines: 6,
@@ -423,7 +463,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         keyboardType: TextInputType.multiline);
   }
 
-  Widget _postTypeField() {
+  Widget _postTypeField(setState) {
     return AuthDropDownField(
         key: const Key('post type'),
         icon: const Icon(Icons.question_mark),
@@ -437,7 +477,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         });
   }
 
-  Widget _RoleRadioField() {
+  Widget _RoleRadioField(setState) {
     return AuthRadioField(
         key: const Key('role'),
         controller: _role.ct,
@@ -466,11 +506,12 @@ class _HomePageState extends ConsumerState<HomePage> {
           Option(name: "dog", value: "dog")
         ],
         onChanged: (value) => setState(() {
+              _breeds.ct.text = "";
               _petType.ct.text = value;
             }));
   }
 
-  Widget _BreedsField() {
+  Widget _BreedsField(setState) {
     if (_petType.ct.text == "cat") {
       return AuthDropDownField(
           isRequiredField: false,
@@ -514,7 +555,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     }
   }
 
-  Widget _districtField() {
+  Widget _districtField(setState) {
     return AuthDropDownField(
         isRequiredField: false,
         key: const Key('_districtField'),
