@@ -74,8 +74,10 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
       await _auth.signInWithGoogle(context).whenComplete(() => null);
       String? token = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       var response = await Http.get(url: "/users/profile",authorization: token);
+     
       UserModel userModel = UserModel.fromJson(response.data);
       SharedPreferencesService.saveProfile(userModel);
+       await Helper.refreshToken();
       // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
       RouteStateScope.of(context).go("/");
     } catch (ex) {
@@ -94,8 +96,10 @@ class _LoginFormState extends ConsumerState<LoginScaffold> {
        await _auth.signInWithEmailAndPassword(_emailName.ct.text,_password.ct.text).whenComplete(() => null);
            String? token = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
       var response = await Http.get(url: "/users/profile",authorization: token);
+      
       UserModel userModel = UserModel.fromJson(response.data);
       SharedPreferencesService.saveProfile(userModel);
+      await Helper.refreshToken();
       // String token = _auth.getAccessToken == null ? "" : _auth.getAccessToken!;       
       RouteStateScope.of(context).go("/");
         // RouteStateScope.of(context).go("/");

@@ -59,7 +59,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+        dio.options.headers["Authorization"] = SharedPreferencesService.getString("token"); 
       }
       Response response = await dio.get((server ?? Config.apiServer )+ url);
       return response;
@@ -87,7 +87,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+        dio.options.headers["Authorization"] = SharedPreferencesService.getString("token"); 
       }
       Response response = await dio.post((server ?? Config.apiServer )+ url, data: data);
       return response;
@@ -116,7 +116,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-       dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+       dio.options.headers["Authorization"] = SharedPreferencesService.getString("token"); 
       }
 
       Response response = await dio.put((server ?? Config.apiServer )+ url, data: data);
@@ -146,7 +146,7 @@ class Http {
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
       }else{
-        dio.options.headers["Authorization"] = await  FirebaseAuth.instance.currentUser?.getIdToken(true);
+        dio.options.headers["Authorization"] = SharedPreferencesService.getString("token"); 
       }
 
       Response response = await dio.delete((server ?? Config.apiServer )+ url);

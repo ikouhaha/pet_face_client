@@ -62,7 +62,7 @@ final _getDataProvider =
   DataFilter.params.forEach((key, value) {
     paramsUrl += "$key=$value&";
   });
-
+  await Helper.refreshToken();
   var response = await Http.get(url: DataFilter.url + paramsUrl);
   pets = PostModelFromJson(json.encode(response.data));
   response = await Http.get(url: "/options/breeds/cat");
@@ -101,6 +101,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   List<Option> catBreeds = [];
   List<Option> postTypes = [];
   List<Option> districts = [];
+  String token  = "";
 
   @override
   void initState() {
@@ -108,6 +109,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     postTypes.add(Option(value: "lost", name: "Lost"));
     postTypes.add(Option(value: "found", name: "Found"));
     postTypes.add(Option(value: "adopt", name: "Adoption"));
+    
   }
 
   @override

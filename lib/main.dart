@@ -1,6 +1,9 @@
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/app.dart';
+import 'package:pet_saver_client/common/config.dart';
+import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/pages/home.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,9 +32,22 @@ class Logger extends ProviderObserver {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferencesService.sharedPrefs  = await SharedPreferences.getInstance();
+
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final remoteConfig = FirebaseRemoteConfig.instance;
+  await remoteConfig.setConfigSettings(RemoteConfigSettings(
+      fetchTimeout: const Duration(minutes: 1),
+      minimumFetchInterval: const Duration(hours: 1),
+  ));
+  await remoteConfig.fetchAndActivate();
+  Config.apiServer = remoteConfig.getString('apiServer');
+  Config.pythonApiServer = remoteConfig.getString('pythonApiServer');
+  Config.googleClientId = remoteConfig.getString('googleClientId');
+  //await Helper.refreshToken();
   runApp(
      ProviderScope(observers: [Logger()], child:  App())
   );
