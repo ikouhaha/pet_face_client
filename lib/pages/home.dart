@@ -203,11 +203,9 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                             String url = "/posts/filter/inames?";
                             findResults.asMap().forEach((index, value) {
-                              if (index == 0) {
-                                url += "name=${value.filename}";
-                              } else {
-                                url += "&name=${value.filename}";
-                              }
+                   
+                                url += "name=${value.filename}&";
+
                             });
                             DataFilter.url = url;
                           }
@@ -246,7 +244,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           builder: (context, setState) {
             return AlertDialog(
               scrollable: true,
-              title: Text("Title of Dialog"),
+              title: Text("Filter"),
               content: Form(
                   key: _filterKeyForm,
                   child: Column(

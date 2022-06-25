@@ -41,12 +41,16 @@ void main() async {
   final remoteConfig = FirebaseRemoteConfig.instance;
   await remoteConfig.setConfigSettings(RemoteConfigSettings(
       fetchTimeout: const Duration(minutes: 1),
-      minimumFetchInterval: const Duration(hours: 1),
+      minimumFetchInterval: const Duration(minutes: 1),
+
   ));
   await remoteConfig.fetchAndActivate();
+
+  
   Config.apiServer = remoteConfig.getString('apiServer');
   Config.pythonApiServer = remoteConfig.getString('pythonApiServer');
   Config.googleClientId = remoteConfig.getString('googleClientId');
+  Config.firebaseRDBUrl = remoteConfig.getString('firebaseRDBUrl');
   //await Helper.refreshToken();
   runApp(
      ProviderScope(observers: [Logger()], child:  App())

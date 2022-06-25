@@ -57,6 +57,7 @@ dependencies:
   pinch_zoom: ^1.0.0
   firebase_database: ^9.0.16
   firebase_remote_config: ^2.0.9
+  intl: ^0.17.0
 
 dependency_overrides:
   photo_view:

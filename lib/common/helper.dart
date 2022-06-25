@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/models/storage.dart';
@@ -27,6 +28,10 @@ class Helper {
     //final fifteenAgo = dateTime!.subtract(new Duration(minutes: 15));
 
     return (timeago.format(dateTime)); // 15 minutes ago
+  }
+  
+  static String getCurrentDateTimeString(){
+    return DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
   }
 
   static void showErrorToast({msg}) {
