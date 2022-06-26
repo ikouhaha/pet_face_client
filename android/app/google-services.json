@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "544220858909",
+    "firebase_url": "https://petsaver-81af2-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "petsaver-81af2",
     "storage_bucket": "petsaver-81af2.appspot.com"
   },
@@ -20,10 +21,6 @@
             "package_name": "com.example.pet_saver_client",
             "certificate_hash": "ec328a89f15283ea59876b3631941fe5bab8cee7"
           }
-        },
-        {
-          "client_id": "544220858909-veskdu6cic4thmb0kc8dabhb1tes7j9p.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
@@ -37,6 +34,13 @@
             {
               "client_id": "544220858909-veskdu6cic4thmb0kc8dabhb1tes7j9p.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "544220858909-gir5kmmotpkhadbfe8iu08u999rerh7h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.petSaverClient"
+              }
             }
           ]
         }

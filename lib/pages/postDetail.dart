@@ -38,12 +38,14 @@ class PostDetailPage extends ConsumerStatefulWidget {
 }
 
 class _PostScreenState extends ConsumerState {
-  FirebaseDatabase database = FirebaseDatabase.instanceFor(
-      app: FirebaseDatabase.instance.app, databaseURL: Config.firebaseRDBUrl);
+  late FirebaseDatabase database;
   late DatabaseReference commentListRef;
-  List<Comment> commentList = [];
-  String refId = "";
+  late String id;
+  List<Comment> _commentList = [];
+  bool isOwner = false;
   UserModel? profile;
+  bool isInitRef = false;
+
   FormController comment = FormController();
 
   final _keyForm = GlobalKey<FormState>();
@@ -51,29 +53,98 @@ class _PostScreenState extends ConsumerState {
   @override
   void initState() {
     super.initState();
-    commentListRef = database.ref("comments");
+    database = FirebaseDatabase.instanceFor(
+        app: FirebaseDatabase.instance.app, databaseURL: Config.firebaseRDBUrl);
     profile = SharedPreferencesService.getProfile();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    id = _routeState.route.parameters['id'].toString();
+    if (!isInitRef) {
+      isInitRef = true;
+      commentListRef = database.ref().child("comments").child(id);
+      initCommentListRef(id);
+      // commentListRef.onChildAdded.listen(_onCommentAdded);
+      // commentListRef.onChildRemoved.listen(_onCommentRemoved);
+      // commentListRef.onChildChanged.listen(_onCommentChanged);
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    database.goOffline();
+    // database.goOffline();
     comment.dispose();
+  }
+
+  void initCommentListRef(id) {
+
+    
+
+    commentListRef.onValue.listen((event) {
+      List<Comment> commentList = [];
+      for (final child in event.snapshot.children) {
+        // Handle the post.
+        if (child.value != null) {
+          var comment = Comment.fromJson(Helper.objectToJson(child.value!));
+
+          if (profile?.id == comment.postOwner ||
+              profile?.id == comment.commentById) {
+            commentList.add(comment);
+          } else if (profile?.companyCode != null) {
+            if (comment.companyCode == profile?.companyCode) {
+              commentList.add(comment);
+            }
+          }
+        }
+      }
+
+      if (commentList.length > 0) {
+        
+          _commentList = commentList;
+        
+      }
+    });
+    
+    // commentListRef.onChildAdded.listen((event) {
+    //   // A new comment has been added, so add it to the displayed list.
+    //   print(event);
+    // }, onError: (error) {
+    //   print(error);
+    // });
+
+    // commentListRef.onChildChanged.listen((event) {
+    //   // A comment has changed; use the key to determine if we are displaying this
+    //   // comment and if so displayed the changed comment.
+    //   print(event);
+    // });
+    // commentListRef.onChildRemoved.listen((event) {
+    //   // A comment has been removed; use the key to determine if we are displaying
+    //   // this comment and if so remove it.
+    //   print(event);
+    // });
   }
 
   RouteState get _routeState => RouteStateScope.of(context);
 
   @override
   Widget build(BuildContext context) {
+    // commentListRef.push().set("asdasd");
+
     if (FirebaseAuth.instance.currentUser == null) {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }
-    var id = _routeState.route.parameters['id'];
-    if (id == null) {
+    var pid = _routeState.route.parameters['id'];
+    if (pid == null) {
       return Container();
     }
+
+    //initCommentListRef(id);
+
     var provider = ref.watch(_getDataProvider(id));
     return provider.when(
         loading: () => Center(
@@ -88,8 +159,15 @@ class _PostScreenState extends ConsumerState {
           return Text("Error: ${err}");
         },
         data: (data) {
-          refId = "${data.createdBy}|${profile?.id}";
-
+          if (profile!.role == "staff") {
+            if (data.companyCode == profile!.companyCode) {
+              isOwner = true;
+            }
+          } else if (profile!.role == "user") {
+            if (data.createdBy == profile!.id) {
+              isOwner = true;
+            }
+          }
           return Scaffold(
             body: Stack(children: [
               Positioned.fill(
@@ -104,25 +182,7 @@ class _PostScreenState extends ConsumerState {
                                 children: [
                                   PostCard(data),
                                   CommentCard(data),
-                                  Expanded(
-                                    child: ListView(
-      children: [
-        ListTile(
-          title: Text('List item 1'),
-          subtitle: Text('Secondary text'),
-          leading: Icon(Icons.label),
-          trailing: Radio(
-            value: 1,
-            groupValue: "",
-            onChanged: (value) {
-              // Update value.
-            },
-          ),
-        ),
-      ],
-    ),
-                                  )
-
+                                  CommentListCard()
                                   // const _SignUpButton(),
                                 ],
                               )))))
@@ -187,73 +247,95 @@ class _PostScreenState extends ConsumerState {
     ));
   }
 
-  Widget CommentCard(post) {
+  Widget CommentCard(PostModel post) {
     return Container(
+        padding: EdgeInsets.only(top: 10),
         child: Form(
             key: _keyForm,
-            child: Card(
-                clipBehavior: Clip.antiAlias,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AuthTextField(
-                        maxLines: 4,
-                        key: const Key('comment'),
-                        icon: Icon(Icons.comment),
-                        controller: comment.ct,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 20),
-                        hint: 'Comments',
-                        keyboardType: TextInputType.multiline,
-                        validator: (value) => Validations.validateText(value)),
-                    CupertinoButton(
-                        onPressed: () {
-                          if (_keyForm.currentState!.validate()) {
-                            Comment cm = Comment();
-                            cm.avatar = profile?.avatarUrl;
-                            cm.comment = comment.ct.text;
-                            cm.commentBy = profile?.displayName;
-                            cm.commentById = profile?.id;
-                            cm.commentDate = Helper.getCurrentDateTimeString();
-                            cm.postId = post.id;
-                            refId = "${post.createdBy}|${profile?.id}";
-                            commentListRef.child(refId).push().set(cm.toJson());
-                          }
-                          // RouteStateScope.of(context).go("/post/${profile.id}");
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            //  A google icon here
-                            //  an External Package used here
-                            //  Font_awesome_flutter package used
-                            Text("Send Private comment"),
-                          ],
-                        )
-                        //_saveButtons(),
-                        // Image.asset('assets/card-sample-image.jpg'),
-                        // Image.asset('assets/card-sample-image-2.jpg'),
-                        ),
-                  ],
-                ))));
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AuthTextField(
+                    maxLines: 4,
+                    key: const Key('comment'),
+                    icon: Icon(Icons.comment),
+                    controller: comment.ct,
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    hint: 'Comments',
+                    keyboardType: TextInputType.multiline,
+                    validator: (value) => Validations.validateText(value)),
+                CupertinoButton(
+                    onPressed: () {
+                      if (_keyForm.currentState!.validate()) {
+                        Comment cm = Comment();
+                        cm.avatar = profile?.avatarUrl;
+                        cm.companyCode = profile?.companyCode;
+                        cm.postOwner = post.createdBy;
+                        cm.comment = comment.ct.text;
+                        cm.commentBy = profile?.displayName;
+                        cm.commentById = profile?.id;
+                        cm.commentDate = Helper.getCurrentDateTimeString();
+                        cm.postId = post.id;
+                       
+                        var ref = commentListRef.push();
+                        cm.key = ref.key;
+                        ref.set(cm.toJson());
+                      }
+                      // RouteStateScope.of(context).go("/post/${profile.id}");
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        //  A google icon here
+                        //  an External Package used here
+                        //  Font_awesome_flutter package used
+                        Text("Send Private comment"),
+                      ],
+                    )
+                    //_saveButtons(),
+                    // Image.asset('assets/card-sample-image.jpg'),
+                    // Image.asset('assets/card-sample-image-2.jpg'),
+                    ),
+              ],
+            )));
   }
 
-  Widget CommentListCard(post) {
-    return ListView(
-      children: [
-        ListTile(
-          title: Text('List item 1'),
-          subtitle: Text('Secondary text'),
-          leading: Icon(Icons.label),
-          trailing: Radio(
-            value: 1,
-            groupValue: "",
-            onChanged: (value) {
-              // Update value.
+  Widget CommentListCard() {
+    return ListView.builder(
+      itemCount: _commentList.length,
+      shrinkWrap: true,
+      itemBuilder: (BuildContext context, int index) {
+        var comment = _commentList[index];
+        var title = (comment.commentBy ?? '') +
+            ' ▪ ' +
+            Helper.getTimeAgo(
+                Helper.stringToDate(dateString: comment.commentDate!));
+        var subtitle = (comment.comment ?? '');
+        Widget? trailing = null;
+
+        if (isOwner) {
+          trailing = IconButton(
+            icon: const Icon(Icons.reply),
+            onPressed: () {
+              setState(() {
+                // _volume += 10;
+              });
             },
-          ),
-        ),
-      ],
+          );
+        }
+
+        return ListTile(
+          title: Text(title, style: TextStyle(fontSize: 12)),
+          isThreeLine: true,
+          subtitle: Text(subtitle),
+          leading: comment.avatar == null
+              ? Icon(Icons.person)
+              : CircleAvatar(backgroundImage: NetworkImage(comment.avatar!)),
+          enableFeedback: true,
+          trailing: trailing,
+        );
+      },
     );
   }
 }

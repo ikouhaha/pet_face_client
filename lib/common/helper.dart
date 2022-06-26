@@ -30,8 +30,15 @@ class Helper {
     return (timeago.format(dateTime)); // 15 minutes ago
   }
   
+  static dynamic objectToJson(Object object) {
+    return json.decode(json.encode(object));
+  }
+
   static String getCurrentDateTimeString(){
     return DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+  }
+  static DateTime stringToDate({required String dateString,String format = 'yyyy-MM-dd – kk:mm'}){
+    return DateFormat(format).parse(dateString);
   }
 
   static void showErrorToast({msg}) {
