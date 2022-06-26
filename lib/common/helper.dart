@@ -35,9 +35,9 @@ class Helper {
   }
 
   static String getCurrentDateTimeString(){
-    return DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
+    return DateFormat('yyyy-MM-dd – hh:mm').format(DateTime.now());
   }
-  static DateTime stringToDate({required String dateString,String format = 'yyyy-MM-dd – kk:mm'}){
+  static DateTime stringToDate({required String dateString,String format = 'yyyy-MM-dd – hh:mm'}){
     return DateFormat(format).parse(dateString);
   }
 

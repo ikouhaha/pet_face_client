@@ -39,6 +39,7 @@ class PostDetailPage extends ConsumerStatefulWidget {
 
 class _PostScreenState extends ConsumerState {
   late FirebaseDatabase database;
+  ScrollController _scrollController = new ScrollController();
   late DatabaseReference commentListRef;
   late String id;
   List<Comment> _commentList = [];
@@ -66,7 +67,7 @@ class _PostScreenState extends ConsumerState {
     if (!isInitRef) {
       isInitRef = true;
       commentListRef = database.ref().child("comments").child(id);
-      initCommentListRef(id);
+      //initCommentListRef(id);
       // commentListRef.onChildAdded.listen(_onCommentAdded);
       // commentListRef.onChildRemoved.listen(_onCommentRemoved);
       // commentListRef.onChildChanged.listen(_onCommentChanged);
@@ -81,9 +82,6 @@ class _PostScreenState extends ConsumerState {
   }
 
   void initCommentListRef(id) {
-
-    
-
     commentListRef.onValue.listen((event) {
       List<Comment> commentList = [];
       for (final child in event.snapshot.children) {
@@ -103,12 +101,15 @@ class _PostScreenState extends ConsumerState {
       }
 
       if (commentList.length > 0) {
-        
-          _commentList = commentList;
-        
+        if (this.mounted) {
+          setState(() {
+            _commentList = commentList;
+          });
+        }
+        ;
       }
     });
-    
+
     // commentListRef.onChildAdded.listen((event) {
     //   // A new comment has been added, so add it to the displayed list.
     //   print(event);
@@ -277,10 +278,14 @@ class _PostScreenState extends ConsumerState {
                         cm.commentById = profile?.id;
                         cm.commentDate = Helper.getCurrentDateTimeString();
                         cm.postId = post.id;
-                       
+
                         var ref = commentListRef.push();
                         cm.key = ref.key;
                         ref.set(cm.toJson());
+                        _keyForm.currentState!.reset();
+                        comment.ct.clear();
+                        
+                        FocusManager.instance.primaryFocus?.unfocus();
                       }
                       // RouteStateScope.of(context).go("/post/${profile.id}");
                     },
@@ -302,41 +307,83 @@ class _PostScreenState extends ConsumerState {
   }
 
   Widget CommentListCard() {
-    return ListView.builder(
-      itemCount: _commentList.length,
-      shrinkWrap: true,
-      itemBuilder: (BuildContext context, int index) {
-        var comment = _commentList[index];
-        var title = (comment.commentBy ?? '') +
-            ' ▪ ' +
-            Helper.getTimeAgo(
-                Helper.stringToDate(dateString: comment.commentDate!));
-        var subtitle = (comment.comment ?? '');
-        Widget? trailing = null;
+    return Container(
+        child: StreamBuilder(
+            stream: commentListRef.onValue,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text("Error: ${snapshot.error}");
+              }
+              if (snapshot.hasData) {
+                var data = snapshot.data;
+                if (data == null) {
+                  return Container();
+                }
+                var value = (data! as DatabaseEvent).snapshot;
+                if (value == null) {
+                  return Container();
+                }
 
-        if (isOwner) {
-          trailing = IconButton(
-            icon: const Icon(Icons.reply),
-            onPressed: () {
-              setState(() {
-                // _volume += 10;
-              });
-            },
-          );
-        }
+                List<Comment> commentList = [];
+                for (final child in value.children) {
+                  // Handle the post.
+                  if (child.value != null) {
+                    var comment =
+                        Comment.fromJson(Helper.objectToJson(child.value!));
 
-        return ListTile(
-          title: Text(title, style: TextStyle(fontSize: 12)),
-          isThreeLine: true,
-          subtitle: Text(subtitle),
-          leading: comment.avatar == null
-              ? Icon(Icons.person)
-              : CircleAvatar(backgroundImage: NetworkImage(comment.avatar!)),
-          enableFeedback: true,
-          trailing: trailing,
-        );
-      },
-    );
+                    if (profile?.id == comment.postOwner ||
+                        profile?.id == comment.commentById) {
+                      commentList.add(comment);
+                    } else if (profile?.companyCode != null) {
+                      if (comment.companyCode == profile?.companyCode) {
+                        commentList.add(comment);
+                      }
+                    }
+                  }
+                }
+
+                commentList = commentList.reversed.toList();
+                //return Container();
+                return ListView.builder(
+                  itemCount: commentList.length,
+                  controller: _scrollController,
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    var comment = commentList[index];
+                    var title = (comment.commentBy ?? '') +
+                        ' ▪ ' +
+                        Helper.getTimeAgo(Helper.stringToDate(
+                            dateString: comment.commentDate!));
+                    var subtitle = (comment.comment ?? '');
+                    Widget? trailing = null;
+
+                    if (isOwner) {
+                      trailing = IconButton(
+                        icon: const Icon(Icons.reply),
+                        onPressed: () {
+                          setState(() {
+                            // _volume += 10;
+                          });
+                        },
+                      );
+                    }
+
+                    return ListTile(
+                      title: Text(title, style: TextStyle(fontSize: 12)),
+                      isThreeLine: true,
+                      subtitle: Text(subtitle),
+                      leading: comment.avatar == null
+                          ? Icon(Icons.person)
+                          : CircleAvatar(
+                              backgroundImage: NetworkImage(comment.avatar!)),
+                      enableFeedback: true,
+                      trailing: trailing,
+                    );
+                  },
+                );
+              }
+              return Container();
+            }));
   }
 }
 

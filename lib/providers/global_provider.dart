@@ -1,16 +1,6 @@
-import 'dart:typed_data';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:formz/formz.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:pet_saver_client/common/helper.dart';
-import 'package:pet_saver_client/common/http-common.dart';
-import 'package:pet_saver_client/models/storage.dart';
-import 'package:pet_saver_client/models/user.dart';
 
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
