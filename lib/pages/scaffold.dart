@@ -160,13 +160,13 @@ class MyScaffoldState extends ConsumerState {
                   }
                   data = data as Map<dynamic, dynamic>;
 
-                  var count = data!.keys.length;
+                  var count = data.length;
 
                   if (count > 0) {
                     return IconButton(
                       padding: EdgeInsets.only(right: 15),
                         icon: Badge(
-                      badgeContent: Text("3", style: TextStyle(color: Colors.white)),
+                      badgeContent: Text(count.toString(), style: TextStyle(color: Colors.white)),
                       child: IconButton(
                         icon: Icon(Icons.notifications),
                         onPressed: () {

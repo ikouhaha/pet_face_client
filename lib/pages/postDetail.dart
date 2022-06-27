@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/common/config.dart';
@@ -14,6 +13,7 @@ import 'package:pet_saver_client/models/comment.dart';
 import 'package:pet_saver_client/models/formController.dart';
 import 'package:pet_saver_client/models/post.dart';
 import 'package:pet_saver_client/models/user.dart';
+import 'package:pet_saver_client/models/notification.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,8 +31,7 @@ final _getDataProvider =
 class PostDetailPage extends ConsumerStatefulWidget {
   const PostDetailPage({
     Key? key,
-    String? id
-    ,
+    String? id,
   }) : super(key: key);
 
   @override
@@ -49,6 +48,7 @@ class _PostScreenState extends ConsumerState {
   bool isOwner = false;
   UserModel? profile;
   bool isInitRef = false;
+  PostModel post = PostModel();
 
   FormController comment = FormController();
 
@@ -71,7 +71,6 @@ class _PostScreenState extends ConsumerState {
       isInitRef = true;
       commentListRef = database.ref().child("comments").child(id);
       notificationsListRef = database.ref().child("notifications");
-  
     }
   }
 
@@ -82,7 +81,6 @@ class _PostScreenState extends ConsumerState {
     comment.dispose();
   }
 
-
   RouteState get _routeState => RouteStateScope.of(context);
 
   @override
@@ -92,79 +90,75 @@ class _PostScreenState extends ConsumerState {
     if (FirebaseAuth.instance.currentUser == null) {
       RouteStateScope.of(context).go("/signin");
       return Scaffold(
-            appBar: AppBar(
-              title: const Text("Post Detail"),
-            ));
+          appBar: AppBar(
+        title: const Text("Post Detail"),
+      ));
     }
     var pid = _routeState.route.parameters['id'];
     if (pid == null) {
-      return  Scaffold(
-            appBar: AppBar(
-              title: const Text("Post Detail"),
-            ));
+      return Scaffold(
+          appBar: AppBar(
+        title: const Text("Post Detail"),
+      ));
     }
-
-    
 
     //initCommentListRef(id);
 
     var provider = ref.watch(_getDataProvider(id));
 
-    return  Scaffold(
-            appBar: AppBar(
-              title: const Text("Post Detail"),
-            )
-            ,body: provider.when(
-        loading: () => Center(
-              child: CircularProgressIndicator(),
-            ),
-        error: (dynamic err, stack) {
-          if (err.message == 401) {
-            FirebaseAuth.instance.signOut();
-            RouteStateScope.of(context).go("/signin");
-          }
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Post Detail"),
+        ),
+        body: provider.when(
+            loading: () => Center(
+                  child: CircularProgressIndicator(),
+                ),
+            error: (dynamic err, stack) {
+              if (err.message == 401) {
+                FirebaseAuth.instance.signOut();
+                RouteStateScope.of(context).go("/signin");
+              }
 
-          return Text("Error: ${err}");
-        },
-        data: (data) {
-          if (profile!.role == "staff") {
-            if (data.companyCode == profile!.companyCode) {
-              isOwner = true;
-            }
-          } else if (profile!.role == "user") {
-            if (data.createdBy == profile!.id) {
-              isOwner = true;
-            }
-          }
+              return Text("Error: ${err}");
+            },
+            data: (data) {
+               post = data;
+              if (profile!.role == "staff") {
+                if (data.companyCode == profile!.companyCode) {
+                  isOwner = true;
+                }
+              } else if (profile!.role == "user") {
+                if (data.createdBy == profile!.id) {
+                  isOwner = true;
+                }
+              }
 
-          List<Widget> widgets = [];
-          widgets.add(PostCard(data));
-          if(!isOwner){
-             widgets.add(CommentCard(data));   
-          }
-          widgets.add(CommentListCard());
-          
-          return Stack(children: [
-              Positioned.fill(
-                  child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8.0),
-                      child: Card(
-                          child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 30.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children:widgets,
-                              )))))
-            ]
-          );
-        })
-            );
-
-   
+              List<Widget> widgets = [];
+              widgets.add(PostCard());
+              if (!isOwner) {
+                widgets.add(CommentCard());
+              }
+              widgets.add(CommentListCard());
+             
+              return Stack(children: [
+                Positioned.fill(
+                    child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8.0),
+                        child: Card(
+                            child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 30.0),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: widgets,
+                                )))))
+              ]);
+            }));
   }
 
-  Widget PostCard(PostModel post) {
+  Widget PostCard() {
     return Container(
         child: Column(
       mainAxisSize: MainAxisSize.min,
@@ -220,7 +214,7 @@ class _PostScreenState extends ConsumerState {
     ));
   }
 
-  Widget CommentCard(PostModel post) {
+  Widget CommentCard({int? replyId,context}) {
     return Container(
         padding: EdgeInsets.only(top: 10),
         child: Form(
@@ -242,6 +236,7 @@ class _PostScreenState extends ConsumerState {
                     onPressed: () {
                       if (_keyForm.currentState!.validate()) {
                         Comment cm = Comment();
+                        Notifications nt = Notifications();
                         cm.avatar = profile?.avatarUrl;
                         cm.companyCode = post.companyCode;
                         cm.postOwner = post.createdBy;
@@ -256,14 +251,15 @@ class _PostScreenState extends ConsumerState {
                         ref.set(cm.toJson());
 
                         _keyForm.currentState!.reset();
-                        setState(() {
-                           //reset
-                           comment.dispose();
-                           comment = FormController();
-                        });
-                       
-                        
+                        comment.ct.clear();
                         FocusManager.instance.primaryFocus?.unfocus();
+                        // setState(() {
+                        //   //reset
+                        //   comment.dispose();
+                        //   comment = FormController();
+                        // });
+
+                        
 
                         String notificationPath = "";
 
@@ -275,16 +271,23 @@ class _PostScreenState extends ConsumerState {
                             notificationPath = post.companyCode!;
                           } else {
                             //send to post owner
-                            notificationPath =  post.createdBy.toString();
+                            notificationPath = post.createdBy.toString();
                           }
+                        }else{
+                          //reply to user
+                          notificationPath = replyId.toString();
                         }
 
-                        ref = notificationsListRef.child(notificationPath).push();
-                        cm.key = ref.key;
-                        ref.set(cm.toJson());
+                        ref =
+                            notificationsListRef.child(notificationPath).push();
+                        nt.key = ref.key;
+                        nt.type = "comment";
+                        nt.jsonValue = json.encode(cm);
+                        ref.set(nt.toJson());
 
-                      
-                        
+                        if(context!=null){
+                          Navigator.pop(context);
+                        }
                       }
                       // RouteStateScope.of(context).go("/post/${profile.id}");
                     },
@@ -305,6 +308,19 @@ class _PostScreenState extends ConsumerState {
             )));
   }
 
+  void showBottomComment(Comment comment) {
+    showModalBottomSheet<void>(
+        isScrollControlled: true,
+        context: context,
+     builder: (context) =>  Padding(
+            padding: MediaQuery.of(context).viewInsets,
+            child: 
+             Container(
+                   height: 185, 
+                   child: CommentCard(replyId: comment.commentById,context:context),
+             )));
+  }
+
   Widget CommentListCard() {
     return Container(
         child: StreamBuilder(
@@ -318,10 +334,7 @@ class _PostScreenState extends ConsumerState {
                 if (data == null) {
                   return Container();
                 }
-                var value = (data! as DatabaseEvent).snapshot;
-                if (value == null) {
-                  return Container();
-                }
+                var value = (data as DatabaseEvent).snapshot;
 
                 List<Comment> commentList = [];
                 for (final child in value.children) {
@@ -356,13 +369,11 @@ class _PostScreenState extends ConsumerState {
                     var subtitle = (comment.comment ?? '');
                     Widget? trailing = null;
 
-                    if (isOwner) {
+                    if (isOwner&&comment.commentById!=profile?.id) {
                       trailing = IconButton(
                         icon: const Icon(Icons.reply),
                         onPressed: () {
-                          setState(() {
-                            // _volume += 10;
-                          });
+                          showBottomComment(comment);
                         },
                       );
                     }
