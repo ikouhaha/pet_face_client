@@ -22,10 +22,11 @@ class RouteState extends ChangeNotifier {
 
   ParsedRoute get route => _route;
 
+
   late GlobalKey<NavigatorState> navigatorKey;
 
   set route(ParsedRoute route) {
-    // Don't notify listeners if the path hasn't changed.
+    // Don't notify listeners if the path hasn't changed.?
     if (_route == route) return;
 
     _route = route;
@@ -38,6 +39,7 @@ class RouteState extends ChangeNotifier {
   }
 
   Future<void> go(String route) async {
+    
     this.route =
         await _parser.parseRouteInformation(RouteInformation(location: route));
         

@@ -31,6 +31,8 @@ final _getDataProvider =
 class PostDetailPage extends ConsumerStatefulWidget {
   const PostDetailPage({
     Key? key,
+    String? id
+    ,
   }) : super(key: key);
 
   @override
@@ -139,17 +141,30 @@ class _PostScreenState extends ConsumerState {
 
     if (FirebaseAuth.instance.currentUser == null) {
       RouteStateScope.of(context).go("/signin");
-      return Container();
+      return Scaffold(
+            appBar: AppBar(
+              title: const Text("Post Detail"),
+            ));
     }
     var pid = _routeState.route.parameters['id'];
     if (pid == null) {
-      return Container();
+      return  Scaffold(
+            appBar: AppBar(
+              title: const Text("Post Detail"),
+            ));
     }
+
+    
 
     //initCommentListRef(id);
 
     var provider = ref.watch(_getDataProvider(id));
-    return provider.when(
+
+    return  Scaffold(
+            appBar: AppBar(
+              title: const Text("Post Detail"),
+            )
+            ,body: provider.when(
         loading: () => Center(
               child: CircularProgressIndicator(),
             ),
@@ -178,8 +193,8 @@ class _PostScreenState extends ConsumerState {
              widgets.add(CommentCard(data));   
           }
           widgets.add(CommentListCard());
-          return Scaffold(
-            body: Stack(children: [
+          
+          return Stack(children: [
               Positioned.fill(
                   child: SingleChildScrollView(
                       padding: const EdgeInsets.fromLTRB(8, 0, 8, 8.0),
@@ -191,9 +206,12 @@ class _PostScreenState extends ConsumerState {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children:widgets,
                               )))))
-            ]),
+            ]
           );
-        });
+        })
+            );
+
+   
   }
 
   Widget PostCard(PostModel post) {

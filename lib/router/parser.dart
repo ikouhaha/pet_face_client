@@ -21,7 +21,7 @@ class TemplateRouteParser extends RouteInformationParser<ParsedRoute> {
     required List<String> allowedPaths,
 
     /// The initial route
-    String initialRoute = '/splash',
+    String initialRoute = '/',
 
     ///  [RouteGuard] used to redirect.
     this.guard,

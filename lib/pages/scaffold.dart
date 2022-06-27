@@ -3,6 +3,7 @@ import 'package:badges/badges.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_saver_client/pages/notifications.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 
 import 'scaffold_body.dart';
@@ -18,9 +19,7 @@ class MyScaffoldState extends State<MyScaffold> {
   int previousSelectIndex = 0;
   Text getTitle(String path, int idx) {
     String title = "";
-    if (path == "/post/:id") {
-      title = "Post Detail";
-    } else if (idx == 0) {
+    if (idx == 0) {
       title = "Pet Saver";
     } else if (idx == 1) {
       title = "Create Post";
@@ -51,57 +50,12 @@ class MyScaffoldState extends State<MyScaffold> {
     }
   }
 
-  GestureDetector? getLeading(String path, int idx) {
-    if (path == "/post/:id") {
-      if (idx == 0) {
-        return GestureDetector(
-          onTap: () {
-            RouteStateScope.of(context).go("/");
-          },
-          child: const Icon(
-            Icons.arrow_back, // add custom icons also
-          ),
-        );
-      } else if (idx == 3) {
-        return GestureDetector(
-          onTap: () {
-            RouteStateScope.of(context).go("/mypost");
-          },
-          child: const Icon(
-            Icons.arrow_back, // add custom icons also
-          ),
-        );
-      }
-    } else if (path == "/edit/post/:id") {
-      return GestureDetector(
-        onTap: () {
-          RouteStateScope.of(context).go("/mypost");
-        },
-        child: const Icon(
-          Icons.arrow_back, // add custom icons also
-        ),
-      );
-    }
-    else if (path == "/notifications") {
-      return GestureDetector(
-        onTap: () {
-          RouteStateScope.of(context).go("/");
-        },
-        child: const Icon(
-          Icons.arrow_back, // add custom icons also
-        ),
-      );
-    }
-
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final routeState = RouteStateScope.of(context);
     final selectedIndex = _getSelectedIndex(routeState.route.pathTemplate);
     return Scaffold(
-        endDrawer: Drawer(
+        drawer: Drawer(
             child: ListView(
           // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
@@ -123,7 +77,6 @@ class MyScaffoldState extends State<MyScaffold> {
                 Navigator.of(context).pop();
               },
             ),
-           
             ListTile(
               title: const Text('Add Post'),
               onTap: () {
@@ -150,13 +103,17 @@ class MyScaffoldState extends State<MyScaffold> {
         )),
         appBar: AppBar(
           title: getTitle(routeState.route.pathTemplate, selectedIndex),
-          leading: getLeading(routeState.route.pathTemplate, selectedIndex),
           actions: [
             IconButton(
               icon: const Icon(Icons.notifications),
               tooltip: 'Notifications',
               onPressed: () {
-                routeState.go('/notifications');
+                Navigator.of(context).push<void>(
+                  MaterialPageRoute(
+                    builder: (context) => NotificationPage(),
+                  ),
+                );
+                //routeState.go('/notifications');
               },
             ),
           ],
@@ -166,7 +123,7 @@ class MyScaffoldState extends State<MyScaffold> {
           body: const BookstoreScaffoldBody(),
           onDestinationSelected: (idx) {
             if (idx == 0) routeState.go('/');
-            
+
             if (idx == 1) routeState.go('/new/post');
 
             if (idx == 2) routeState.go('/mypost');

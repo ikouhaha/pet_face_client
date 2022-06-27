@@ -4,7 +4,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pet_saver_client/pages/editPost.dart';
+import 'package:pet_saver_client/pages/mypost.dart';
 import 'package:pet_saver_client/pages/notifications.dart';
+import 'package:pet_saver_client/pages/postDetail.dart';
 
 import 'package:pet_saver_client/pages/signup_scaffold.dart';
 import 'package:pet_saver_client/router/route_state.dart';
@@ -32,44 +35,63 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
   final _signInKey = const ValueKey('Sign in');
   final _signUpKey = const ValueKey('Sign up');
   final _scaffoldKey = const ValueKey('App scaffold');
-
+  final _notificationKey = const ValueKey('notification');
+  final _postKey = const ValueKey('post');
+  final _editKey = const ValueKey('editPost');
 
   @override
   Widget build(BuildContext context) {
     final routeState = RouteStateScope.of(context);
-    
+    final pathTemplate = routeState.route.pathTemplate;
 
     return Navigator(
       key: widget.navigatorKey,
       onPopPage: (route, dynamic result) {
 
-        
-        
+        if (route.settings is Page &&
+            (route.settings as Page).key == _postKey) {
+          routeState.go('/');
+        }
+
+          if (route.settings is Page &&
+            (route.settings as Page).key == _editKey) {
+          routeState.go('/mypost');
+        }
+
         return route.didPop(result);
       },
       pages: [
         if (routeState.route.pathTemplate == '/signin')
           // Display the sign in screen.
           FadeTransitionPage<void>(
-            key: _signInKey,
-            child: const LoginScaffold()
-            
-          )
-        else  if (routeState.route.pathTemplate == '/signup')
+              key: _signInKey, child: const LoginScaffold())
+        else if (routeState.route.pathTemplate == '/signup')
           // Display the sign in screen.
           FadeTransitionPage<void>(
-            key: _signUpKey,
-            child:const SignupScaffold()
-            
-          )
+              key: _signUpKey, child: const SignupScaffold())
         else ...[
           // Display the app
           FadeTransitionPage<void>(
             key: _scaffoldKey,
             child: MyScaffold(),
           ),
-          // Add an additional page to the stack if the user is viewing a book
-          // or an author
+          // if (pathTemplate == '/notifications')
+          //    MaterialPage<void>(
+          //       key: _notificationKey,
+          //       child: const NotificationPage()
+          //     ),
+           if(pathTemplate=='/post/:id')
+            MaterialPage<void>(
+              key: _postKey,
+              child: const PostDetailPage(),
+            ),
+            
+           if(pathTemplate=='/edit/post/:id')
+            MaterialPage<void>(
+              key: _editKey,
+              child: const EditPostPage(),
+            )
+  
           // if (selectedBook != null)
           //   MaterialPage<void>(
           //     key: _bookDetailsKey,
@@ -88,5 +110,4 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
       ],
     );
   }
-
 }

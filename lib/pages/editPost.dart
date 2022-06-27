@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:ffi';
 
@@ -33,21 +32,20 @@ class PostLoadingData {
   final List<Option> districts;
   final PostModel post;
 
-  PostLoadingData(this.catBreeds, this.dogBreeds,this.districts,this.post);
+  PostLoadingData(this.catBreeds, this.dogBreeds, this.districts, this.post);
 }
 
-
-
-final _getDataProvider = FutureProvider.autoDispose.family<PostLoadingData,int>((ref,id) async {
-     var response = await Http.get(url: "/options/breeds/cat");
+final _getDataProvider =
+    FutureProvider.autoDispose.family<PostLoadingData, int>((ref, id) async {
+  var response = await Http.get(url: "/options/breeds/cat");
   var catBreeds = optionsFromJson(json.encode(response.data));
   response = await Http.get(url: "/options/breeds/dog");
   var dogBreeds = optionsFromJson(json.encode(response.data));
   response = await Http.get(url: "/options/districts");
   var districts = optionsFromJson(json.encode(response.data));
-   response = await Http.get(url: "/posts/$id");
+  response = await Http.get(url: "/posts/$id");
   var post = PostModelObjFromJson(json.encode(response.data));
-  return PostLoadingData(catBreeds, dogBreeds,districts,post);
+  return PostLoadingData(catBreeds, dogBreeds, districts, post);
 });
 
 class EditPostPage extends ConsumerStatefulWidget {
@@ -69,7 +67,7 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
   final _district = FormController();
   bool isInit = false;
   int id = -1;
-  
+
   List<Option> dogBreeds = [];
   List<Option> catBreeds = [];
   List<Option> postTypes = [];
@@ -81,26 +79,22 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
     //_petType.ct.text = "cat"; //default value
     var profile = SharedPreferencesService.getProfile()!;
     post.createdBy = profile.id;
-    
 
     _district.ct.addListener(() {
-      if(_district.ct.text.isNotEmpty){
-            int? value = int?.parse(_district.ct.text);
-        post.districtId = value; 
+      if (_district.ct.text.isNotEmpty) {
+        int? value = int?.parse(_district.ct.text);
+        post.districtId = value;
       }
-       
     });
     _petType.ct.addListener(() {
       post.petType = _petType.ct.text;
-      
     });
 
     _breeds.ct.addListener(() {
-      if(_breeds.ct.text.isNotEmpty){
-          int? value = int?.parse(_breeds.ct.text);
+      if (_breeds.ct.text.isNotEmpty) {
+        int? value = int?.parse(_breeds.ct.text);
         post.breedId = value;
       }
-    
     });
 
     _postType.ct.addListener(() {
@@ -140,81 +134,92 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
   Widget build(BuildContext context) {
     if (FirebaseAuth.instance.currentUser == null) {
       RouteStateScope.of(context).go("/signin");
-      return Container();
+      return Scaffold(
+          appBar: AppBar(
+        title: const Text("Edit Post"),
+      ));
     }
     dogBreeds = [];
     catBreeds = [];
     var paramId = RouteStateScope.of(context).route.parameters['id'];
     if (paramId == null) {
-    
-      return Container();
+      return Scaffold(
+          appBar: AppBar(
+        title: const Text("Edit Post"),
+      ));
     }
 
     id = int.parse(paramId);
     var provider = ref.watch(_getDataProvider(id));
     //return const Center(child: Text("asdsd"));
-    return provider.when(
-        loading: () => Center(
-              child: CircularProgressIndicator(),
-            ),
-        error: (dynamic err, stack) {
-          if (err.message == 401) {
-            FirebaseAuth.instance.signOut();
-            RouteStateScope.of(context).go("/signin");
-          }
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Edit Post"),
+        ),
+        body: provider.when(
+            loading: () => Center(
+                  child: CircularProgressIndicator(),
+                ),
+            error: (dynamic err, stack) {
+              if (err.message == 401) {
+                FirebaseAuth.instance.signOut();
+                RouteStateScope.of(context).go("/signin");
+              }
 
-          return Text("Error: ${err}");
-        },
-        data: (data) {
-          dogBreeds = data.dogBreeds;
-          catBreeds = data.catBreeds;
-          districts = data.districts;
-          
-          if(!isInit){
-            post = data.post;
-            _district.ct.text = post.districtId.toString();
-          _petType.ct.text = post.petType??"";
-          _postType.ct.text = post.type??"";
-          _about.ct.text = post.about??"";
-          _breeds.ct.text = post.breedId==null?"":post.breedId.toString();
-          isInit = true;
-          }
-          
-          return Scaffold(
-            body: Stack(children: [
-              Positioned.fill(
-                  child: Card(
-                      child: SingleChildScrollView(
-                          padding: const EdgeInsets.fromLTRB(1, 0, 1, 8.0),
-                          child: Container(
-                              margin:
-                                  const EdgeInsets.symmetric(vertical: 30.0),
-                              child: Form(
-                                  key: _keyForm,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      //_petTypeField(),
+              return Text("Error: ${err}");
+            },
+            data: (data) {
+              dogBreeds = data.dogBreeds;
+              catBreeds = data.catBreeds;
+              districts = data.districts;
 
-                                      _postTypeField(),
-                                      _BreedsField(),
-                                      _imageField(),
-                                      _districtField(),
-                                      _descriptionField(),
-                                      _submitButton(),
-                                      // const _SignUpButton(),
-                                    ],
-                                  ))))))
-            ]),
-          );
-        });
+              if (!isInit) {
+                post = data.post;
+                _district.ct.text = post.districtId.toString();
+                _petType.ct.text = post.petType ?? "";
+                _postType.ct.text = post.type ?? "";
+                _about.ct.text = post.about ?? "";
+                _breeds.ct.text =
+                    post.breedId == null ? "" : post.breedId.toString();
+                isInit = true;
+              }
+
+              return Stack(children: [
+                Positioned.fill(
+                    child: Card(
+                        child: SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(1, 0, 1, 8.0),
+                            child: Container(
+                                margin:
+                                    const EdgeInsets.symmetric(vertical: 30.0),
+                                child: Form(
+                                    key: _keyForm,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        //_petTypeField(),
+
+                                        _postTypeField(),
+                                        _BreedsField(),
+                                        _imageField(),
+                                        _districtField(),
+                                        _descriptionField(),
+                                        _submitButton(),
+                                        // const _SignUpButton(),
+                                      ],
+                                    ))))))
+              ]);
+            }));
   }
 
   Widget _imageField() {
     return ImageField(
-        image: post.imageBase64==null?null:Helper.getImageByBase64orHttp(post.imageBase64!),
+        image: post.imageBase64 == null
+            ? null
+            : Helper.getImageByBase64orHttp(post.imageBase64!),
         validator: (value) {
           return Validations.validateText(post.imageBase64);
         },
@@ -224,25 +229,22 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
             Response response = await Http.postImage(
                 server: Config.pythonApiServer,
                 url: "/detectBase64/0",
-                imageFile: file
-                );
+                imageFile: file);
             post.imageBase64 = await Helper.imageToBase64(file);
-            post.imageFilename = Helper.uuid()+".jpg";
+            post.imageFilename = Helper.uuid() + ".jpg";
             results =
                 petDetectResponseFromJson(json.encode(response.data["result"]));
             print(results);
             for (var result in results) {
               if (result.name != null) {
-                if(result.name!=post.petType){
+                if (result.name != post.petType) {
                   _breeds.ct.text = "";
                 }
                 _petType.ct.text = result.name!;
                 post.petType = result.name!;
-                for(var crop in result.cropImgs!){
-                     post.cropImageBase64 = crop;
-                  }
-               
-                
+                for (var crop in result.cropImgs!) {
+                  post.cropImageBase64 = crop;
+                }
               }
             }
             //todo make it to multiple, currently just support a pet a image
@@ -295,7 +297,6 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
   }
 
   Widget _petTypeField() {
-   
     return AuthRadioField(
         type: RadioWidget.row,
         key: const Key('pet type'),
@@ -314,7 +315,7 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
   }
 
   Widget _BreedsField() {
-    String? value =  _breeds.ct.text.isEmpty ? null : _breeds.ct.text;
+    String? value = _breeds.ct.text.isEmpty ? null : _breeds.ct.text;
     if (_petType.ct.text == "cat") {
       return AuthDropDownField(
           key: const Key('breedsCat'),
@@ -323,13 +324,13 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
           hint: 'Breeds',
           validator: (value) => Validations.validateText(value),
           options: catBreeds,
-          value:value,
+          value: value,
           onChanged: (value) {
             setState(() {
               _breeds.ct.text = value;
             });
           });
-    } else if(_petType.ct.text == "dog") {
+    } else if (_petType.ct.text == "dog") {
       return AuthDropDownField(
         key: const Key('breedsDog'),
         icon: const Icon(Icons.list),
@@ -344,15 +345,15 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
           });
         },
       );
-    }else{
-       return AuthDropDownField(
+    } else {
+      return AuthDropDownField(
         key: const Key('breedsEmpty'),
         icon: const Icon(Icons.list),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
         hint: 'Please upload a image',
         validator: (value) => Validations.validateText(value),
         options: [],
-        value:value,
+        value: value,
         onChanged: null,
       );
     }
@@ -381,16 +382,17 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
             // you'd often call a server or save the information in a database.
             try {
               EasyLoading.showProgress(0.3, status: 'Processing...');
-              Response response = await Http.put(url: "/posts/$id", data: post.toJson());
+              Response response =
+                  await Http.put(url: "/posts/$id", data: post.toJson());
               //save image after success save the post to the database
               await Http.post(
-                server: Config.pythonApiServer,
-                url: "/image",
-                data: {
-                  "name": post.imageFilename,
-                  "type": post.petType,
-                  "imageBase64":post.imageBase64
-                });
+                  server: Config.pythonApiServer,
+                  url: "/image",
+                  data: {
+                    "name": post.imageFilename,
+                    "type": post.petType,
+                    "imageBase64": post.imageBase64
+                  });
               RouteStateScope.of(context).go("/mypost");
               EasyLoading.showSuccess("create success");
             } catch (e) {

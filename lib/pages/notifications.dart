@@ -20,10 +20,26 @@ class _NotificationPageState extends State<NotificationPage> {
       return Container();
     }
     
-    return const Scaffold(
-      body: Center(child: Text("No Notification Found")),
+     return Scaffold(
+      appBar: AppBar(
+        title: Text("book!.title"),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Text(
+              "book!.title",
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            Text(
+              "book!.author.name",
+              style: Theme.of(context).textTheme.subtitle1,
+            ),
+          
+          ],
+        ),
+      ),
     );
-
-   
+  
   }
 }
