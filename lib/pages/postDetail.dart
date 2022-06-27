@@ -41,6 +41,7 @@ class _PostScreenState extends ConsumerState {
   late FirebaseDatabase database;
   ScrollController _scrollController = new ScrollController();
   late DatabaseReference commentListRef;
+  late DatabaseReference notificationsListRef;
   late String id;
   List<Comment> _commentList = [];
   bool isOwner = false;
@@ -67,6 +68,7 @@ class _PostScreenState extends ConsumerState {
     if (!isInitRef) {
       isInitRef = true;
       commentListRef = database.ref().child("comments").child(id);
+      notificationsListRef = database.ref().child("notifications");
       //initCommentListRef(id);
       // commentListRef.onChildAdded.listen(_onCommentAdded);
       // commentListRef.onChildRemoved.listen(_onCommentRemoved);
@@ -169,6 +171,13 @@ class _PostScreenState extends ConsumerState {
               isOwner = true;
             }
           }
+
+          List<Widget> widgets = [];
+          widgets.add(PostCard(data));
+          if(!isOwner){
+             widgets.add(CommentCard(data));   
+          }
+          widgets.add(CommentListCard());
           return Scaffold(
             body: Stack(children: [
               Positioned.fill(
@@ -180,12 +189,7 @@ class _PostScreenState extends ConsumerState {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  PostCard(data),
-                                  CommentCard(data),
-                                  CommentListCard()
-                                  // const _SignUpButton(),
-                                ],
+                                children:widgets,
                               )))))
             ]),
           );
@@ -271,7 +275,7 @@ class _PostScreenState extends ConsumerState {
                       if (_keyForm.currentState!.validate()) {
                         Comment cm = Comment();
                         cm.avatar = profile?.avatarUrl;
-                        cm.companyCode = profile?.companyCode;
+                        cm.companyCode = post.companyCode;
                         cm.postOwner = post.createdBy;
                         cm.comment = comment.ct.text;
                         cm.commentBy = profile?.displayName;
@@ -282,9 +286,28 @@ class _PostScreenState extends ConsumerState {
                         var ref = commentListRef.push();
                         cm.key = ref.key;
                         ref.set(cm.toJson());
+
+                        String notificationPath = "";
+
+                        //if not owner, send notification to owner
+                        if (!isOwner) {
+                          if (post.companyCode != null &&
+                              post.companyCode!.isNotEmpty) {
+                            //it mean staff post
+                            notificationPath = post.companyCode!;
+                          } else {
+                            //send to post owner
+                            notificationPath =  post.createdBy.toString();
+                          }
+                        }
+
+                        ref = notificationsListRef.child(notificationPath).push();
+                        cm.key = ref.key;
+                        ref.set(cm.toJson());
+
                         _keyForm.currentState!.reset();
                         comment.ct.clear();
-                        
+
                         FocusManager.instance.primaryFocus?.unfocus();
                       }
                       // RouteStateScope.of(context).go("/post/${profile.id}");

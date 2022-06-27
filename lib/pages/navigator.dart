@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pet_saver_client/pages/notifications.dart';
 
 import 'package:pet_saver_client/pages/signup_scaffold.dart';
 import 'package:pet_saver_client/router/route_state.dart';
@@ -41,17 +42,7 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
     return Navigator(
       key: widget.navigatorKey,
       onPopPage: (route, dynamic result) {
-        // When a page that is stacked on top of the scaffold is popped, display
-        // the /books or /authors tab in BookstoreScaffold.
-        // if (route.settings is Page &&
-        //     (route.settings as Page).key == _bookDetailsKey) {
-        //   routeState.go('/');
-        // }
-      
-        // if (route.settings is Page &&
-        //     (route.settings as Page).key == _authorDetailsKey) {
-        //   routeState.go('/authors');
-        // }
+
         
         
         return route.didPop(result);

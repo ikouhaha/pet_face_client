@@ -3,14 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 
-class MessagePage extends StatefulWidget {
-  const MessagePage({Key? key}) : super(key: key);
+class NotificationPage extends StatefulWidget {
+  const NotificationPage({Key? key}) : super(key: key);
 
   @override
-  _MessagePageState createState() => _MessagePageState();
+  _NotificationPageState createState() => _NotificationPageState();
 }
 
-class _MessagePageState extends State<MessagePage> {
+class _NotificationPageState extends State<NotificationPage> {
 
 
   @override
@@ -21,7 +21,7 @@ class _MessagePageState extends State<MessagePage> {
     }
     
     return const Scaffold(
-      body: Center(child: Text("No Message Found")),
+      body: Center(child: Text("No Notification Found")),
     );
 
    

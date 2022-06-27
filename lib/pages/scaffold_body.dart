@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:pet_saver_client/pages/editPost.dart';
-import 'package:pet_saver_client/pages/message.dart';
+import 'package:pet_saver_client/pages/notifications.dart';
 import 'package:pet_saver_client/pages/post.dart';
 import 'package:pet_saver_client/pages/home.dart';
 import 'package:pet_saver_client/pages/list.dart';
@@ -29,7 +29,7 @@ class BookstoreScaffoldBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var currentRoute = RouteStateScope.of(context).route;
-
+  
     // A nested Router isn't necessary because the back button behavior doesn't
     // need to be customized.
     return Navigator(
@@ -51,10 +51,10 @@ class BookstoreScaffoldBody extends StatelessWidget {
             key: ValueKey('mypost'),
             child: PostPage(),
           )
-          else if (currentRoute.pathTemplate== '/message')
+          else if (currentRoute.pathTemplate== '/notifications')
           const FadeTransitionPage<void>(
-            key: ValueKey('message'),
-            child: MessagePage(),
+            key: ValueKey('notifications'),
+            child: NotificationPage(),
           )
           else if (currentRoute.pathTemplate == '/new/post')
           const FadeTransitionPage<void>(

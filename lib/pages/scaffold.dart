@@ -1,8 +1,5 @@
-// Copyright 2021, the Flutter project authors. Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
-
 import 'package:adaptive_navigation/adaptive_navigation.dart';
+import 'package:badges/badges.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -26,36 +23,32 @@ class MyScaffoldState extends State<MyScaffold> {
     } else if (idx == 0) {
       title = "Pet Saver";
     } else if (idx == 1) {
-      title = "Message";
-    } else if (idx == 2) {
       title = "Create Post";
-    } else if (idx == 3) {
+    } else if (idx == 2) {
       title = "My Post";
-    } else if (idx == 4) {
+    } else if (idx == 3) {
       title = "Settings";
     }
 
     return Text(title);
   }
 
-  ListTile getSigninout(){
-      if(FirebaseAuth.instance.currentUser==null){
-        return ListTile(
-          title: Text("Sign In"),
-          onTap: (){
-             RouteStateScope.of(context).go("/signin");
-    
-          },
-        );
-      }else{
-        return ListTile(
-          title: Text("Sign Out",style: TextStyle(color: Colors.redAccent)),
-          onTap: (){
+  ListTile getSigninout() {
+    if (FirebaseAuth.instance.currentUser == null) {
+      return ListTile(
+        title: Text("Sign In"),
+        onTap: () {
+          RouteStateScope.of(context).go("/signin");
+        },
+      );
+    } else {
+      return ListTile(
+          title: Text("Sign Out", style: TextStyle(color: Colors.redAccent)),
+          onTap: () {
             FirebaseAuth.instance.signOut();
             RouteStateScope.of(context).go("/signin");
-          }
-        );
-      }
+          });
+    }
   }
 
   GestureDetector? getLeading(String path, int idx) {
@@ -79,7 +72,7 @@ class MyScaffoldState extends State<MyScaffold> {
           ),
         );
       }
-    }else if(path =="/edit/post/:id"){
+    } else if (path == "/edit/post/:id") {
       return GestureDetector(
         onTap: () {
           RouteStateScope.of(context).go("/mypost");
@@ -89,7 +82,16 @@ class MyScaffoldState extends State<MyScaffold> {
         ),
       );
     }
-   
+    else if (path == "/notifications") {
+      return GestureDetector(
+        onTap: () {
+          RouteStateScope.of(context).go("/");
+        },
+        child: const Icon(
+          Icons.arrow_back, // add custom icons also
+        ),
+      );
+    }
 
     return null;
   }
@@ -121,13 +123,7 @@ class MyScaffoldState extends State<MyScaffold> {
                 Navigator.of(context).pop();
               },
             ),
-            ListTile(
-              title: const Text('Message'),
-              onTap: () {
-                routeState.go('/message');
-                Navigator.of(context).pop();
-              },
-            ),
+           
             ListTile(
               title: const Text('Add Post'),
               onTap: () {
@@ -153,29 +149,38 @@ class MyScaffoldState extends State<MyScaffold> {
           ],
         )),
         appBar: AppBar(
-          title: getTitle(routeState.route.pathTemplate,selectedIndex),
+          title: getTitle(routeState.route.pathTemplate, selectedIndex),
           leading: getLeading(routeState.route.pathTemplate, selectedIndex),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications),
+              tooltip: 'Notifications',
+              onPressed: () {
+                routeState.go('/notifications');
+              },
+            ),
+          ],
         ),
         body: AdaptiveNavigationScaffold(
           selectedIndex: selectedIndex,
           body: const BookstoreScaffoldBody(),
           onDestinationSelected: (idx) {
             if (idx == 0) routeState.go('/');
-            if (idx == 1) routeState.go('/message');
-            if (idx == 2) routeState.go('/new/post');
+            
+            if (idx == 1) routeState.go('/new/post');
 
-            if (idx == 3) routeState.go('/mypost');
-            if (idx == 4) routeState.go('/settings');
+            if (idx == 2) routeState.go('/mypost');
+            if (idx == 3) routeState.go('/settings');
           },
           destinations: const [
             AdaptiveScaffoldDestination(
               title: 'Home',
               icon: Icons.home,
             ),
-            AdaptiveScaffoldDestination(
-              title: 'Message',
-              icon: Icons.comment,
-            ),
+            // AdaptiveScaffoldDestination(
+            //   title: 'Message',
+            //   icon: Icons.comment,
+            // ),
             AdaptiveScaffoldDestination(
               title: 'Post',
               icon: Icons.post_add,
@@ -193,22 +198,18 @@ class MyScaffoldState extends State<MyScaffold> {
   }
 
   int _getSelectedIndex(String pathTemplate) {
-
     if (pathTemplate == "/") {
-      previousSelectIndex= 0;
+      previousSelectIndex = 0;
       return 0;
-    } else if (pathTemplate == "/message") {
-      previousSelectIndex= 1;
-      return 1;
     } else if (pathTemplate == "/new/post") {
-      previousSelectIndex= 2;
-      return 2;
+      previousSelectIndex = 1;
+      return 1;
     } else if (pathTemplate == "/mypost") {
-      previousSelectIndex= 3;
-      return 3;
+      previousSelectIndex = 2;
+      return 2;
     } else if (pathTemplate == "/settings") {
-      previousSelectIndex= 4;
-      return 4;
+      previousSelectIndex = 3;
+      return 3;
     }
 
     return previousSelectIndex;
