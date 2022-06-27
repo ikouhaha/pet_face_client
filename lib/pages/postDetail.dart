@@ -71,10 +71,7 @@ class _PostScreenState extends ConsumerState {
       isInitRef = true;
       commentListRef = database.ref().child("comments").child(id);
       notificationsListRef = database.ref().child("notifications");
-      //initCommentListRef(id);
-      // commentListRef.onChildAdded.listen(_onCommentAdded);
-      // commentListRef.onChildRemoved.listen(_onCommentRemoved);
-      // commentListRef.onChildChanged.listen(_onCommentChanged);
+  
     }
   }
 
@@ -85,53 +82,6 @@ class _PostScreenState extends ConsumerState {
     comment.dispose();
   }
 
-  void initCommentListRef(id) {
-    commentListRef.onValue.listen((event) {
-      List<Comment> commentList = [];
-      for (final child in event.snapshot.children) {
-        // Handle the post.
-        if (child.value != null) {
-          var comment = Comment.fromJson(Helper.objectToJson(child.value!));
-
-          if (profile?.id == comment.postOwner ||
-              profile?.id == comment.commentById) {
-            commentList.add(comment);
-          } else if (profile?.companyCode != null) {
-            if (comment.companyCode == profile?.companyCode) {
-              commentList.add(comment);
-            }
-          }
-        }
-      }
-
-      if (commentList.length > 0) {
-        if (this.mounted) {
-          setState(() {
-            _commentList = commentList;
-          });
-        }
-        ;
-      }
-    });
-
-    // commentListRef.onChildAdded.listen((event) {
-    //   // A new comment has been added, so add it to the displayed list.
-    //   print(event);
-    // }, onError: (error) {
-    //   print(error);
-    // });
-
-    // commentListRef.onChildChanged.listen((event) {
-    //   // A comment has changed; use the key to determine if we are displaying this
-    //   // comment and if so displayed the changed comment.
-    //   print(event);
-    // });
-    // commentListRef.onChildRemoved.listen((event) {
-    //   // A comment has been removed; use the key to determine if we are displaying
-    //   // this comment and if so remove it.
-    //   print(event);
-    // });
-  }
 
   RouteState get _routeState => RouteStateScope.of(context);
 
@@ -305,6 +255,16 @@ class _PostScreenState extends ConsumerState {
                         cm.key = ref.key;
                         ref.set(cm.toJson());
 
+                        _keyForm.currentState!.reset();
+                        setState(() {
+                           //reset
+                           comment.dispose();
+                           comment = FormController();
+                        });
+                       
+                        
+                        FocusManager.instance.primaryFocus?.unfocus();
+
                         String notificationPath = "";
 
                         //if not owner, send notification to owner
@@ -323,10 +283,8 @@ class _PostScreenState extends ConsumerState {
                         cm.key = ref.key;
                         ref.set(cm.toJson());
 
-                        _keyForm.currentState!.reset();
-                        comment.ct.clear();
-
-                        FocusManager.instance.primaryFocus?.unfocus();
+                      
+                        
                       }
                       // RouteStateScope.of(context).go("/post/${profile.id}");
                     },
