@@ -44,6 +44,8 @@ class AuthTextField extends StatelessWidget {
         borderSide: new BorderSide(color: Colors.blueAccent, width: 2));
     UnderlineInputBorder errorBorder = UnderlineInputBorder(
         borderSide: new BorderSide(color: Colors.redAccent, width: 2));
+    
+    
     return Visibility(
         visible: visible,
         child: Padding(
