@@ -123,7 +123,7 @@ class _PostScreenState extends ConsumerState {
               return Text("Error: ${err}");
             },
             data: (data) {
-               post = data;
+              post = data;
               if (profile!.role == "staff") {
                 if (data.companyCode == profile!.companyCode) {
                   isOwner = true;
@@ -134,13 +134,6 @@ class _PostScreenState extends ConsumerState {
                 }
               }
 
-              List<Widget> widgets = [];
-              widgets.add(PostCard());
-              if (!isOwner) {
-                widgets.add(CommentCard());
-              }
-              widgets.add(CommentListCard());
-             
               return Stack(children: [
                 Positioned.fill(
                     child: SingleChildScrollView(
@@ -152,7 +145,27 @@ class _PostScreenState extends ConsumerState {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  children: widgets,
+                                  children: [
+                                    PostCard(),
+                                    Padding(
+                                        padding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 12),
+                                        child: TextField(
+                                      readOnly: true,
+                                      
+                                      onTap: () {
+                                        showBottomComment();
+                                      },
+                                      decoration: const InputDecoration(
+                                        labelText: "Send private comment...",
+                                        border: OutlineInputBorder(),
+                                        disabledBorder: OutlineInputBorder(),
+                                      ),
+                                    )
+                                        
+                                        ),
+                                   
+                                    CommentListCard()
+                                  ],
                                 )))))
               ]);
             }));
@@ -214,7 +227,7 @@ class _PostScreenState extends ConsumerState {
     ));
   }
 
-  Widget CommentCard({int? replyId,context}) {
+  Widget CommentCard({int? replyId, context}) {
     return Container(
         padding: EdgeInsets.only(top: 10),
         child: Form(
@@ -259,8 +272,6 @@ class _PostScreenState extends ConsumerState {
                         //   comment = FormController();
                         // });
 
-                        
-
                         String notificationPath = "";
 
                         //if not owner, send notification to owner
@@ -273,7 +284,7 @@ class _PostScreenState extends ConsumerState {
                             //send to post owner
                             notificationPath = post.createdBy.toString();
                           }
-                        }else{
+                        } else {
                           //reply to user
                           notificationPath = replyId.toString();
                         }
@@ -285,8 +296,9 @@ class _PostScreenState extends ConsumerState {
                         nt.jsonValue = json.encode(cm);
                         ref.set(nt.toJson());
 
-                        if(context!=null){
+                        if (context != null) {
                           Navigator.pop(context);
+                          
                         }
                       }
                       // RouteStateScope.of(context).go("/post/${profile.id}");
@@ -308,17 +320,18 @@ class _PostScreenState extends ConsumerState {
             )));
   }
 
-  void showBottomComment(Comment comment) {
+  void showBottomComment({Comment? comment}) {
     showModalBottomSheet<void>(
         isScrollControlled: true,
         context: context,
-     builder: (context) =>  Padding(
+        
+        builder: (context) => Padding(
             padding: MediaQuery.of(context).viewInsets,
-            child: 
-             Container(
-                   height: 185, 
-                   child: CommentCard(replyId: comment.commentById,context:context),
-             )));
+            child: Container(
+              height: 185,
+              child:
+                  CommentCard(replyId: comment?.commentById, context: context),
+            ))).whenComplete(() => FocusManager.instance.primaryFocus?.unfocus());
   }
 
   Widget CommentListCard() {
@@ -369,11 +382,11 @@ class _PostScreenState extends ConsumerState {
                     var subtitle = (comment.comment ?? '');
                     Widget? trailing = null;
 
-                    if (isOwner&&comment.commentById!=profile?.id) {
+                    if (isOwner && comment.commentById != profile?.id) {
                       trailing = IconButton(
                         icon: const Icon(Icons.reply),
                         onPressed: () {
-                          showBottomComment(comment);
+                          showBottomComment(comment: comment);
                         },
                       );
                     }
