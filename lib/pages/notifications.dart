@@ -97,6 +97,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   notificationsList.add(notification);
                 }
               }
+              notificationsList = notificationsList.reversed.toList(); //latest first
 
                 return ListView.builder(
                   itemCount: notificationsList.length,
@@ -108,8 +109,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           Comment.fromJson(json.decode(notification.jsonValue!));
                       var title = (comment.commentBy ?? '') +
                           ' ▪ ' +
-                          Helper.getTimeAgo(Helper.stringToDate(
-                              dateString: comment.commentDate!));
+                          Helper.getTimeAgo(Helper.timeStampToDatetime(comment.commentDate!));
                       var subtitle = (comment.comment ?? '');
                       Widget? trailing = null;
 

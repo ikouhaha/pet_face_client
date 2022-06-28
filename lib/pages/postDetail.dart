@@ -259,7 +259,7 @@ class _PostScreenState extends ConsumerState {
                         cm.comment = comment.ct.text;
                         cm.commentBy = profile?.displayName;
                         cm.commentById = profile?.id;
-                        cm.commentDate = Helper.getCurrentDateTimeString();
+                        cm.commentDate = DateTime.now().microsecondsSinceEpoch;
                         cm.postId = post.id;
 
                         var ref = commentListRef.push();
@@ -380,8 +380,7 @@ class _PostScreenState extends ConsumerState {
                     var comment = commentList[index];
                     var title = (comment.commentBy ?? '') +
                         ' ▪ ' +
-                        Helper.getTimeAgo(Helper.stringToDate(
-                            dateString: comment.commentDate!));
+                        Helper.getTimeAgo(Helper.timeStampToDatetime(comment.commentDate!));
                     var subtitle = (comment.comment ?? '');
                     Widget? trailing = null;
 

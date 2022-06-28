@@ -28,7 +28,7 @@ class Comment {
     int? postId;
     String? avatar;
     String? comment;
-    String? commentDate;
+    int? commentDate;
     String? commentBy;
     
 
@@ -40,7 +40,7 @@ class Comment {
         int? postId,
         String? avatar,
         String? comment,
-        String? commentDate,
+        int? commentDate,
         String? commentBy,
         
     }) => 

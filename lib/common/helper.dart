@@ -28,6 +28,7 @@ class Helper {
     //final fifteenAgo = dateTime!.subtract(new Duration(minutes: 15));
 
     return (timeago.format(dateTime)); // 15 minutes ago
+    
   }
   
   static dynamic objectToJson(Object object) {
@@ -37,9 +38,13 @@ class Helper {
   static String getCurrentDateTimeString(){
     return DateFormat('yyyy-MM-dd – hh:mm').format(DateTime.now());
   }
-  static DateTime stringToDate({required String dateString,String format = 'yyyy-MM-dd – hh:mm'}){
-    return DateFormat(format).parse(dateString);
+
+
+  static DateTime timeStampToDatetime(int timestamp){
+    return DateTime.fromMicrosecondsSinceEpoch(timestamp);
   }
+
+
 
   static void showErrorToast({msg}) {
     Fluttertoast.showToast(
