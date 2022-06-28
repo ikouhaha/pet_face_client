@@ -134,20 +134,10 @@ class _PostScreenState extends ConsumerState {
                 }
               }
 
-              return Stack(children: [
-                Positioned.fill(
-                    child: SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8.0),
-                        child: Card(
-                            child: Container(
-                                margin: EdgeInsets.symmetric(vertical: 30.0),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    PostCard(),
-                                    Padding(
+               List<Widget> widgets = [];
+              widgets.add(PostCard());
+              if (!isOwner) {
+                widgets.add(Padding(
                                         padding: EdgeInsets.symmetric(vertical: 10.0,horizontal: 12),
                                         child: TextField(
                                       readOnly: true,
@@ -162,10 +152,23 @@ class _PostScreenState extends ConsumerState {
                                       ),
                                     )
                                         
-                                        ),
-                                   
-                                    CommentListCard()
-                                  ],
+                                        ));
+              }
+              widgets.add(CommentListCard());
+             
+
+              return Stack(children: [
+                Positioned.fill(
+                    child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8.0),
+                        child: Card(
+                            child: Container(
+                                margin: EdgeInsets.symmetric(vertical: 30.0),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: widgets,
                                 )))))
               ]);
             }));
