@@ -19,17 +19,20 @@ class Comment {
         this.commentDate,
         this.commentBy,
         this.commentById,
+        this.replyTo,
     });
 
     String? key;
     int? postOwner;
     int? commentById;
+    int? replyTo;
     String? companyCode;
     int? postId;
     String? avatar;
     String? comment;
     int? commentDate;
     String? commentBy;
+    
     
 
     Comment copyWith({
@@ -42,6 +45,7 @@ class Comment {
         String? comment,
         int? commentDate,
         String? commentBy,
+        int? replyTo,
         
     }) => 
         Comment(
@@ -53,7 +57,8 @@ class Comment {
             avatar: avatar ?? this.avatar,
             comment: comment ?? this.comment,
             commentDate: commentDate ?? this.commentDate,
-            commentBy: commentBy ?? this.commentBy
+            commentBy: commentBy ?? this.commentBy,
+            replyTo: replyTo ?? this.replyTo
             
         );
 
@@ -67,6 +72,7 @@ class Comment {
         comment: json["comment"] == null ? null : json["comment"],
         commentDate: json["commentDate"] == null ? null : json["commentDate"],
         commentBy: json["commentBy"] == null ? null : json["commentBy"],
+        replyTo: json["replyTo"] == null ? null : json["replyTo"],
         
     );
 
@@ -80,6 +86,7 @@ class Comment {
         "comment": comment == null ? null : comment,
         "commentDate": commentDate == null ? null : commentDate,
         "commentBy": commentBy == null ? null : commentBy,
+        "replyTo": replyTo == null ? null : replyTo,
         
     };
 }

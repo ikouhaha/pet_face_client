@@ -21,7 +21,7 @@ class NotificationPage extends StatefulWidget {
 
 class _NotificationPageState extends State<NotificationPage> {
   late FirebaseDatabase database;
-  late DatabaseReference notificationsListRef;
+  DatabaseReference? notificationsListRef;
   UserModel? profile;
 
   @override
@@ -52,7 +52,7 @@ class _NotificationPageState extends State<NotificationPage> {
     }
 
     void clearAll() async {
-      await notificationsListRef.remove();
+      await notificationsListRef?.remove();
     }
 
     return Scaffold(
@@ -69,7 +69,7 @@ class _NotificationPageState extends State<NotificationPage> {
           padding: EdgeInsets.only(top:10),
           child:
          StreamBuilder(
-          stream: notificationsListRef.onValue,
+          stream: notificationsListRef?.onValue,
           builder: (context, snapshot) {
             var emptyNotification = const Center(
               child: Text("No messages"),
@@ -99,6 +99,9 @@ class _NotificationPageState extends State<NotificationPage> {
               }
               notificationsList = notificationsList.reversed.toList(); //latest first
 
+              if(notificationsList.length==0){
+                return emptyNotification;
+              }
                 return ListView.builder(
                   itemCount: notificationsList.length,
                   itemBuilder: (context, idx) {
@@ -117,8 +120,8 @@ class _NotificationPageState extends State<NotificationPage> {
                           padding: EdgeInsets.only(left:10,right: 10),
                           child: Card(
                               child: ListTile(
-                            onTap: () async {
-                              await notificationsListRef.child(notification.key!).remove();
+                            onTap: ()  {
+                              notificationsListRef?.child(notification.key!).remove();
                               RouteStateScope.of(context).go("/post/${comment.postId}");
                               
                             },

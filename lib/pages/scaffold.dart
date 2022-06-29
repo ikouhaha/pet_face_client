@@ -23,7 +23,7 @@ class MyScaffold extends ConsumerStatefulWidget {
 class MyScaffoldState extends ConsumerState {
   int previousSelectIndex = 0;
   late FirebaseDatabase database;
-  late DatabaseReference notificationsListRef;
+  DatabaseReference? notificationsListRef;
   UserModel? profile;
 
   @override
@@ -134,7 +134,7 @@ class MyScaffoldState extends ConsumerState {
           title: getTitle(routeState.route.pathTemplate, selectedIndex),
           actions: [
             StreamBuilder(
-              stream: notificationsListRef.onValue,
+              stream: notificationsListRef?.onValue,
               builder: (context, snapshot) {
                 var goLink = () => Navigator.of(context).push<void>(
                       MaterialPageRoute(

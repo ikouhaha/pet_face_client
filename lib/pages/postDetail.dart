@@ -261,6 +261,9 @@ class _PostScreenState extends ConsumerState {
                         cm.commentById = profile?.id;
                         cm.commentDate = DateTime.now().microsecondsSinceEpoch;
                         cm.postId = post.id;
+                        if(replyId != null){
+                          cm.replyTo = replyId;
+                        }
 
                         var ref = commentListRef.push();
                         cm.key = ref.key;
@@ -360,9 +363,10 @@ class _PostScreenState extends ConsumerState {
                         Comment.fromJson(Helper.objectToJson(child.value!));
 
                     if (profile?.id == comment.postOwner ||
-                        profile?.id == comment.commentById) {
+                        profile?.id == comment.commentById||
+                        profile?.id== comment.replyTo) {
                       commentList.add(comment);
-                    } else if (profile?.companyCode != null) {
+                    } else if (profile?.companyCode != null) { //staff post
                       if (comment.companyCode == profile?.companyCode) {
                         commentList.add(comment);
                       }
