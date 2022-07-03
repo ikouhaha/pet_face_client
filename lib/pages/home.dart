@@ -101,7 +101,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   List<Option> catBreeds = [];
   List<Option> postTypes = [];
   List<Option> districts = [];
-  String token  = "";
+  String token = "";
 
   @override
   void initState() {
@@ -109,7 +109,6 @@ class _HomePageState extends ConsumerState<HomePage> {
     postTypes.add(Option(value: "lost", name: "Lost"));
     postTypes.add(Option(value: "found", name: "Found"));
     postTypes.add(Option(value: "adopt", name: "Adoption"));
-    
   }
 
   @override
@@ -141,11 +140,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     // loadPage();
     var response = await Http.get(url: DataFilter.url + paramsUrl);
     setState(() {
-        refresh = true;
-        posts = PostModelFromJson(json.encode(response.data));
-
+      refresh = true;
+      posts = PostModelFromJson(json.encode(response.data));
     });
-    
   }
 
   Alert detectImageAlert() {
@@ -167,11 +164,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                       try {
                         EasyLoading.showProgress(0.3, status: 'detecting...');
                         Response response = await Http.postImage(
-                          server: Config.pythonApiServer,
-                          url: "/detectBase64/0",
-                          imageFile: file,
-                          name:""
-                        );
+                            server: Config.pythonApiServer,
+                            url: "/detectBase64/0",
+                            imageFile: file,
+                            name: "");
                         post.imageBase64 = await Helper.imageToBase64(file);
                         results = petDetectResponseFromJson(
                             json.encode(response.data["result"]));
@@ -194,7 +190,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                               data: {
                                 "type": DataFilter.params["petType"],
                                 "imageBase64": results[0].cropImgs![0],
-                                
                               },
                             );
 
@@ -203,9 +198,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                             String url = "/posts/filter/inames?";
                             findResults.asMap().forEach((index, value) {
-                   
-                                url += "name=${value.filename}&";
-
+                              url += "name=${value.filename}&";
                             });
                             DataFilter.url = url;
                           }
@@ -409,12 +402,29 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
       return Container();
     }, data: (data) {
-      if(!refresh){
-          posts = data.posts;
-      }else{
+      if (!refresh) {
+        posts = data.posts;
+      } else {
         refresh = false;
+        return Scaffold(
+          body: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: Container(
+                child: MasonryGridView.count(
+              addAutomaticKeepAlives: true,
+              crossAxisCount: 2,
+              mainAxisSpacing: 2,
+              crossAxisSpacing: 2,
+              itemCount: posts.length,
+              itemBuilder: (context, index) {
+                return PostCard(profile: posts[index]);
+              },
+            )),
+          ),
+          floatingActionButton: _createButton(),
+        );
       }
-      
+
       dogBreeds = data.dogBreeds;
       catBreeds = data.catBreeds;
       districts = data.districts;
