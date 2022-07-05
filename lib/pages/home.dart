@@ -265,7 +265,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         post.petType = _petType.ct.text;
                         post.type = _postType.ct.text;
                         if (_breeds.ct.text.isNotEmpty) {
-                          post.breedId = int?.parse(_breeds.ct.text);
+                          post.breedID = int?.parse(_breeds.ct.text);
                         }
                         if (_district.ct.text.isNotEmpty) {
                           post.districtId = int?.parse(_district.ct.text);
@@ -277,7 +277,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         setFilterValue("petType", post.petType);
                         setFilterValue("about", post.about);
                         setFilterValue("districtId", post.districtId);
-                        setFilterValue("breedId", post.breedId);
+                        setFilterValue("breedID", post.breedID);
 
                         Navigator.pop(context);
 
@@ -338,7 +338,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     //               post.petType = _petType.ct.text;
     //               post.type = _postType.ct.text;
     //               if(_breeds.ct.text.isNotEmpty){
-    //                 post.breedId = int?.parse(_breeds.ct.text);
+    //                 post.breedID = int?.parse(_breeds.ct.text);
     //               }
     //                if(_district.ct.text.isNotEmpty){
     //                 post.districtId = int?.parse(_district.ct.text);
@@ -350,7 +350,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     //               setFilterValue("petType", post.petType);
     //               setFilterValue("about", post.about);
     //               setFilterValue("districtId", post.districtId);
-    //               setFilterValue("breedId", post.breedId);
+    //               setFilterValue("breedID", post.breedID);
 
     //               Navigator.of(context, rootNavigator: true).pop();
 

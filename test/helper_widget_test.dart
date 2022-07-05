@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_saver_client/firebase_options.dart';
 import 'package:pet_saver_client/pages/splash.dart';
+import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
+// import 'package:mockito/annotations.dart';
+
+import 'mock.dart';
 
 
 String get testEmulatorHost {
@@ -19,11 +21,24 @@ String get testEmulatorHost {
 const int testEmulatorPort = 9099;
 
 void main() {
-  setUpAll(
-    () async {
-      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    },
-  );
+  setupFirebaseAuthMocks();
+  FirebaseAuth? auth;
+  MockFirebaseAuth mockAuthPlatform = MockFirebaseAuth();
+  var testCount = 0;
+
+   setUpAll(() async{
+    final app = await Firebase.initializeApp(
+        name: '$testCount',
+        options: const FirebaseOptions(
+          apiKey: '',
+          appId: '',
+          messagingSenderId: '',
+          projectId: '',
+        ),
+      );
+    FirebaseAuthPlatform.instance =  mockAuthPlatform = FirebaseAuthPlatform;
+    auth = FirebaseAuth.instanceFor(app: app);
+   });
 
   Widget createWidgetForTesting({required Widget child}) {
     return MaterialApp(
@@ -32,13 +47,15 @@ void main() {
   }
 
   testWidgets('load empty page', (tester) async {
+    
     await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
 
     await tester.pumpAndSettle();
 
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
+    await auth?.signInWithEmailAndPassword(
         email: "ikouhaha888@gmail.com", password: "ikouhaha765");
 
+    print(FirebaseAuth.instance.currentUser);
     
   });
 }

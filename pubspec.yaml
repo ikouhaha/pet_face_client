@@ -59,6 +59,7 @@ dependencies:
   firebase_database: ^9.0.16
   firebase_remote_config: ^2.0.9
   intl: ^0.17.0
+  firebase_core_platform_interface: 4.4.3
 
 dependency_overrides:
   photo_view:

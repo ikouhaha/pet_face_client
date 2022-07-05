@@ -93,7 +93,7 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
     _breeds.ct.addListener(() {
       if (_breeds.ct.text.isNotEmpty) {
         int? value = int?.parse(_breeds.ct.text);
-        post.breedId = value;
+        post.breedID = value;
       }
     });
 
@@ -180,7 +180,7 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
                 _postType.ct.text = post.type ?? "";
                 _about.ct.text = post.about ?? "";
                 _breeds.ct.text =
-                    post.breedId == null ? "" : post.breedId.toString();
+                    post.breedID == null ? "" : post.breedID.toString();
                 isInit = true;
               }
 

@@ -84,7 +84,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
 
     _breeds.ct.addListener(() {
       int? value = int?.parse(_breeds.ct.text);
-      post.breedId = value;
+      post.breedID = value;
     });
 
     _postType.ct.addListener(() {

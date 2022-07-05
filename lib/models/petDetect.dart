@@ -33,8 +33,9 @@ class PetDetectResponse {
     );
 
     Map<String, dynamic> toJson() => {
-        "cropImages": List<dynamic>.from(cropImgs!.map((x) => x)),
+      "name": name,
+        "cropImgs": List<dynamic>.from(cropImgs!.map((x) => x)),
         "labelImg": labelImg,
-        "name": name,
+        
     };
 }

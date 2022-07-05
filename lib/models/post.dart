@@ -17,7 +17,7 @@ class PostModel {
   PostModel(
       {this.type,
       this.about,
-      this.breedId,
+      this.breedID,
       this.imageBase64,
       this.createdBy,
       this.id,
@@ -34,7 +34,7 @@ class PostModel {
 
   String? type;
   String? about;
-  int? breedId;
+  int? breedID;
   String? imageBase64;
   String? cropImageBase64;
 
@@ -54,7 +54,7 @@ class PostModel {
   PostModel copyWith({
     String? name,
     String? about,
-    int? breedId,
+    int? breedID,
     String? imageBase64,
     int? createdBy,
     int? id,
@@ -70,7 +70,7 @@ class PostModel {
   }) =>
       PostModel(
         about: about ?? this.about,
-        breedId: breedId ?? this.breedId,
+        breedID: breedID ?? this.breedID,
         imageBase64: imageBase64 ?? this.imageBase64,
         createdBy: createdBy ?? this.createdBy,
         id: id ?? this.id,
@@ -88,7 +88,7 @@ class PostModel {
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(
         about: json["about"],
-        breedId: json["breedID"],
+        breedID: json["breedID"],
         imageBase64: json["imageBase64"],
         createdBy: json["createdBy"],  
         id: json["id"],
@@ -106,7 +106,7 @@ class PostModel {
 
   Map<String, dynamic> toJson() => {
         "about": about,
-        "breedID": breedId,
+        "breedID": breedID,
         "imageBase64": imageBase64,
         "createdBy": createdBy,
         "id": id,
