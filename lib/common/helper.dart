@@ -6,13 +6,10 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pet_saver_client/common/config.dart';
 import 'package:pet_saver_client/common/sharePerfenceService.dart';
-import 'package:pet_saver_client/models/storage.dart';
-import 'package:pet_saver_client/models/user.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class Helper {

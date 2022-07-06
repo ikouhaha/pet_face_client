@@ -11,6 +11,16 @@ import 'package:pet_saver_client/common/sharePerfenceService.dart';
 import 'package:pet_saver_client/providers/global_provider.dart';
 
 class Http {
+  static Dio? _dio;
+  static bool _autoPopup = true;
+
+  static void setDio({Dio? dio}){
+    _dio = dio;
+  }
+  static void setAutoPopup({bool autoPopup = true}) {
+    _autoPopup = autoPopup;
+  }
+
   static String getErrorMsg({ex}) {
     String errorMessage = "";
     if (ex.response != null &&
@@ -51,10 +61,10 @@ class Http {
 
   static Future<Response> get(
       { required url, authorization, String? server}) async {
-        var dio = Dio();
+        var dio = _dio??Dio();
     try {
       //print(navigatorKey.currentContext);
-
+      
       
       if (authorization != null) {
         dio.options.headers["Authorization"] = authorization;
@@ -70,7 +80,10 @@ class Http {
        // await ref.read(GlobalProvider).logout();
        throw Exception(ex.response!.statusCode);
       } else {
-        EasyLoading.showError(errorMsg);
+        if(_autoPopup){
+           EasyLoading.showError(errorMsg);
+        }
+       
       }
 
       throw Exception(errorMsg);
@@ -81,7 +94,7 @@ class Http {
 
   static Future<Response> post(
       { required url, data, authorization, String? server}) async {
-         var dio = Dio();
+         var dio = _dio??Dio();
     try {
      
       if (authorization != null) {
@@ -96,9 +109,11 @@ class Http {
       if (ex.response != null && ex.response!.statusCode == 401) {
         //await ref.read(GlobalProvider).logout();
         if (ex.response!.statusMessage != null) {
+          if(_autoPopup)
           EasyLoading.showError(ex.response!.statusMessage!);
         }
       } else {
+        if(_autoPopup)
         EasyLoading.showError(errorMsg);
       }
 
@@ -110,7 +125,7 @@ class Http {
 
   static Future<Response> put(
       { required url, data, authorization, String? server}) async {
-        var dio = Dio();
+        var dio = _dio??Dio();
     try {
     
       if (authorization != null) {
@@ -126,9 +141,11 @@ class Http {
       if (ex.response != null && ex.response!.statusCode == 401) {
         //await ref.read(GlobalProvider).logout();
         if (ex.response!.statusMessage != null) {
+          if(_autoPopup)
           EasyLoading.showError(ex.response!.statusMessage!);
         }
       } else {
+        if(_autoPopup)
         EasyLoading.showError(errorMsg);
       }
 
@@ -140,7 +157,7 @@ class Http {
 
   static Future<Response> delete(
       { required url, authorization, String? server}) async {
-        var dio = Dio();
+        var dio = _dio??Dio();
     try {
      
       if (authorization != null) {
@@ -156,9 +173,11 @@ class Http {
       if (ex.response != null && ex.response!.statusCode == 401) {
         //await ref.read(GlobalProvider).logout();
         if (ex.response!.statusMessage != null) {
+          if(_autoPopup)
           EasyLoading.showError(ex.response!.statusMessage!);
         }
       } else {
+        if(_autoPopup)
         EasyLoading.showError(errorMsg);
       }
     
@@ -170,7 +189,7 @@ class Http {
 
   static Future<Response> postImage(
       {required url, required XFile imageFile, String? server, String? name}) async {
-    var dio = Dio();
+    var dio = _dio??Dio();
     try {
       
       dio.options.headers["Connection"] ="Keep-Alive" ;
@@ -199,7 +218,8 @@ class Http {
       
       return response;
     } on DioError catch (ex) {
-      String errorMsg = getErrorMsg(ex: ex);      
+      String errorMsg = getErrorMsg(ex: ex);    
+      if(_autoPopup)  
       EasyLoading.showError(errorMsg);
       throw Exception(errorMsg);
     }finally{

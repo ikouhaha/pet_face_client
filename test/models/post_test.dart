@@ -59,13 +59,13 @@ void main() {
   });
 
   test('test PostModelFromJson',(){
-    var list = PostModelFromJson("[{\"type\":\"lost\",\"about\":\"test\",\"breedID\":1,\"imageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"createdBy\":1,\"id\":1,\"breed\":\"test\",\"createdByName\":\"test\",\"companyCode\":\"test\",\"imageFilename\":\"test.png\",\"petType\":\"cat\",\"cropImageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"district\":\"test\",\"districtId\":1}]");
+    var list = PostModelFromJson("[{\"type\":\"lost\",\"about\":\"test\",\"breedID\":1,\"imageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"createdBy\":1,\"id\":1,\"breed\":\"test\",\"createdByName\":\"test\",\"companyCode\":\"test\",\"imageFilename\":\"test.png\",\"petType\":\"cat\",\"cropImageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"district\":\"test\",\"districtId\":1,\"createdOn\":\"2020-01-01T00:00:00.000Z\",\"updatedAt\":\"2020-01-01T00:00:00.000Z\"}]");
     expect(list, isNotNull);
   
   });
 
   test('test PostModelObjFromJson',(){
-    var obj = PostModelObjFromJson("{\"type\":\"lost\",\"about\":\"test\",\"breedID\":1,\"imageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"createdBy\":1,\"id\":1,\"breed\":\"test\",\"createdByName\":\"test\",\"companyCode\":\"test\",\"imageFilename\":\"test.png\",\"petType\":\"cat\",\"cropImageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"district\":\"test\",\"districtId\":1}");
+    var obj = PostModelObjFromJson("{\"type\":\"lost\",\"about\":\"test\",\"breedID\":1,\"imageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"createdBy\":1,\"id\":1,\"breed\":\"test\",\"createdByName\":\"test\",\"companyCode\":\"test\",\"imageFilename\":\"test.png\",\"petType\":\"cat\",\"cropImageBase64\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\",\"district\":\"test\",\"districtId\":1,""\"createdOn\":\"2020-01-01T00:00:00.000Z\"}");
     expect(obj, isNotNull);
   
   });
@@ -112,8 +112,8 @@ void main() {
       "petType": "cat",
       "cropImageBase64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=",
       "district": "test",
-      "districtId": 1
-    
+      "districtId": 1,
+      "createdOn": "2020-01-01T00:00:00.000Z"
 
     };
     
@@ -193,14 +193,15 @@ void main() {
       "petType": "cat",
       "cropImageBase64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=",
       "district": "test",
-      "districtId": 1
-    
-
+      "districtId": 1,
+      "createdOn": "2020-01-01T00:00:00.000Z",
+      
     
     };
     
     PostModel obj = PostModel.fromJson(json);
     obj = obj.copyWith(
+      name: "test2",
       type: "found",
       about: "test2",
       breedID: 2,
@@ -208,7 +209,7 @@ void main() {
       createdBy: 2,
       id: 2,
       breed: "test",
-
+      createdByName: "test",
       companyCode: "test2",
       imageFilename: "test.png",
       petType: "dog",

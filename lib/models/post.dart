@@ -66,6 +66,7 @@ class PostModel {
     String? district,
     int? districtId,
     DateTime? createdOn,
+    String? createdByName,
     
   }) =>
       PostModel(
@@ -75,7 +76,7 @@ class PostModel {
         createdBy: createdBy ?? this.createdBy,
         id: id ?? this.id,
         type: type ?? this.type,
-        breed: type ?? this.breed,
+        breed: breed ?? this.breed,
         companyCode: companyCode ?? this.companyCode,
         imageFilename: imageFilename ?? this.imageFilename,
         petType: petType ?? this.petType,
@@ -83,6 +84,7 @@ class PostModel {
         district: district ?? this.district,
         districtId: districtId ?? this.districtId,
         createdOn: createdOn ?? this.createdOn,
+        createdByName: createdByName ?? this.createdByName,
 
       );
 
