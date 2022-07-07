@@ -192,7 +192,7 @@ class Http {
     var dio = _dio??Dio();
     try {
       
-      dio.options.headers["Connection"] ="Keep-Alive" ;
+      //dio.options.headers["Connection"] ="Keep-Alive" ;
       FormData body = FormData();
       var bytes = await imageFile.readAsBytes();
       final MultipartFile file = MultipartFile.fromBytes(bytes, filename: imageFile.name);

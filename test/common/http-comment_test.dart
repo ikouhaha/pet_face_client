@@ -19,10 +19,6 @@ import 'package:http_mock_adapter/http_mock_adapter.dart';
 
 void main() {
     const successMessage = {'message': 'Success'};
-  const errorMessage = {'message': 'error'};
-  const testPath = 'test';
-  const testData = {'data': 'sample data'};
-  const header = {'Content-Type': 'application/json'};
 
 
 
@@ -61,6 +57,143 @@ void main() {
      //await tester.pumpAndSettle();
 
   });
+
+  
+  test('test Http get message error', () async {
+      //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
+      var dio = Dio();
+    var dioAdapter = DioAdapter(dio: dio);
+     dio.httpClientAdapter = dioAdapter;
+    Http.setDio(dio:dio);
+    Http.setAutoPopup(autoPopup:false);
+     dioAdapter.onGet(
+      'https://example.com/test',
+      (request) {
+        return request.reply(500, {'message': 'error'});
+      },
+      data: null,
+      queryParameters: {},
+      headers: {},
+    );
+
+
+    try{
+      final response = await Http.get(url: "/test", authorization: "Bearer 12345",server: "https://example.com");
+    } on dynamic catch( e){
+      expect(e.message, "error");
+
+    }
+  });
+
+   test('test Http get 401 error', () async {
+      //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
+      var dio = Dio();
+    var dioAdapter = DioAdapter(dio: dio);
+     dio.httpClientAdapter = dioAdapter;
+    Http.setDio(dio:dio);
+    Http.setAutoPopup(autoPopup:false);
+     dioAdapter.onGet(
+      'https://example.com/test',
+      (request) {
+        return request.reply(401, {'message': 'error'},statusMessage: "Unauthorized");
+      },
+      data: null,
+      queryParameters: {},
+      headers: {},
+    );
+
+
+    try{
+      final response = await Http.get(url: "/test", authorization: "Bearer 12345",server: "https://example.com");
+    } on dynamic catch( e){
+      expect(e.message, 401);
+      // expect(e.message, "error");
+      
+    }
+  });
+
+  
+   test('test Http get data stack error', () async {
+      //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
+      var dio = Dio();
+    var dioAdapter = DioAdapter(dio: dio);
+     dio.httpClientAdapter = dioAdapter;
+    Http.setDio(dio:dio);
+    Http.setAutoPopup(autoPopup:false);
+     dioAdapter.onGet(
+      'https://example.com/test',
+      (request) {
+        return request.reply(500, {'stack': 'error'});
+      },
+      data: null,
+      queryParameters: {},
+      headers: {},
+    );
+
+
+    try{
+      final response = await Http.get(url: "/test", authorization: "Bearer 12345",server: "https://example.com");
+    } on dynamic catch( e){
+      expect(e.message, "error");
+      // expect(e.message, "error");
+      
+    }
+  });
+
+    test('test Http get data result error', () async {
+      //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
+      var dio = Dio();
+    var dioAdapter = DioAdapter(dio: dio);
+     dio.httpClientAdapter = dioAdapter;
+    Http.setDio(dio:dio);
+    Http.setAutoPopup(autoPopup:false);
+     dioAdapter.onGet(
+      'https://example.com/test',
+      (request) {
+        return request.reply(500, {'result': 'error'});
+      },
+      data: null,
+      queryParameters: {},
+      headers: {},
+    );
+
+
+    try{
+      final response = await Http.get(url: "/test", authorization: "Bearer 12345",server: "https://example.com");
+    } on dynamic catch( e){
+      expect(e.message, "error");
+      // expect(e.message, "error");
+      
+    }
+  });
+
+  test('test Http get data error', () async {
+      //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
+      var dio = Dio();
+    var dioAdapter = DioAdapter(dio: dio);
+     dio.httpClientAdapter = dioAdapter;
+    Http.setDio(dio:dio);
+    Http.setAutoPopup(autoPopup:false);
+     dioAdapter.onGet(
+      'https://example.com/test',
+      (request) {
+        return request.reply(500,"error");
+      },
+      data: null,
+      queryParameters: {},
+      headers: {},
+    );
+
+
+    try{
+      final response = await Http.get(url: "/test", authorization: "Bearer 12345",server: "https://example.com");
+    } on dynamic catch( e){
+      expect(e.message, "error");
+      // expect(e.message, "error");
+      
+    }
+  });
+
 
     test('test Http post', () async {
       //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
@@ -132,6 +265,32 @@ void main() {
 
    
     final response = await Http.delete(url: "/delete", authorization: "Bearer 12345",server: "https://httpbin.org");
+     expect(response.data, successMessage);
+     //await tester.pumpAndSettle();
+
+  });
+
+
+   test('test Http post Image', () async {
+      //await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
+    var img64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=";
+    var dio = Dio();
+    var dioAdapter = DioAdapter(dio: dio);
+     dio.httpClientAdapter = dioAdapter;
+    Http.setDio(dio:dio);
+    Http.setAutoPopup(autoPopup:false);
+     dioAdapter.onPost(
+      "https://pet-saver-aiapi.azurewebsites.net/detectBase64/0",
+      (request) {
+        return request.reply(200, successMessage,delay: const Duration(seconds: 1));
+      }
+    );
+
+    var file = XFile.fromData(base64Decode(img64));
+     
+     //await tester.pumpAndSettle();
+    final response = await Http.postImage(url: "/detectBase64/0",server: "https://pet-saver-aiapi.azurewebsites.net",name: "test"
+    ,imageFile: file);
      expect(response.data, successMessage);
      //await tester.pumpAndSettle();
 

@@ -59,7 +59,7 @@ dependencies:
   firebase_database: ^9.0.16
   firebase_remote_config: ^2.0.9
   intl: ^0.17.0
-  firebase_core_platform_interface: 4.4.3
+  #firebase_core_platform_interface: 4.4.3
   http_mock_adapter: ^0.3.3
   mockito: ^5.2.0
 

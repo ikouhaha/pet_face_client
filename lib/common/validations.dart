@@ -48,7 +48,7 @@ class Validations {
     return null;
   }
 
-   static String? validateInt(Int? value) {
+   static String? validateInt(int? value) {
      
      if (value == null) {
        
