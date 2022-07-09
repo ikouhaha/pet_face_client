@@ -15,6 +15,6 @@ return MaterialApp(
    
     await tester.pumpWidget(createWidgetForTesting(child: const Splash()));
 
-    await tester.pumpAndSettle();
+    await tester.pump();
   });
 }

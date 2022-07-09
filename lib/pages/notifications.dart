@@ -13,31 +13,35 @@ import 'package:pet_saver_client/models/user.dart';
 import 'package:pet_saver_client/router/route_state.dart';
 
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+  User? user;
+  FirebaseDatabase? database;
+   NotificationPage({Key? key,this.user,this.database}) : super(key: key);
 
   @override
   _NotificationPageState createState() => _NotificationPageState();
 }
 
 class _NotificationPageState extends State<NotificationPage> {
-  late FirebaseDatabase database;
+ 
+  
   DatabaseReference? notificationsListRef;
   UserModel? profile;
+
+   User? get user => widget.user ?? FirebaseAuth.instance.currentUser;
+   FirebaseDatabase? get database => widget.database ?? FirebaseDatabase.instanceFor(app: FirebaseDatabase.instance.app, databaseURL: Config.firebaseRDBUrl);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    database = FirebaseDatabase.instanceFor(
-        app: FirebaseDatabase.instance.app, databaseURL: Config.firebaseRDBUrl);
     profile = SharedPreferencesService.getProfile();
     if (profile?.role == "staff") {
-      notificationsListRef = database
+      notificationsListRef = database!
           .ref()
           .child("notifications")
           .child(profile?.companyCode.toString() ?? "");
     } else if (profile?.role == "user") {
-      notificationsListRef = database
+      notificationsListRef = database!
           .ref()
           .child("notifications")
           .child(profile?.id.toString() ?? "");
@@ -46,7 +50,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
+    if (user == null) {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }

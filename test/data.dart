@@ -2,6 +2,7 @@ class TestData {
 
   // static String apiServer = "https://pet-saver-api.azurewebsites.net/api/v1";
   // static String pythonApiServer = "https://pet-saver-aiapi.azurewebsites.net";
+    static var shortImage = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=";
     static var postList = [
     {
         "about": "asdasd",

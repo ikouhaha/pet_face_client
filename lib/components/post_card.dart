@@ -35,6 +35,14 @@ class _postCardState extends State<PostCard> {
     this._post = widget.profile;
   }
 
+   dynamic getImageProvider(){
+    if(!Config.isTest){
+      return NetworkImage(Config.apiServer + "/posts/image/${_post.id}");
+    }else{
+      return const AssetImage('assets/test.jpg');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -47,9 +55,7 @@ class _postCardState extends State<PostCard> {
               height: 150,
               child: PhotoView(
                 // customSize: Size(MediaQuery.of(context).size.width,150),
-                imageProvider:
-                    NetworkImage(Config.apiServer + "/posts/image/${_post.id}"),
-
+                imageProvider:getImageProvider(),
                 initialScale: PhotoViewComputedScale.contained,
               ),
             ),

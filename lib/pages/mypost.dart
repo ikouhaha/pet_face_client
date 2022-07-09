@@ -36,15 +36,14 @@ final _getDataProvider =
 });
 
 class PostPage extends ConsumerStatefulWidget {
-  const PostPage({
-    Key? key,
-  }) : super(key: key);
+  User? user;
+  PostPage({Key? key, this.user}) : super(key: key);
 
   @override
   _SettingScreenState createState() => _SettingScreenState();
 }
 
-class _SettingScreenState extends ConsumerState {
+class _SettingScreenState extends ConsumerState<PostPage> {
   //final _petname = FormController();
   final _name = FormController();
   final _editKeyForm = GlobalKey<FormState>();
@@ -103,9 +102,11 @@ class _SettingScreenState extends ConsumerState {
             ));
   }
 
+  User? get user => widget.user ?? FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
+    if (user == null) {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }
@@ -128,7 +129,13 @@ class _SettingScreenState extends ConsumerState {
           return Text("Error: ${err}");
         },
         data: (posts) {
-          print(posts);
+          // print(posts);
+          if (Config.isTest) {
+            Future.delayed(Duration(seconds: 5), () {
+              showConfirmDelete(posts[0]);
+            });
+          }
+
           return Scaffold(
               body: MasonryGridView.count(
             crossAxisCount: 2,

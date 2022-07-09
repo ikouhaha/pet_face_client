@@ -117,6 +117,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     DataFilter.reset();
     super.dispose();
     _filterKeyForm.currentState?.dispose();
+    // floatBtnOpen.dispose();
   }
 
   void controllersReset() {
@@ -582,11 +583,32 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   Widget _createButton() {
+    if (Config.isTest) {
+    
+      if (Config.testMode == "1") {
+        return FloatingActionButton(
+          onPressed: () {
+            filterAlert();
+          },
+          child: Icon(Icons.add),
+        );
+      } else if(Config.testMode == "2") {
+        return FloatingActionButton(
+          onPressed: () {
+            detectImageAlert().show();
+          },
+          child: Icon(Icons.add),
+        );
+      }
+    }
+
     return SpeedDial(
+        key: const Key("speedDial"),
         icon: Icons.search,
         backgroundColor: Colors.blue,
         children: [
           SpeedDialChild(
+            key: const Key('search'),
             foregroundColor: Colors.white,
             child: const Icon(Icons.list),
             label: 'filters',
@@ -596,6 +618,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             },
           ),
           SpeedDialChild(
+            key: const Key('detect'),
             foregroundColor: Colors.white,
             child: const Icon(Icons.filter),
             label: 'Detect loss pet',

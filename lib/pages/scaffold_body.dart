@@ -48,7 +48,7 @@ class BookstoreScaffoldBody extends StatelessWidget {
             child: SettingPage(),
           )
            else if (currentRoute.pathTemplate== '/mypost')
-          const FadeTransitionPage<void>(
+           FadeTransitionPage<void>(
             key: ValueKey('mypost'),
             child: PostPage(),
           )
