@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 
@@ -48,7 +47,7 @@ class AuthDropDownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem<String>> stringItems = [];
-    List<DropdownMenuItem<Int>> intItems = [];
+    List<DropdownMenuItem<int>> intItems = [];
     if( optionType==AuthDropDownFieldType.Int){
          options.forEach((Option options) {
       intItems.add(DropdownMenuItem(

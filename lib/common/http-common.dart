@@ -13,9 +13,11 @@ import 'package:pet_saver_client/providers/global_provider.dart';
 class Http {
   static Dio? _dio;
   static bool _autoPopup = true;
+  static bool _autoClose = true;
 
   static void setDio({Dio? dio}){
     _dio = dio;
+    _autoClose = false;
   }
   static void setAutoPopup({bool autoPopup = true}) {
     _autoPopup = autoPopup;
@@ -88,6 +90,7 @@ class Http {
 
       throw Exception(errorMsg);
     }finally{
+      if(_autoClose)
       dio.close();
     }
   }
@@ -119,6 +122,7 @@ class Http {
 
       throw Exception(errorMsg);
     }finally{
+      if(_autoClose)
       dio.close();
     }
   }
@@ -151,6 +155,7 @@ class Http {
 
       throw Exception(errorMsg);
     }finally{
+      if(_autoClose)
       dio.close();
     }
   }
@@ -183,6 +188,7 @@ class Http {
     
       throw Exception(errorMsg);
     }finally{
+      if(_autoClose)
       dio.close();
     }
   }
@@ -223,6 +229,7 @@ class Http {
       EasyLoading.showError(errorMsg);
       throw Exception(errorMsg);
     }finally{
+      if(_autoClose)
       dio.close();
     }
   }

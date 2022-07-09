@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,8 +48,12 @@ final _getDataProvider =
 });
 
 class EditPostPage extends ConsumerStatefulWidget {
-  const EditPostPage({
+  User? user;
+  String? pid;
+  EditPostPage({
     Key? key,
+    this.user,
+    this.pid
   }) : super(key: key);
 
   @override
@@ -129,10 +132,11 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
   // void _handleBookTapped(Book book) {
   //   _routeState.go('/book/${book.id}');
   // }
+  User? get user => widget.user??FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
+    if (user == null) {
       RouteStateScope.of(context).go("/signin");
       return Scaffold(
           appBar: AppBar(
@@ -141,7 +145,7 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
     }
     dogBreeds = [];
     catBreeds = [];
-    var paramId = RouteStateScope.of(context).route.parameters['id'];
+    var paramId = widget.pid??RouteStateScope.of(context).route.parameters['id'];
     if (paramId == null) {
       return Scaffold(
           appBar: AppBar(
@@ -408,24 +412,4 @@ class _PostScreenState extends ConsumerState<EditPostPage> {
   }
 }
 
-class _LogoutButton extends ConsumerWidget {
-  const _LogoutButton({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Consumer(
-      builder: (context, ref, child) {
-        // print("------status-----");
-        // print(state.status.isValidated);
 
-        return Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Text('Logout'),
-                disabledColor: Colors.blueAccent.withOpacity(0.6),
-                color: Colors.redAccent,
-                onPressed: () => ref.read(GlobalProvider).logout()));
-      },
-    );
-  }
-}

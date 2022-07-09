@@ -1,7 +1,6 @@
 // ignore_for_file: unused_import, avoid_print, non_constant_identifier_names, unused_element
 
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -371,24 +370,3 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
   }
 }
 
-class _LogoutButton extends ConsumerWidget {
-  const _LogoutButton({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Consumer(
-      builder: (context, ref, child) {
-        // print("------status-----");
-        // print(state.status.isValidated);
-
-        return Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: const Text('Logout'),
-                disabledColor: Colors.blueAccent.withOpacity(0.6),
-                color: Colors.redAccent,
-                onPressed: () => ref.read(GlobalProvider).logout()));
-      },
-    );
-  }
-}

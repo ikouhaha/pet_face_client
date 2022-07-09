@@ -24,7 +24,6 @@ class _BookstoreState extends State<App> {
   @override
   void initState() {
     /// Configure the parser with all of the app's allowed path templates.
-    /// var status = ref.watch(AuthenticationProvider);
     _routeParser = TemplateRouteParser(
       allowedPaths: [
         '/',

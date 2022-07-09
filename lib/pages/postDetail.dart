@@ -416,24 +416,3 @@ class _PostScreenState extends ConsumerState {
   }
 }
 
-class _LogoutButton extends ConsumerWidget {
-  const _LogoutButton({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Consumer(
-      builder: (context, ref, child) {
-        // print("------status-----");
-        // print(state.status.isValidated);
-
-        return Padding(
-            padding: EdgeInsets.only(top: 20),
-            child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                child: Text('Logout'),
-                disabledColor: Colors.blueAccent.withOpacity(0.6),
-                color: Colors.redAccent,
-                onPressed: () => ref.read(GlobalProvider).logout()));
-      },
-    );
-  }
-}

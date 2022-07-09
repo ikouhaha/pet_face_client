@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pet_saver_client/common/helper.dart';
 import 'package:pet_saver_client/common/http-common.dart';
 import 'package:pet_saver_client/common/sharePerfenceService.dart';
@@ -15,10 +14,6 @@ import 'package:pet_saver_client/components/auth_text_field.dart';
 import 'package:pet_saver_client/models/formController.dart';
 
 import 'package:pet_saver_client/models/user.dart';
-
-
-import 'package:pet_saver_client/providers/global_provider.dart';
-
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 

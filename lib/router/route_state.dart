@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:pet_saver_client/providers/navigator_provider.dart';
+
 
 import 'parsed_route.dart';
 import 'parser.dart';
