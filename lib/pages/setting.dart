@@ -9,15 +9,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
 class SettingPage extends ConsumerStatefulWidget {
-  const SettingPage({
+  User? user;
+  SettingPage({
     Key? key,
+    this.user,
   }) : super(key: key);
 
   @override
   _SettingScreenState createState() => _SettingScreenState();
 }
 
-class _SettingScreenState extends ConsumerState {
+
+class _SettingScreenState extends ConsumerState<SettingPage> {
  
   @override
   void initState() {
@@ -35,9 +38,11 @@ class _SettingScreenState extends ConsumerState {
   //   _routeState.go('/book/${book.id}');
   // }
 
+  User? get user => widget.user??FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
-      if (FirebaseAuth.instance.currentUser == null) {
+      if (user == null) {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }

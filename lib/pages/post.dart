@@ -46,8 +46,10 @@ final _getDataProvider = FutureProvider<PostLoadingData>((ref) async {
 });
 
 class CreatePostPage extends ConsumerStatefulWidget {
-  const CreatePostPage({
+  User? user;
+   CreatePostPage({
     Key? key,
+    this.user
   }) : super(key: key);
 
   @override
@@ -118,10 +120,12 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
   // void _handleBookTapped(Book book) {
   //   _routeState.go('/book/${book.id}');
   // }
+    User? get user => widget.user ?? FirebaseAuth.instance.currentUser;
+
 
   @override
   Widget build(BuildContext context) {
-    if (FirebaseAuth.instance.currentUser == null) {
+    if (user == null) {
       RouteStateScope.of(context).go("/signin");
       return Container();
     }

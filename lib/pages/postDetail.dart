@@ -29,16 +29,18 @@ final _getDataProvider =
 });
 
 class PostDetailPage extends ConsumerStatefulWidget {
-  const PostDetailPage({
+  User? user;
+  PostDetailPage({
     Key? key,
     String? id,
+    this.user,
   }) : super(key: key);
 
   @override
   _PostScreenState createState() => _PostScreenState();
 }
 
-class _PostScreenState extends ConsumerState {
+class _PostScreenState extends ConsumerState<PostDetailPage> {
   late FirebaseDatabase database;
   ScrollController _scrollController = new ScrollController();
   late DatabaseReference commentListRef;
@@ -66,7 +68,10 @@ class _PostScreenState extends ConsumerState {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    id = _routeState.route.parameters['id'].toString();
+    id =  _routeState.route.parameters['id'].toString();
+    if(Config.isTest){
+      id = "36";
+    }
     if (!isInitRef) {
       isInitRef = true;
       commentListRef = database.ref().child("comments").child(id);
@@ -82,12 +87,29 @@ class _PostScreenState extends ConsumerState {
   }
 
   RouteState get _routeState => RouteStateScope.of(context);
+   User? get user => widget.user ?? FirebaseAuth.instance.currentUser;
+
+   dynamic getImageProvider(post){
+    if(!Config.isTest){
+      return NetworkImage(Config.apiServer + "/posts/image/${post.id}");
+    }else{
+      return const AssetImage('assets/test.jpg');
+    }
+  }
+
+   dynamic getAvatarProvider(String avatar){
+    if(!Config.isTest){
+      return NetworkImage(avatar);
+    }else{
+      return const AssetImage('assets/test.jpg');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // commentListRef.push().set("asdasd");
 
-    if (FirebaseAuth.instance.currentUser == null) {
+    if (  user == null) {
       RouteStateScope.of(context).go("/signin");
       return Scaffold(
           appBar: AppBar(
@@ -95,6 +117,9 @@ class _PostScreenState extends ConsumerState {
       ));
     }
     var pid = _routeState.route.parameters['id'];
+     if(Config.isTest){
+      pid = "36";
+    }
     if (pid == null) {
       return Scaffold(
           appBar: AppBar(
@@ -221,7 +246,7 @@ class _PostScreenState extends ConsumerState {
           child: PhotoView(
             // customSize: Size(MediaQuery.of(context).size.width,150),
             imageProvider:
-                NetworkImage(Config.apiServer + "/posts/image/${post.id}"),
+                getImageProvider(post),
 
             initialScale: PhotoViewComputedScale.contained,
           ),
@@ -404,7 +429,7 @@ class _PostScreenState extends ConsumerState {
                       leading: comment.avatar == null
                           ? Icon(Icons.person)
                           : CircleAvatar(
-                              backgroundImage: NetworkImage(comment.avatar!)),
+                              backgroundImage: getAvatarProvider(comment.avatar!)),
                       enableFeedback: true,
                       trailing: trailing,
                     );

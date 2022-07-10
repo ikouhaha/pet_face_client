@@ -83,7 +83,7 @@ class _BookstoreNavigatorState extends State<MyNavigator> {
            if(pathTemplate=='/post/:id')
             MaterialPage<void>(
               key: _postKey,
-              child: const PostDetailPage(),
+              child:  PostDetailPage(),
             ),
             
            if(pathTemplate=='/edit/post/:id')

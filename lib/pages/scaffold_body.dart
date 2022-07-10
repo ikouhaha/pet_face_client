@@ -43,7 +43,7 @@ class BookstoreScaffoldBody extends StatelessWidget {
             
           )
         else if (currentRoute.pathTemplate== '/settings')
-          const FadeTransitionPage<void>(
+           FadeTransitionPage<void>(
             key: ValueKey('settings'),
             child: SettingPage(),
           )
@@ -53,7 +53,7 @@ class BookstoreScaffoldBody extends StatelessWidget {
             child: PostPage(),
           )
           else if (currentRoute.pathTemplate == '/new/post')
-          const FadeTransitionPage<void>(
+           FadeTransitionPage<void>(
             key: ValueKey('post'),
             child: CreatePostPage(),
           )
