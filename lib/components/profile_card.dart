@@ -53,7 +53,9 @@ class _ProfileCardState extends ConsumerState<ProfileCard> {
     _displayName.ct.addListener(() {
       _user = _user.copyWith(displayName: _displayName.ct.text);
     });
-
+    _companyCode.ct.addListener(() {
+      _user = _user.copyWith(companyCode: _companyCode.ct.text);
+    });
     // _email.ct.text = _user.email ?? "";
     _displayName.ct.text = _user.displayName ?? "";
     _companyCode.ct.text = _user.companyCode ?? "";
