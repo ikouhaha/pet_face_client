@@ -75,6 +75,7 @@ class _PostScreenState extends ConsumerState<CreatePostPage> {
     //_petType.ct.text = "cat"; //default value
     var profile = SharedPreferencesService.getProfile()!;
     post.createdBy = profile.id;
+    post.companyCode = profile.companyCode;
     _district.ct.addListener(() {
       int? value = int?.parse(_district.ct.text);
       post.districtId = value;
